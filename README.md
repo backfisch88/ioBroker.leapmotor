@@ -1,23 +1,46 @@
 # ioBroker.leapmotor
 
-[![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](https://github.com/YOUR_GITHUB/ioBroker.leapmotor)
+[![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](https://github.com/backfisch88/ioBroker.leapmotor)
 
-Leapmotor electric vehicle integration for ioBroker. Tested on T03.
+Unofficial Leapmotor electric vehicle integration for ioBroker. Tested on T03.
+
+## ⚠️ Important: Use a Second Account
+
+**Do not use your main Leapmotor account!**
+
+The adapter maintains a permanent session with the Leapmotor cloud. If the same account is used simultaneously in the Leapmotor app, both sessions will conflict and log each other out.
+
+**Recommended setup:**
+
+1. Create a second Leapmotor account (e.g. with a second email address)
+1. In the Leapmotor app → Vehicle Management → Share vehicle → grant the second account full rights
+1. Use the second account in the adapter configuration
+
+This way your main account stays logged in to the app at all times.
+
+-----
 
 ## Features
 
-- Vehicle status (SOC, range, temperature, tire pressure, GPS, doors, windows)
+- Vehicle status polling every 1–60 minutes (configurable)
+- Battery SOC, range, temperature, tire pressure, GPS, doors, windows
 - Remote control: climate (heat/cool/vent), lock/unlock, windows, trunk, find
 - Consumption statistics with weekly history
-- Dynamic vehicle dashboard (composite HTML with live status + controls)
+- Dynamic vehicle dashboard (composite HTML widget for VIS)
 - Automatic token refresh
 - Picture cache (downloaded once, stored locally)
 
-## Tested vehicles
+## Tested Vehicles
 
 - Leapmotor T03 ✅
 
 ## Installation
+
+```bash
+iobroker url https://github.com/backfisch88/ioBroker.leapmotor
+```
+
+Or manually:
 
 ```bash
 cd /opt/iobroker/node_modules
@@ -30,32 +53,60 @@ cd /opt/iobroker && iobroker add leapmotor --allow-root
 
 ## Configuration
 
-| Setting | Description |
-|---------|-------------|
-| Email | Leapmotor app email |
-| Password | Leapmotor app password |
-| Vehicle PIN | 4-digit PIN (for lock/unlock) |
-| Polling interval | Status update interval in minutes (default: 5) |
+|Setting         |Description                                                         |
+|----------------|--------------------------------------------------------------------|
+|Email           |Leapmotor account email (recommend using a dedicated second account)|
+|Password        |Leapmotor account password                                          |
+|Vehicle PIN     |4-digit vehicle PIN – required for all remote commands              |
+|Polling interval|Status update interval in minutes (default: 5)                      |
 
 ## Datapoints
 
 ```
-leapmotor.0.<VIN>.status.*           → Vehicle status (read-only)
-leapmotor.0.<VIN>.consumption.*      → Consumption & statistics (read-only)
-leapmotor.0.<VIN>.pictures.*         → Vehicle images (read-only)
+leapmotor.0.<VIN>.status.*                → Vehicle status (read-only)
+leapmotor.0.<VIN>.consumption.*           → Consumption & statistics (read-only)
+leapmotor.0.<VIN>.pictures.*              → Vehicle images (read-only)
 leapmotor.0.<VIN>.pictures.composite_html → Full dashboard HTML widget
-leapmotor.0.<VIN>.cmd.*              → Commands (writable)
+leapmotor.0.<VIN>.cmd.*                   → Commands (writable)
 ```
 
 ### VIS Dashboard Widget
 
-Add a **basic - string (unescaped)** widget in VIS:
-- Object ID: `leapmotor.0.<VIN>.pictures.composite_html`
+Add a **basic - string (unescaped)** widget in VIS and set the Object ID to:
 
-## Disclaimer
+```
+leapmotor.0.<VIN>.pictures.composite_html
+```
 
-Unofficial adapter based on reverse engineering. Use at your own risk.
+### Available Commands
+
+|Command                |Description                    |PIN required|
+|-----------------------|-------------------------------|:----------:|
+|cmd.ac_heiz            |Start heating                  |✅           |
+|cmd.ac_kuehl           |Start cooling                  |✅           |
+|cmd.ac_luft            |Start ventilation              |✅           |
+|cmd.ac_off             |Stop climate                   |✅           |
+|cmd.ac_temp            |Target temperature (16–30°C)   |–           |
+|cmd.defrost            |Windshield defrost             |✅           |
+|cmd.lock               |Lock vehicle                   |✅           |
+|cmd.unlock             |Unlock vehicle                 |✅           |
+|cmd.trunk_open         |Open trunk                     |✅           |
+|cmd.trunk_close        |Close trunk                    |✅           |
+|cmd.windows_open       |Open windows                   |–           |
+|cmd.windows_close      |Close windows                  |–           |
+|cmd.find               |Find vehicle (horn/lights)     |–           |
+|cmd.battery_preheat    |Battery preheat on             |✅           |
+|cmd.battery_preheat_off|Battery preheat off            |✅           |
+|cmd.refresh            |Trigger immediate status update|–           |
+
+## Legal Notice
+
+This adapter is **not affiliated with, endorsed by, or officially connected to Leapmotor** or any of its subsidiaries or affiliates.
+
+The adapter communicates with Leapmotor’s cloud API using credentials provided by the user. All trademarks, service marks, product names, and company names or logos mentioned are the property of their respective owners.
+
+Use at your own risk. The authors accept no liability for any damage, data loss, or other issues caused by the use of this software.
 
 ## License
 
-MIT © Henrik Schönhofen
+MIT © Henrik Schönhofen (backfisch88)
