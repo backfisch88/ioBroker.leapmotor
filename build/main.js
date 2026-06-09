@@ -388,8 +388,8 @@ class LeapmotorAdapter extends utils.Adapter{
         const tempState=await this.getStateAsync(`${vehicle.vin}.cmd.ac_temp`);
         const temp=String(tempState?.val??22);
         const ac=(mode,op)=>JSON.stringify({circle:'out',mode,operate:op,position:'all',temperature:temp,windlevel:'3',wshld:'0'});
-        const noPinCmds={'ac_kuehl':['170',ac('cold','manual')],'ac_heiz':['170',ac('hot','manual')],'ac_luft':['170',ac('wind','manual')],'ac_off':['170',ac('wind','off')],'defrost':['170',ac('wind','manual')],'find':['120','{}'],'battery_preheat':['190','{"operate":"on"}'],'battery_preheat_off':['190','{"operate":"off"}'],'windows_open':['230','{"value":"100"}'],'windows_close':['230','{"value":"0"}']};
-        const pinCmds={'lock':['110','{}'],'unlock':['110','{"operate":"unlock"}'],'trunk_open':['130','{"operate":"open"}'],'trunk_close':['130','{"operate":"close"}']};
+        const noPinCmds={'find':['120','{}'],'windows_open':['230','{"value":"100"}'],'windows_close':['230','{"value":"0"}']};
+        const pinCmds={'ac_kuehl':['170',ac('cold','manual')],'ac_heiz':['170',ac('hot','manual')],'ac_luft':['170',ac('wind','manual')],'ac_off':['170',ac('wind','off')],'defrost':['170',ac('wind','manual')],'battery_preheat':['190','{"operate":"on"}'],'battery_preheat_off':['190','{"operate":"off"}'],'lock':['110','{}'],'unlock':['110','{"operate":"unlock"}'],'trunk_open':['130','{"operate":"open"}'],'trunk_close':['130','{"operate":"close"}']};
         try{
             if(noPinCmds[cmd])await this.client.sendCommandWithoutPin(vehicle,...noPinCmds[cmd]);
             else if(pinCmds[cmd])await this.client.sendCommandWithPin(vehicle,...pinCmds[cmd]);
