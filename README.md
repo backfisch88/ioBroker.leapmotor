@@ -1,5 +1,7 @@
 # ioBroker.leapmotor
 
+![Logo](admin/leapmotor.png)
+
 [![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](https://github.com/backfisch88/ioBroker.leapmotor)
 
 Unofficial Leapmotor electric vehicle integration for ioBroker. Tested on T03.
