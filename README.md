@@ -13,8 +13,10 @@ The adapter maintains a permanent session with the Leapmotor cloud. If the same 
 **Recommended setup:**
 
 1. Create a second Leapmotor account (e.g. with a second email address)
-1. In the Leapmotor app → Vehicle Management → Share vehicle → grant the second account full rights
-1. Use the second account in the adapter configuration
+1. In the Leapmotor app, navigate to:
+   **Personal Center → My Vehicle → [Vehicle Name] → Shared Members → Add Shared Member**
+1. Enter the second account’s email and grant all rights
+1. Use the second account credentials in the adapter configuration
 
 This way your main account stays logged in to the app at all times.
 
