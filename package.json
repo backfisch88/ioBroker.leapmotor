@@ -1,0 +1,53 @@
+{
+  "name": "iobroker.leapmotor",
+  "version": "0.2.0",
+  "description": "Leapmotor vehicle integration for ioBroker",
+  "author": {
+    "name": "Henrik Sch\u00f6nhofen",
+    "email": "henrik.schoenhofen@gmx.de"
+  },
+  "homepage": "https://github.com/backfisch88/ioBroker.leapmotor",
+  "license": "MIT",
+  "keywords": [
+    "ioBroker",
+    "leapmotor",
+    "electric vehicle",
+    "EV",
+    "T03"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/backfisch88/ioBroker.leapmotor.git"
+  },
+  "dependencies": {
+    "@iobroker/adapter-core": "^3.0.0",
+    "adm-zip": "^0.5.17",
+    "axios": "^1.6.0",
+    "node-forge": "^1.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/node-forge": "^1.3.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "typescript": "^5.0.0"
+  },
+  "main": "build/main.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "watch": "tsc -p tsconfig.json --watch"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "ioBroker": {
+    "type": "general",
+    "adminTab": false,
+    "singleton": false,
+    "multiHost": false,
+    "words": "leapmotor"
+  },
+  "bugs": {
+    "url": "https://github.com/backfisch88/ioBroker.leapmotor/issues"
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "common": {
+    "name": "leapmotor",
+    "version": "0.2.0",
+    "news": {
+      "0.2.0": {
+        "en": "Full release: status, consumption, pictures, composite HTML dashboard",
+        "de": "Vollversion: Status, Verbrauch, Bilder, HTML-Dashboard"
+      },
+      "0.1.0": {
+        "en": "Initial release",
+        "de": "Erste Ver\u00f6ffentlichung"
+      }
+    },
+    "title": "Leapmotor",
+    "titleLang": {
+      "en": "Leapmotor Vehicle Integration",
+      "de": "Leapmotor Fahrzeug Integration"
+    },
+    "desc": {
+      "en": "Integrate Leapmotor electric vehicles into ioBroker. Supports status monitoring, remote control (climate, lock/unlock), and real-time updates.",
+      "de": "Integration von Leapmotor Elektrofahrzeugen in ioBroker. Unterst\u00fctzt Status\u00fcberwachung, Fernsteuerung (Klima, Ver-/Entriegeln) und Echtzeit-Updates."
+    },
+    "authors": [
+      "Henrik Sch\u00f6nhofen <henrik.schoenhofen@gmx.de>"
+    ],
+    "keywords": [
+      "leapmotor",
+      "electric vehicle",
+      "EV",
+      "T03"
+    ],
+    "license": "MIT",
+    "platform": "Javascript/Node.js",
+    "main": "build/main.js",
+    "icon": "leapmotor.png",
+    "enabled": true,
+    "readme": "https://github.com/backfisch88/ioBroker.leapmotor/blob/main/README.md",
+    "loglevel": "info",
+    "mode": "daemon",
+    "type": "general",
+    "connectionType": "cloud",
+    "dataSource": "push",
+    "adminUI": {
+      "config": "json"
+    }
+  },
+  "native": {
+    "email": "",
+    "password": "",
+    "operationPassword": "",
+    "pollingInterval": 5,
+    "language": "de"
+  },
+  "objects": [],
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "name": "Connection status",
+        "type": "boolean",
+        "role": "indicator.connected",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    }
+  ]
+}
