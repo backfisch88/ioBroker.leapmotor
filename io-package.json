@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "leapmotor",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "news": {
+      "0.2.1": {
+        "en": "Fix: logo size, protectedNative, encryptedNative",
+        "de": "Fix: Logo-Gr\u00f6\u00dfe, protectedNative, encryptedNative",
+        "ru": "\u0418\u0441\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438\u0435: \u0440\u0430\u0437\u043c\u0435\u0440 \u043b\u043e\u0433\u043e\u0442\u0438\u043f\u0430",
+        "pt": "Corre\u00e7\u00e3o: tamanho do logotipo",
+        "nl": "Fix: logo grootte",
+        "fr": "Correction: taille du logo",
+        "it": "Correzione: dimensione logo",
+        "es": "Correcci\u00f3n: tama\u00f1o del logo",
+        "pl": "Poprawka: rozmiar logo",
+        "uk": "\u0412\u0438\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u043d\u044f: \u0440\u043e\u0437\u043c\u0456\u0440 \u043b\u043e\u0433\u043e\u0442\u0438\u043f\u0443",
+        "zh-cn": "\u4fee\u590d\uff1a\u5fbd\u6807\u5927\u5c0f"
+      },
       "0.2.0": {
         "en": "Full release: status, consumption, pictures, composite HTML dashboard",
         "de": "Vollversion: Status, Verbrauch, Bilder, HTML-Dashboard",

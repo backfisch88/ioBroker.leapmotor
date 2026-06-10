@@ -1,14 +1,20 @@
 {
   "name": "iobroker.leapmotor",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Leapmotor electric vehicle integration for ioBroker",
   "author": {
-    "name": "Henrik Schönhofen",
+    "name": "Henrik Sch\u00f6nhofen",
     "email": "henrik.schoenhofen@gmx.de"
   },
   "homepage": "https://github.com/backfisch88/ioBroker.leapmotor",
   "license": "MIT",
-  "keywords": ["ioBroker", "leapmotor", "electric vehicle", "EV", "T03"],
+  "keywords": [
+    "ioBroker",
+    "leapmotor",
+    "electric vehicle",
+    "EV",
+    "T03"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/backfisch88/ioBroker.leapmotor.git"
