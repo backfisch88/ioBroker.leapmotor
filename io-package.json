@@ -37,6 +37,7 @@
     "enabled": true,
     "readme": "https://github.com/backfisch88/ioBroker.leapmotor/blob/main/README.md",
     "loglevel": "info",
+    "tier": 2,
     "mode": "daemon",
     "type": "general",
     "connectionType": "cloud",
