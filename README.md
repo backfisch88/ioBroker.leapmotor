@@ -1,8 +1,9 @@
-# ioBroker.leapmotor
-
 ![Logo](admin/leapmotor.png)
 
+# ioBroker.leapmotor
+
 [![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](https://github.com/backfisch88/ioBroker.leapmotor)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Unofficial Leapmotor electric vehicle integration for ioBroker. Tested on T03.
 
@@ -40,19 +41,10 @@ This way your main account stays logged in to the app at all times.
 
 ## Installation
 
+Install via ioBroker Admin UI or use:
+
 ```bash
 iobroker url https://github.com/backfisch88/ioBroker.leapmotor
-```
-
-Or manually:
-
-```bash
-cd /opt/iobroker/node_modules
-unzip ioBroker.leapmotor.zip
-mv iobroker-leapmotor iobroker.leapmotor
-chown -R iobroker:iobroker /opt/iobroker/node_modules/iobroker.leapmotor
-su iobroker -c "cd /opt/iobroker/node_modules/iobroker.leapmotor && npm install --production"
-cd /opt/iobroker && iobroker add leapmotor --allow-root
 ```
 
 ## Configuration
@@ -103,6 +95,19 @@ leapmotor.0.<VIN>.pictures.composite_html
 |cmd.battery_preheat_off|Battery preheat off            |✅           |
 |cmd.refresh            |Trigger immediate status update|–           |
 
+## Changelog
+
+### 0.2.0 (2026-06-10)
+
+- Full release: status, consumption, pictures, composite HTML dashboard
+- Automatic token refresh
+- Picture cache
+- All remote commands require PIN verification
+
+### 0.1.0 (2026-06-09)
+
+- Initial release
+
 ## Legal Notice
 
 This adapter is **not affiliated with, endorsed by, or officially connected to Leapmotor** or any of its subsidiaries or affiliates.
@@ -113,4 +118,6 @@ Use at your own risk. The authors accept no liability for any damage, data loss,
 
 ## License
 
-MIT © Henrik Schönhofen (backfisch88)
+MIT License
+
+Copyright (c) 2026 Henrik Schönhofen (backfisch88)
