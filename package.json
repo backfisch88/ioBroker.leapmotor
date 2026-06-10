@@ -38,7 +38,7 @@
     "watch": "tsc -p tsconfig.json --watch"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "ioBroker": {
     "type": "general",
