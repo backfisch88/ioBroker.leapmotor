@@ -114,3 +114,5 @@ Use at your own risk. The authors accept no liability for any damage, data loss,
 ## License
 
 MIT © Henrik Schönhofen (backfisch88)
+
+[Older changelogs can be found there](CHANGELOG_OLD.md)
