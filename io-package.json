@@ -5,61 +5,104 @@
     "news": {
       "0.2.0": {
         "en": "Full release: status, consumption, pictures, composite HTML dashboard",
-        "de": "Vollversion: Status, Verbrauch, Bilder, HTML-Dashboard"
+        "de": "Vollversion: Status, Verbrauch, Bilder, HTML-Dashboard",
+        "ru": "Полный выпуск: статус, потребление, изображения, HTML-панель",
+        "pt": "Versão completa: status, consumo, imagens, painel HTML",
+        "nl": "Volledige release: status, verbruik, afbeeldingen, HTML-dashboard",
+        "fr": "Version complète: statut, consommation, images, tableau de bord HTML",
+        "it": "Versione completa: stato, consumo, immagini, dashboard HTML",
+        "es": "Versión completa: estado, consumo, imágenes, panel HTML",
+        "pl": "Pełna wersja: status, zużycie, obrazy, panel HTML",
+        "uk": "Повний випуск: статус, споживання, зображення, HTML-панель",
+        "zh-cn": "完整版本：状态、消耗、图片、HTML仪表板"
       },
       "0.1.0": {
         "en": "Initial release",
-        "de": "Erste Ver\u00f6ffentlichung"
+        "de": "Erste Veröffentlichung",
+        "ru": "Первый выпуск",
+        "pt": "Lançamento inicial",
+        "nl": "Eerste release",
+        "fr": "Première version",
+        "it": "Prima versione",
+        "es": "Versión inicial",
+        "pl": "Pierwsze wydanie",
+        "uk": "Перший випуск",
+        "zh-cn": "初始版本"
       }
     },
-    "title": "Leapmotor",
     "titleLang": {
       "en": "Leapmotor Vehicle Integration",
-      "de": "Leapmotor Fahrzeug Integration"
+      "de": "Leapmotor Fahrzeug Integration",
+      "ru": "Интеграция автомобиля Leapmotor",
+      "pt": "Integração de veículo Leapmotor",
+      "nl": "Leapmotor Voertuig Integratie",
+      "fr": "Intégration véhicule Leapmotor",
+      "it": "Integrazione veicolo Leapmotor",
+      "es": "Integración de vehículo Leapmotor",
+      "pl": "Integracja pojazdu Leapmotor",
+      "uk": "Інтеграція транспортного засобу Leapmotor",
+      "zh-cn": "零跑汽车集成"
     },
     "desc": {
-      "en": "Integrate Leapmotor electric vehicles into ioBroker. Supports status monitoring, remote control (climate, lock/unlock), and real-time updates.",
-      "de": "Integration von Leapmotor Elektrofahrzeugen in ioBroker. Unterst\u00fctzt Status\u00fcberwachung, Fernsteuerung (Klima, Ver-/Entriegeln) und Echtzeit-Updates."
+      "en": "Integrate Leapmotor electric vehicles into ioBroker. Supports status monitoring, remote control and real-time updates.",
+      "de": "Integration von Leapmotor Elektrofahrzeugen in ioBroker. Unterstützt Statusüberwachung, Fernsteuerung und Echtzeit-Updates.",
+      "ru": "Интеграция электромобилей Leapmotor в ioBroker.",
+      "pt": "Integre veículos elétricos Leapmotor no ioBroker.",
+      "nl": "Integreer Leapmotor elektrische voertuigen in ioBroker.",
+      "fr": "Intégrez les véhicules électriques Leapmotor dans ioBroker.",
+      "it": "Integra i veicoli elettrici Leapmotor in ioBroker.",
+      "es": "Integra vehículos eléctricos Leapmotor en ioBroker.",
+      "pl": "Integruj pojazdy elektryczne Leapmotor z ioBroker.",
+      "uk": "Інтегруйте електромобілі Leapmotor в ioBroker.",
+      "zh-cn": "将零跑电动汽车集成到ioBroker中。"
     },
-    "authors": [
-      "Henrik Sch\u00f6nhofen <henrik.schoenhofen@gmx.de>"
-    ],
-    "keywords": [
-      "leapmotor",
-      "electric vehicle",
-      "EV",
-      "T03"
-    ],
-    "license": "MIT",
+    "authors": ["Henrik Schönhofen <henrik.schoenhofen@gmx.de>"],
+    "keywords": ["leapmotor", "electric vehicle", "EV", "T03"],
+    "licenseInformation": {
+      "license": "MIT",
+      "type": "free"
+    },
     "platform": "Javascript/Node.js",
-    "main": "build/main.js",
     "icon": "leapmotor.png",
+    "extIcon": "https://raw.githubusercontent.com/backfisch88/ioBroker.leapmotor/main/admin/leapmotor.png",
     "enabled": true,
     "readme": "https://github.com/backfisch88/ioBroker.leapmotor/blob/main/README.md",
     "loglevel": "info",
     "mode": "daemon",
-    "type": "general",
+    "type": "vehicle",
+    "tier": 3,
+    "compact": false,
     "connectionType": "cloud",
-    "dataSource": "push",
+    "dataSource": "poll",
     "adminUI": {
       "config": "json"
-    }
+    },
+    "dependencies": [
+      {
+        "js-controller": ">=6.0.11"
+      }
+    ],
+    "globalDependencies": [
+      {
+        "admin": ">=7.6.17"
+      }
+    ],
+    "protectedNative": ["password", "operationPassword"],
+    "encryptedNative": ["password", "operationPassword"]
   },
   "native": {
     "email": "",
     "password": "",
     "operationPassword": "",
     "pollingInterval": 5,
-    "language": "de"
+    "language": "en-GB"
   },
   "objects": [],
   "instanceObjects": [
     {
       "_id": "info",
       "type": "channel",
-      "common": {
-        "name": "Information"
-      },
+      "common": { "name": "Information" },
       "native": {}
     },
     {

@@ -4,46 +4,43 @@
     "email": {
       "type": "text",
       "label": "Leapmotor E-Mail",
-      "help": "Deine Leapmotor App E-Mail Adresse",
+      "help": "Use a dedicated second account (see README)",
       "newLine": true,
-      "sm": 12
+      "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12
     },
     "password": {
       "type": "password",
-      "label": "Passwort",
-      "help": "Dein Leapmotor App Passwort",
+      "label": "Password",
       "newLine": false,
-      "sm": 12
+      "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12
     },
     "operationPassword": {
       "type": "password",
-      "label": "Fahrzeug-PIN",
-      "help": "4-stelliger Fahrzeug-PIN (nur für Verriegeln/Entriegeln nötig)",
+      "label": "Vehicle PIN",
+      "help": "4-digit PIN required for all remote commands",
       "newLine": true,
-      "sm": 12
+      "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12
     },
     "pollingInterval": {
       "type": "number",
-      "label": "Abfrageintervall (Minuten)",
-      "help": "Wie oft der Fahrzeugstatus abgefragt wird (Minimum: 1)",
+      "label": "Polling interval (minutes)",
+      "help": "How often to fetch vehicle status (1-60)",
       "min": 1,
       "max": 60,
-      "def": 5,
       "newLine": true,
-      "sm": 6
+      "xs": 12, "sm": 6, "md": 6, "lg": 6, "xl": 6
     },
     "language": {
       "type": "select",
-      "label": "Sprache",
+      "label": "Language",
       "options": [
+        {"label": "English", "value": "en-GB"},
         {"label": "Deutsch", "value": "de"},
-        {"label": "English", "value": "en"},
         {"label": "Français", "value": "fr"},
         {"label": "Italiano", "value": "it"}
       ],
-      "def": "de",
       "newLine": false,
-      "sm": 6
+      "xs": 12, "sm": 6, "md": 6, "lg": 6, "xl": 6
     }
   }
 }
