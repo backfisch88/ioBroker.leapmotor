@@ -3,8 +3,8 @@
  * Tested on T03 with EU gateway: appgateway.leapmotor-international.de
  */
 
-import * as crypto from 'crypto';
-import * as https from 'https';
+import * as crypto from 'node:crypto';
+import * as https from 'node:https';
 import * as forge from 'node-forge';
 import axios, { AxiosInstance } from 'axios';
 import {

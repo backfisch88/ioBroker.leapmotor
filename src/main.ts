@@ -5,8 +5,8 @@
 
 import * as utils from '@iobroker/adapter-core';
 import { LeapmotorClient, Vehicle } from './leapmotor-client';
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 
 const CERT_DIR     = path.join(__dirname, '..', 'certs');
 const PICTURE_CACHE = path.join(__dirname, '..', 'pictures_cache.json');
