@@ -32,7 +32,6 @@
     ],
     "license": "MIT",
     "platform": "Javascript/Node.js",
-    "main": "build/main.js",
     "icon": "leapmotor.png",
     "enabled": true,
     "readme": "https://github.com/backfisch88/ioBroker.leapmotor/blob/main/README.md",
