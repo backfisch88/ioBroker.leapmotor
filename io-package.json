@@ -9,7 +9,7 @@
       },
       "0.1.0": {
         "en": "Initial release",
-        "de": "Erste Ver\u00f6ffentlichung"
+        "de": "Erste Veröffentlichung"
       }
     },
     "title": "Leapmotor",
@@ -19,10 +19,10 @@
     },
     "desc": {
       "en": "Integrate Leapmotor electric vehicles into ioBroker. Supports status monitoring, remote control (climate, lock/unlock), and real-time updates.",
-      "de": "Integration von Leapmotor Elektrofahrzeugen in ioBroker. Unterst\u00fctzt Status\u00fcberwachung, Fernsteuerung (Klima, Ver-/Entriegeln) und Echtzeit-Updates."
+      "de": "Integration von Leapmotor Elektrofahrzeugen in ioBroker. Unterstützt Statusüberwachung, Fernsteuerung (Klima, Ver-/Entriegeln) und Echtzeit-Updates."
     },
     "authors": [
-      "Henrik Sch\u00f6nhofen <henrik.schoenhofen@gmx.de>"
+      "Henrik Schönhofen <henrik.schoenhofen@gmx.de>"
     ],
     "keywords": [
       "leapmotor",
@@ -43,7 +43,12 @@
     "dataSource": "push",
     "adminUI": {
       "config": "json"
-    }
+    },
+    "globalDependencies": [
+      {
+        "admin": ">=7.8.23"
+      }
+    ]
   },
   "native": {
     "email": "",

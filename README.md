@@ -114,3 +114,9 @@ Use at your own risk. The authors accept no liability for any damage, data loss,
 ## License
 
 MIT © Henrik Schönhofen (backfisch88)
+
+## Changelog
+
+### **WORK IN PROGRESS**
+- (ioBroker-Bot) Adapter requires admin >= 7.8.23 now.
+
