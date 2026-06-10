@@ -1,6 +1,7 @@
 # Changelog
 
 ## **WORK IN PROGRESS**
+- No changes yet
 
 ## 0.2.1 (2026-06-10)
 - Fix: logo size, protectedNative, encryptedNative
