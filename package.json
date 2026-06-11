@@ -51,7 +51,10 @@
     "watch": "tsc -p tsconfig.json --watch",
     "lint": "echo \"No linting configured\"",
     "test": "echo \"No tests configured\"",
-    "release": "release-script"
+    "release": "release-script",
+    "test:package": "echo \"No package tests configured\"",
+    "test:unit": "echo \"No unit tests configured\"",
+    "test:integration": "echo \"No integration tests configured\""
   },
   "engines": {
     "node": ">=22"
