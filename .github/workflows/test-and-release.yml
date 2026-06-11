@@ -19,47 +19,34 @@ jobs:
   check-and-lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@v4
+      - uses: ioBroker/testing-action-check@v1
         with:
-          node-version: 24.x
-      - run: npm install --production
-      - name: Verify build files
-        run: |
-          test -f build/main.js
-          test -f build/leapmotor-client.js
-          test -f build/leapmotor-crypto.js
-          echo "All build files present ✓"
+          node-version: '22.x'
+          lint: false
+          type-check: false
 
   adapter-tests:
     needs: check-and-lint
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [20.x, 22.x, 24.x]
+        node-version: [22.x, 24.x]
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@v4
+      - uses: ioBroker/testing-action-adapter@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm install --production
-      - name: Run basic validation
-        run: |
-          node -e "require('./build/leapmotor-crypto.js'); console.log('crypto OK')"
-          node -e "require('./build/leapmotor-client.js'); console.log('client OK')"
-          echo "Validation passed ✓"
+          build: false
 
   deploy:
     needs: adapter-tests
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@v4
+      - uses: ioBroker/testing-action-deploy@v1
         with:
-          node-version: 24.x
-          registry-url: 'https://registry.npmjs.org'
-      - run: npm install --production
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          node-version: '22.x'
+          npm-token: ${{ secrets.NPM_TOKEN }}
+          build: false
