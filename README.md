@@ -106,24 +106,19 @@ This adapter is **not affiliated with, endorsed by, or officially connected to L
 
 Use at your own risk. The authors accept no liability for any damage caused by the use of this software.
 
+## Changelog
+
+### 0.2.1 (2026-06-10)
+- Fix: release script, logo size, workflow improvements
+
+### 0.2.0 (2026-06-10)
+- Full release: status, consumption, pictures, composite HTML dashboard
+- Automatic token refresh
+- Picture cache
+- All remote commands require PIN verification
+
 ## License
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 MIT License
 
 Copyright (c) 2026 Henrik Schönhofen (backfisch88)
-=======
-MIT © Henrik Schönhofen (backfisch88)
-
-[Older changelogs can be found there](CHANGELOG_OLD.md)
->>>>>>> pr-4
-=======
-MIT © Henrik Schönhofen (backfisch88)
-
-## Changelog
-
-### **WORK IN PROGRESS**
-- (ioBroker-Bot) Adapter requires admin >= 7.8.23 now.
-
->>>>>>> pr-11
