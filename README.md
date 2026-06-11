@@ -109,6 +109,7 @@ Use at your own risk. The authors accept no liability for any damage caused by t
 ## License
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 MIT License
 
 Copyright (c) 2026 Henrik Schönhofen (backfisch88)
@@ -117,3 +118,12 @@ MIT © Henrik Schönhofen (backfisch88)
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 >>>>>>> pr-4
+=======
+MIT © Henrik Schönhofen (backfisch88)
+
+## Changelog
+
+### **WORK IN PROGRESS**
+- (ioBroker-Bot) Adapter requires admin >= 7.8.23 now.
+
+>>>>>>> pr-11
