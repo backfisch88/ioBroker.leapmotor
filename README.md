@@ -2,7 +2,7 @@
 
 # ioBroker.leapmotor
 
-[![Version](https://img.shields.io/badge/version-0.2.1-blue.svg)](https://github.com/backfisch88/ioBroker.leapmotor)
+[![Version](https://img.shields.io/badge/version-0.2.2-blue.svg)](https://github.com/backfisch88/ioBroker.leapmotor)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Unofficial Leapmotor electric vehicle integration for ioBroker. Tested on T03.
@@ -91,6 +91,9 @@ leapmotor.0.<VIN>.pictures.composite_html
 
 ## Changelog
 
+### 0.2.2 (2026-06-11)
+- Fix: workflow, test scripts
+
 ### 0.2.1 (2026-06-10)
 - Fix: release script, logo size, workflow improvements
 
@@ -107,6 +110,9 @@ This adapter is **not affiliated with, endorsed by, or officially connected to L
 Use at your own risk. The authors accept no liability for any damage caused by the use of this software.
 
 ## Changelog
+
+### 0.2.2 (2026-06-11)
+- Fix: workflow, test scripts
 
 ### 0.2.1 (2026-06-10)
 - Fix: release script, logo size, workflow improvements
