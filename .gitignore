@@ -3,4 +3,3 @@ pictures_cache.json
 *.log
 .DS_Store
 .commitinfo
-build/
