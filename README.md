@@ -90,12 +90,10 @@ leapmotor.0.<VIN>.pictures.composite_html
 | cmd.refresh | Trigger immediate status update | – |
 
 ## Changelog
-
-### **WORK IN PROGRESS**
+### 0.2.5 (2026-06-12)
 - fix: use dynamic vehicle name from API in HTML dashboard
 - fix: remove debug log messages
 
-
 ### 0.2.4 (2026-06-12)
 - Fix: GitHub release permissions in workflow
 
@@ -107,39 +105,6 @@ leapmotor.0.<VIN>.pictures.composite_html
 
 ### 0.2.1 (2026-06-10)
 - Fix: release script, logo size, workflow improvements
-
-### 0.2.0 (2026-06-10)
-- Full release: status, consumption, pictures, composite HTML dashboard
-- Automatic token refresh
-- Picture cache
-- All remote commands require PIN verification
-
-## Legal Notice
-
-This adapter is **not affiliated with, endorsed by, or officially connected to Leapmotor** or any of its subsidiaries or affiliates.
-
-Use at your own risk. The authors accept no liability for any damage caused by the use of this software.
-
-## Changelog
-
-
-### 0.2.4 (2026-06-12)
-- Fix: GitHub release permissions in workflow
-
-### 0.2.3 (2026-06-12)
-- Fix: add missing news entries
-
-### 0.2.2 (2026-06-11)
-- Fix: workflow, test scripts
-
-### 0.2.1 (2026-06-10)
-- Fix: release script, logo size, workflow improvements
-
-### 0.2.0 (2026-06-10)
-- Full release: status, consumption, pictures, composite HTML dashboard
-- Automatic token refresh
-- Picture cache
-- All remote commands require PIN verification
 
 ## License
 

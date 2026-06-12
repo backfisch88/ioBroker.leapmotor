@@ -1,102 +1,115 @@
 {
   "common": {
     "name": "leapmotor",
-    "version": "0.2.4",
+    "version": "0.2.5",
     "news": {
+      "0.2.5": {
+        "en": "fix: use dynamic vehicle name from API in HTML dashboard\nfix: remove debug log messages",
+        "de": "fix: Verwenden des dynamischen Fahrzeugnamens von API im HTML-Dashboard\nfix: debug-log-nachrichten entfernen",
+        "ru": "исправление: используйте динамическое имя автомобиля из API в панели инструментов HTML\nисправить: удалить сообщения журнала отладки",
+        "pt": "correção: use o nome do veículo dinâmico da API no painel HTML\ncorrigir: remover mensagens de registro de depuração",
+        "nl": "fix: gebruik dynamische voertuignaam van API in HTML dashboard\nfix: verwijder debuglogberichten",
+        "fr": "correction: utiliser le nom dynamique du véhicule de l'API dans le tableau de bord HTML\ncorrection : supprimer les messages de débogage",
+        "it": "fix: utilizzare il nome del veicolo dinamico da API in dashboard HTML\ncorrezione: rimuovere i messaggi di registro del debug",
+        "es": "fijar: utilizar el nombre dinámico del vehículo de API en el panel HTML\nfijación: eliminar mensajes de registro de depuración",
+        "pl": "fix: użyj dynamicznej nazwy pojazdu z API w desce rozdzielczej HTML\nfix: usuń wiadomości z dziennika debugowania",
+        "uk": "виправити: використовувати динамічну назву транспортного засобу від API в панелі інструментів HTML\nвиправити: видалити повідомлення з'єднання",
+        "zh-cn": "固定 : 在 HTML 仪表板中使用来自 API 的动态车名\n固定: 删除调试日志消息"
+      },
       "0.2.1": {
         "en": "Fix: release script, logo size, workflow improvements",
-        "de": "Fix: Release-Script, Logo-Gr\u00f6\u00dfe, Workflow-Verbesserungen",
-        "ru": "\u0418\u0441\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438\u0435: \u0441\u043a\u0440\u0438\u043f\u0442 \u0432\u044b\u043f\u0443\u0441\u043a\u0430, \u0440\u0430\u0437\u043c\u0435\u0440 \u043b\u043e\u0433\u043e\u0442\u0438\u043f\u0430",
-        "pt": "Corre\u00e7\u00e3o: script de lan\u00e7amento, tamanho do logotipo",
+        "de": "Fix: Release-Script, Logo-Größe, Workflow-Verbesserungen",
+        "ru": "Исправление: скрипт выпуска, размер логотипа",
+        "pt": "Correção: script de lançamento, tamanho do logotipo",
         "nl": "Fix: release script, logo grootte",
         "fr": "Correction: script de version, taille du logo",
         "it": "Correzione: script di rilascio, dimensione logo",
-        "es": "Correcci\u00f3n: script de lanzamiento, tama\u00f1o del logo",
+        "es": "Corrección: script de lanzamiento, tamaño del logo",
         "pl": "Poprawka: skrypt wydania, rozmiar logo",
-        "uk": "\u0412\u0438\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u043d\u044f: \u0441\u043a\u0440\u0438\u043f\u0442 \u0432\u0438\u043f\u0443\u0441\u043a\u0443, \u0440\u043e\u0437\u043c\u0456\u0440 \u043b\u043e\u0433\u043e\u0442\u0438\u043f\u0443",
-        "zh-cn": "\u4fee\u590d\uff1a\u53d1\u5e03\u811a\u672c\u3001\u5fbd\u6807\u5927\u5c0f"
+        "uk": "Виправлення: скрипт випуску, розмір логотипу",
+        "zh-cn": "修复：发布脚本、徽标大小"
       },
       "0.2.0": {
         "en": "Full release: status, consumption, pictures, composite HTML dashboard",
         "de": "Vollversion: Status, Verbrauch, Bilder, HTML-Dashboard",
-        "ru": "\u041f\u043e\u043b\u043d\u044b\u0439 \u0432\u044b\u043f\u0443\u0441\u043a: \u0441\u0442\u0430\u0442\u0443\u0441, \u043f\u043e\u0442\u0440\u0435\u0431\u043b\u0435\u043d\u0438\u0435, \u0438\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u044f, HTML-\u043f\u0430\u043d\u0435\u043b\u044c",
-        "pt": "Vers\u00e3o completa: status, consumo, imagens, painel HTML",
+        "ru": "Полный выпуск: статус, потребление, изображения, HTML-панель",
+        "pt": "Versão completa: status, consumo, imagens, painel HTML",
         "nl": "Volledige release: status, verbruik, afbeeldingen, HTML-dashboard",
-        "fr": "Version compl\u00e8te: statut, consommation, images, tableau de bord HTML",
+        "fr": "Version complète: statut, consommation, images, tableau de bord HTML",
         "it": "Versione completa: stato, consumo, immagini, dashboard HTML",
-        "es": "Versi\u00f3n completa: estado, consumo, im\u00e1genes, panel HTML",
-        "pl": "Pe\u0142na wersja: status, zu\u017cycie, obrazy, panel HTML",
-        "uk": "\u041f\u043e\u0432\u043d\u0438\u0439 \u0432\u0438\u043f\u0443\u0441\u043a: \u0441\u0442\u0430\u0442\u0443\u0441, \u0441\u043f\u043e\u0436\u0438\u0432\u0430\u043d\u043d\u044f, \u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u043d\u044f, HTML-\u043f\u0430\u043d\u0435\u043b\u044c",
-        "zh-cn": "\u5b8c\u6574\u7248\u672c\uff1a\u72b6\u6001\u3001\u6d88\u8017\u3001\u56fe\u7247\u3001HTML\u4eea\u8868\u677f"
+        "es": "Versión completa: estado, consumo, imágenes, panel HTML",
+        "pl": "Pełna wersja: status, zużycie, obrazy, panel HTML",
+        "uk": "Повний випуск: статус, споживання, зображення, HTML-панель",
+        "zh-cn": "完整版本：状态、消耗、图片、HTML仪表板"
       },
       "0.2.2": {
         "en": "Fix: workflow, test scripts, package-lock sync",
         "de": "Fix: Workflow, Test-Scripts, package-lock Sync",
-        "ru": "\u0418\u0441\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438\u0435: \u0440\u0430\u0431\u043e\u0447\u0438\u0439 \u043f\u0440\u043e\u0446\u0435\u0441\u0441",
-        "pt": "Corre\u00e7\u00e3o: fluxo de trabalho",
+        "ru": "Исправление: рабочий процесс",
+        "pt": "Correção: fluxo de trabalho",
         "nl": "Fix: workflow",
         "fr": "Correction: workflow",
         "it": "Correzione: workflow",
-        "es": "Correcci\u00f3n: workflow",
+        "es": "Corrección: workflow",
         "pl": "Poprawka: workflow",
-        "uk": "\u0412\u0438\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u043d\u044f: \u0440\u043e\u0431\u043e\u0447\u0438\u0439 \u043f\u0440\u043e\u0446\u0435\u0441",
-        "zh-cn": "\u4fee\u590d\uff1a\u5de5\u4f5c\u6d41\u7a0b"
+        "uk": "Виправлення: робочий процес",
+        "zh-cn": "修复：工作流程"
       },
       "0.2.3": {
         "en": "Fix: add missing news entries",
-        "de": "Fix: fehlende News-Eintr\u00e4ge hinzugef\u00fcgt",
-        "ru": "\u0418\u0441\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438\u0435",
-        "pt": "Corre\u00e7\u00e3o",
+        "de": "Fix: fehlende News-Einträge hinzugefügt",
+        "ru": "Исправление",
+        "pt": "Correção",
         "nl": "Fix",
         "fr": "Correction",
         "it": "Correzione",
-        "es": "Correcci\u00f3n",
+        "es": "Corrección",
         "pl": "Poprawka",
-        "uk": "\u0412\u0438\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u043d\u044f",
-        "zh-cn": "\u4fee\u590d"
+        "uk": "Виправлення",
+        "zh-cn": "修复"
       },
       "0.2.4": {
         "en": "Fix: GitHub release permissions in workflow",
         "de": "Fix: GitHub Release Berechtigungen im Workflow",
-        "ru": "\u0418\u0441\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438\u0435",
-        "pt": "Corre\u00e7\u00e3o",
+        "ru": "Исправление",
+        "pt": "Correção",
         "nl": "Fix",
         "fr": "Correction",
         "it": "Correzione",
-        "es": "Correcci\u00f3n",
+        "es": "Corrección",
         "pl": "Poprawka",
-        "uk": "\u0412\u0438\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u043d\u044f",
-        "zh-cn": "\u4fee\u590d"
+        "uk": "Виправлення",
+        "zh-cn": "修复"
       }
     },
     "titleLang": {
       "en": "Leapmotor Vehicle Integration",
       "de": "Leapmotor Fahrzeug Integration",
-      "ru": "\u0418\u043d\u0442\u0435\u0433\u0440\u0430\u0446\u0438\u044f \u0430\u0432\u0442\u043e\u043c\u043e\u0431\u0438\u043b\u044f Leapmotor",
-      "pt": "Integra\u00e7\u00e3o de ve\u00edculo Leapmotor",
+      "ru": "Интеграция автомобиля Leapmotor",
+      "pt": "Integração de veículo Leapmotor",
       "nl": "Leapmotor Voertuig Integratie",
-      "fr": "Int\u00e9gration v\u00e9hicule Leapmotor",
+      "fr": "Intégration véhicule Leapmotor",
       "it": "Integrazione veicolo Leapmotor",
-      "es": "Integraci\u00f3n de veh\u00edculo Leapmotor",
+      "es": "Integración de vehículo Leapmotor",
       "pl": "Integracja pojazdu Leapmotor",
-      "uk": "\u0406\u043d\u0442\u0435\u0433\u0440\u0430\u0446\u0456\u044f \u0442\u0440\u0430\u043d\u0441\u043f\u043e\u0440\u0442\u043d\u043e\u0433\u043e \u0437\u0430\u0441\u043e\u0431\u0443 Leapmotor",
-      "zh-cn": "\u96f6\u8dd1\u6c7d\u8f66\u96c6\u6210"
+      "uk": "Інтеграція транспортного засобу Leapmotor",
+      "zh-cn": "零跑汽车集成"
     },
     "desc": {
       "en": "Integrate Leapmotor electric vehicles into ioBroker. Supports status monitoring, remote control and real-time updates.",
-      "de": "Integration von Leapmotor Elektrofahrzeugen in ioBroker. Unterst\u00fctzt Status\u00fcberwachung, Fernsteuerung und Echtzeit-Updates.",
-      "ru": "\u0418\u043d\u0442\u0435\u0433\u0440\u0430\u0446\u0438\u044f \u044d\u043b\u0435\u043a\u0442\u0440\u043e\u043c\u043e\u0431\u0438\u043b\u0435\u0439 Leapmotor \u0432 ioBroker.",
-      "pt": "Integre ve\u00edculos el\u00e9tricos Leapmotor no ioBroker.",
+      "de": "Integration von Leapmotor Elektrofahrzeugen in ioBroker. Unterstützt Statusüberwachung, Fernsteuerung und Echtzeit-Updates.",
+      "ru": "Интеграция электромобилей Leapmotor в ioBroker.",
+      "pt": "Integre veículos elétricos Leapmotor no ioBroker.",
       "nl": "Integreer Leapmotor elektrische voertuigen in ioBroker.",
-      "fr": "Int\u00e9grez les v\u00e9hicules \u00e9lectriques Leapmotor dans ioBroker.",
+      "fr": "Intégrez les véhicules électriques Leapmotor dans ioBroker.",
       "it": "Integra i veicoli elettrici Leapmotor in ioBroker.",
-      "es": "Integra veh\u00edculos el\u00e9ctricos Leapmotor en ioBroker.",
+      "es": "Integra vehículos eléctricos Leapmotor en ioBroker.",
       "pl": "Integruj pojazdy elektryczne Leapmotor z ioBroker.",
-      "uk": "\u0406\u043d\u0442\u0435\u0433\u0440\u0443\u0439\u0442\u0435 \u0435\u043b\u0435\u043a\u0442\u0440\u043e\u043c\u043e\u0431\u0456\u043b\u0456 Leapmotor \u0432 ioBroker.",
-      "zh-cn": "\u5c06\u96f6\u8dd1\u7535\u52a8\u6c7d\u8f66\u96c6\u6210\u5230ioBroker\u4e2d\u3002"
+      "uk": "Інтегруйте електромобілі Leapmotor в ioBroker.",
+      "zh-cn": "将零跑电动汽车集成到ioBroker中。"
     },
     "authors": [
-      "Henrik Sch\u00f6nhofen <henrik.schoenhofen@gmx.de>"
+      "Henrik Schönhofen <henrik.schoenhofen@gmx.de>"
     ],
     "keywords": [
       "leapmotor",
