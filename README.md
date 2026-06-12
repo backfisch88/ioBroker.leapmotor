@@ -91,6 +91,9 @@ leapmotor.0.<VIN>.pictures.composite_html
 
 ## Changelog
 
+### **WORK IN PROGRESS**
+
+
 ### 0.2.4 (2026-06-12)
 - Fix: GitHub release permissions in workflow
 
@@ -116,6 +119,9 @@ This adapter is **not affiliated with, endorsed by, or officially connected to L
 Use at your own risk. The authors accept no liability for any damage caused by the use of this software.
 
 ## Changelog
+
+### **WORK IN PROGRESS**
+
 
 ### 0.2.4 (2026-06-12)
 - Fix: GitHub release permissions in workflow
