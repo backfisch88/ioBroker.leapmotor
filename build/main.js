@@ -68,7 +68,7 @@ class LeapmotorAdapter extends utils.Adapter{
             const s=await this.client.getVehicleStatus(vehicle);
             await this.writeStatusStates(vehicle.vin,s);
             this.log.debug(`${vehicle.vin}: SOC=${s.soc}% Range=${s.expectedMileage}km`);
-            await this.buildCompositeHtml(vehicle.vin,s);
+            await this.buildCompositeHtml(vehicle.vin,s,vehicle.name);
         }catch(e){
             const msg=String(e);
             if(msg.includes('ungültig')||msg.includes('Token')||msg.includes('401')){throw e;}
@@ -150,7 +150,7 @@ class LeapmotorAdapter extends utils.Adapter{
 
     // ── Composite HTML ───────────────────────────────────────
 
-    async buildCompositeHtml(vin,s){
+    async buildCompositeHtml(vin,s,vehicleName){
         // Bilder aus Cache lesen
         let pics={};
         try{
@@ -260,7 +260,7 @@ class LeapmotorAdapter extends utils.Adapter{
             <div style="padding:12px 14px 0;display:flex;justify-content:space-between;align-items:flex-end">
                 <div>
                     <div style="font-size:9px;color:${C.textDim};letter-spacing:0.25em;text-transform:uppercase;margin-bottom:2px">LEAPMOTOR T03</div>
-                    <div style="font-size:20px;font-weight:800;color:${C.text}">Kn&ouml;psel</div>
+                    <div style="font-size:20px;font-weight:800;color:${C.text}">${vehicleName||vin}</div>
                 </div>
                 <div style="text-align:right">
                     <div style="font-size:9px;color:${C.textDim};letter-spacing:0.15em;margin-bottom:2px">AKKUSTAND</div>
