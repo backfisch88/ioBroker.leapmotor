@@ -120,8 +120,6 @@ Use at your own risk. The authors accept no liability for any damage caused by t
 
 ## Changelog
 
-### **WORK IN PROGRESS**
-
 
 ### 0.2.4 (2026-06-12)
 - Fix: GitHub release permissions in workflow
