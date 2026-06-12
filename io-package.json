@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "leapmotor",
-    "version": "0.2.6",
+    "version": "0.2.7",
     "news": {
       "0.2.5": {
         "en": "fix: use dynamic vehicle name from API in HTML dashboard\nfix: remove debug log messages",
@@ -84,6 +84,19 @@
       "0.2.6": {
         "en": "Fix: npm publishing workflow",
         "de": "Fix: npm Ver\u00f6ffentlichungs-Workflow",
+        "ru": "\u0418\u0441\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438\u0435",
+        "pt": "Corre\u00e7\u00e3o",
+        "nl": "Fix",
+        "fr": "Correction",
+        "it": "Correzione",
+        "es": "Correcci\u00f3n",
+        "pl": "Poprawka",
+        "uk": "\u0412\u0438\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u043d\u044f",
+        "zh-cn": "\u4fee\u590d"
+      },
+      "0.2.7": {
+        "en": "Fix: npm token in workflow",
+        "de": "Fix: npm Token im Workflow",
         "ru": "\u0418\u0441\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438\u0435",
         "pt": "Corre\u00e7\u00e3o",
         "nl": "Fix",
