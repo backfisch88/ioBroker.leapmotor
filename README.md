@@ -92,6 +92,8 @@ leapmotor.0.<VIN>.pictures.composite_html
 ## Changelog
 
 ### **WORK IN PROGRESS**
+- fix: use dynamic vehicle name from API in HTML dashboard
+- fix: remove debug log messages
 
 
 ### 0.2.4 (2026-06-12)
