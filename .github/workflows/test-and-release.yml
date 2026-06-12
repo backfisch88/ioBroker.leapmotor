@@ -51,4 +51,5 @@ jobs:
       - uses: ioBroker/testing-action-deploy@v1
         with:
           node-version: '24.x'
+          npm-token: ${{ secrets.NPM_TOKEN }}
           build: false
