@@ -1,9 +1,9 @@
 {
   "name": "iobroker.leapmotor",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Leapmotor electric vehicle integration for ioBroker",
   "author": {
-    "name": "Henrik Schönhofen",
+    "name": "Henrik Sch\u00f6nhofen",
     "email": "henrik.schoenhofen@gmx.de"
   },
   "homepage": "https://github.com/backfisch88/ioBroker.leapmotor",
