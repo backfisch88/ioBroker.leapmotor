@@ -160,7 +160,8 @@
     "connectionType": "cloud",
     "dataSource": "poll",
     "adminUI": {
-      "config": "json"
+      "config": "json",
+      "tab": "html"
     },
     "dependencies": [
       {
@@ -171,7 +172,16 @@
       {
         "admin": ">=7.6.20"
       }
-    ]
+    ],
+    "adminTab": {
+      "singleton": true,
+      "name": {
+        "en": "Leapmotor",
+        "de": "Leapmotor"
+      },
+      "link": "tab/index_m.html",
+      "icon": "leapmotor.png"
+    }
   },
   "native": {
     "email": "",

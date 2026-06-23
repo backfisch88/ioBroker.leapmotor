@@ -1,25 +1,24 @@
 'use strict';
 const utils=require('@iobroker/adapter-core');
 const {LeapmotorClient}=require('./leapmotor-client');
-const fs=require('fs');
-const path=require('path');
+const fs=require('node:fs');
+const path=require('node:path');
 const CERT_DIR=path.join(__dirname,'..','certs');
 const PICTURE_CACHE=path.join(__dirname,'..','pictures_cache.json');
 
-// ── Farben für composite_html ────────────────────────────────
 const C={
-    bg:'#070d1a', bg2:'#0d1520', border:'#1e2d45',
-    text:'#c8ddf0', textDim:'#2a4060',
-    accent:'#00d4ff', green:'#00ff88', yellow:'#ffcc00',
-    red:'#ff4444', orange:'#ff9900',
-    heat:'#ff6644', cool:'#00d4ff', vent:'#7c6aff',
-    carBg1:'#111f35', carBg2:'#070d1a',
+    bg:'#070d1a',bg2:'#0d1520',border:'#1e2d45',
+    text:'#c8ddf0',textDim:'#2a4060',
+    accent:'#00d4ff',green:'#00ff88',yellow:'#ffcc00',
+    red:'#ff4444',orange:'#ff9900',
+    heat:'#ff6644',cool:'#00d4ff',vent:'#7c6aff',
+    carBg1:'#111f35',carBg2:'#070d1a',
 };
 
 class LeapmotorAdapter extends utils.Adapter{
     constructor(options={}){
         super({...options,name:'leapmotor'});
-        this.client=null;this.vehicles=[];this.pollTimer=null;this.isPolling=false;
+        this.client=null;this.vehicles=[];this.pollTimer=null;this.isPolling=false;this.pictureCache={};this.lastStatus={};
         this.on('ready',this.onReady.bind(this));
         this.on('stateChange',this.onStateChange.bind(this));
         this.on('unload',this.onUnload.bind(this));
@@ -28,37 +27,49 @@ class LeapmotorAdapter extends utils.Adapter{
     async onReady(){
         this.setState('info.connection',false,true);
         const cfg=this.config;
-        if(!cfg.email||!cfg.password){this.log.error('E-Mail und Passwort müssen konfiguriert sein!');return}
+        if(!cfg.email||!cfg.password){this.log.error('Email and password must be configured!');return}
         let appCertPem,appKeyPem;
         try{appCertPem=fs.readFileSync(path.join(CERT_DIR,'app.crt'),'utf8');appKeyPem=fs.readFileSync(path.join(CERT_DIR,'app.key'),'utf8')}
-        catch(e){this.log.error(`Zertifikate nicht gefunden: ${e}`);return}
+        catch(e){this.log.error(`Certificates not found: ${e}`);return}
         this.client=new LeapmotorClient({username:cfg.email,password:cfg.password,appCertPem,appKeyPem,operationPassword:cfg.operationPassword||undefined,language:cfg.language||'en-GB'});
-        try{this.log.info('Verbinde mit Leapmotor Cloud...');await this.client.login();this.log.info('Login erfolgreich.');this.setState('info.connection',true,true)}
-        catch(e){this.log.error(`Login fehlgeschlagen: ${e}`);return}
+        try{this.log.debug(`Adapter config: language=${cfg.language||'en-GB'}, polling=${cfg.pollingInterval||5}min, pin=${cfg.operationPassword?'set':'NOT SET'}`);
+        this.log.info('Connecting to Leapmotor cloud...');await this.client.login();this.log.info('Login successful.');this.setState('info.connection',true,true)}
+        catch(e){this.log.error(`Login failed: ${e}`);return}
         try{
             this.vehicles=await this.client.getVehicleList();
-            this.log.info(`${this.vehicles.length} Fahrzeug(e) gefunden.`);
-            for(const v of this.vehicles){this.log.info(`  → ${v.name} (${v.carType}) VIN: ${v.vin}`);await this.createVehicleObjects(v);await this.subscribeStatesAsync(`${v.vin}.cmd.*`)}
-        }catch(e){this.log.error(`Fahrzeugliste fehlgeschlagen: ${e}`);return}
+            this.log.info(`Found ${this.vehicles.length} vehicle(s).`);
+            for(const v of this.vehicles){
+                this.log.info(`  → ${v.name} (${v.carType}) VIN: ${v.vin}`);
+                await this.createVehicleObjects(v);
+                await this.subscribeStatesAsync(`${v.vin}.cmd.*`);
+                // Write info datapoints
+                await this.setStateAsync(`${v.vin}.info.name`,{val:v.name,ack:true});
+                await this.setStateAsync(`${v.vin}.info.vin`,{val:v.vin,ack:true});
+                await this.setStateAsync(`${v.vin}.info.model`,{val:v.carType,ack:true});
+                if(v.year)await this.setStateAsync(`${v.vin}.info.year`,{val:v.year,ack:true});
+                
+                if(v.rudder)await this.setStateAsync(`${v.vin}.info.rudder`,{val:v.rudder,ack:true});
+                if(v.allocationCode)await this.setStateAsync(`${v.vin}.info.allocation_code`,{val:v.allocationCode,ack:true});
+            }
+        }catch(e){this.log.error(`Vehicle list failed: ${e}`);return}
         await this.pollAll();
         for(const v of this.vehicles)await this.updatePictures(v);
         const interval=Math.max(1,cfg.pollingInterval||5)*60*1000;
         this.pollTimer=setInterval(()=>this.pollAll(),interval);
-        this.log.info(`Polling alle ${cfg.pollingInterval||5} Minuten.`);
+        this.log.info(`Polling every ${cfg.pollingInterval||5} minutes.`);
     }
 
     async pollAll(){
         if(this.isPolling||!this.client)return;
         this.isPolling=true;
-        try{
-            for(const v of this.vehicles)await this.updateVehicleStatus(v);
-        }catch(e){
+        try{for(const v of this.vehicles)await this.updateVehicleStatus(v);}
+        catch(e){
             const msg=String(e);
             if(msg.includes('ungültig')||msg.includes('Token')||msg.includes('401')){
-                this.log.debug('Token abgelaufen – re-login...');
-                try{await this.client.login();this.log.debug('Re-Login erfolgreich.');for(const v of this.vehicles)await this.updateVehicleStatus(v);}
-                catch(e2){this.log.error('Re-Login fehlgeschlagen: '+e2);}
-            }else{this.log.warn('Polling Fehler: '+e);}
+                this.log.debug('Token expired – re-login...');
+                try{await this.client.login();this.log.debug('Re-login successful.');for(const v of this.vehicles)await this.updateVehicleStatus(v);}
+                catch(e2){this.log.error('Re-login failed: '+e2);}
+            }else{this.log.warn('Polling error: '+e);}
         }finally{this.isPolling=false;}
     }
 
@@ -67,14 +78,126 @@ class LeapmotorAdapter extends utils.Adapter{
         try{
             const s=await this.client.getVehicleStatus(vehicle);
             await this.writeStatusStates(vehicle.vin,s);
-            this.log.debug(`${vehicle.vin}: SOC=${s.soc}% Range=${s.expectedMileage}km`);
+            const pollTime=new Date().toLocaleString('de-DE',{timeZone:'Europe/Berlin'});
+            await this.setStateAsync(`${vehicle.vin}.status.last_poll_time`,{val:pollTime,ack:true});
+            try{await this.updateDailyMileage(vehicle.vin,s.totalMileage)}catch(e){this.log.debug(`Daily mileage error: ${e}`)}
+            try{await this.updateTripDetection(vehicle.vin,s.totalMileage,s.speed,s.soc)}catch(e){this.log.debug(`Trip detection error: ${e}`)}
+            this.log.debug(`${vehicle.vin}: SOC=${s.soc}% Range=${s.expectedMileage}km Temp=${s.outdoorTemp}°C Locked=${s.driverDoorLockStatus} AC=${s.acSwitch}`);
             await this.buildCompositeHtml(vehicle.vin,s,vehicle.name);
         }catch(e){
             const msg=String(e);
             if(msg.includes('ungültig')||msg.includes('Token')||msg.includes('401')){throw e;}
-            this.log.warn('Status Fehler '+vehicle.vin+': '+e);
+            this.log.warn('Status error '+vehicle.vin+': '+e);
         }
-        try{await this.updateConsumption(vehicle)}catch(e){this.log.warn(`Verbrauch Fehler: ${e}`)}
+        try{await this.updateConsumption(vehicle)}catch(e){this.log.warn(`Consumption error: ${e}`)}
+        const lastScheduleCheck=this._lastScheduleCheck||0;
+        if(Date.now()-lastScheduleCheck>300000){
+            this._lastScheduleCheck=Date.now();
+            try{await this.updateSchedules(vehicle)}catch(e){this.log.warn(`Schedule status error: ${e}`)}
+        }
+        try{await this.updateMessages()}catch(e){this.log.warn(`Messages error: ${e}`)}
+    }
+
+    async updateDailyMileage(vin,totalMileage){
+        if(totalMileage==null)return;
+        const today=new Date().toISOString().slice(0,10);
+        const stateId=`${vin}.trips.daily_km_json`;
+        const cur=await this.getStateAsync(stateId);
+        let history=[];
+        try{history=JSON.parse(cur?.val||'[]')}catch{history=[]}
+
+        let todayEntry=history.find(h=>h.date===today);
+        if(!todayEntry){
+            todayEntry={date:today,startMileage:totalMileage,km:0};
+            history.push(todayEntry);
+            history=history.slice(-30);
+        }else{
+            todayEntry.km=Math.max(0,totalMileage-todayEntry.startMileage);
+        }
+
+        await this.setStateAsync(stateId,{val:JSON.stringify(history),ack:true});
+        await this.setStateAsync(`${vin}.trips.today_km`,{val:todayEntry.km,ack:true});
+    }
+
+    async updateTripDetection(vin,totalMileage,speed,soc){
+        if(totalMileage==null)return;
+        const isDriving=speed!=null&&speed>0;
+        if(!this._tripStates)this._tripStates={};
+        const prev=this._tripStates[vin]||{wasActive:false,startMileage:null,startTime:null,startSoc:null};
+
+        if(isDriving&&!prev.wasActive){
+            this._tripStates[vin]={wasActive:true,startMileage:totalMileage,startTime:Date.now(),startSoc:soc};
+            await this.setStateAsync(`${vin}.trips.current_trip_active`,{val:true,ack:true});
+            this.log.debug(`Trip started at ${totalMileage}km`);
+        }else if(!isDriving&&prev.wasActive){
+            const km=Math.max(0,totalMileage-(prev.startMileage??totalMileage));
+            const durationMin=Math.round((Date.now()-(prev.startTime??Date.now()))/60000);
+            const socUsed=prev.startSoc!=null&&soc!=null?Math.max(0,prev.startSoc-soc):null;
+            if(km>=0.5){
+                const trip={
+                    date:new Date(prev.startTime).toISOString().slice(0,10),
+                    startTime:new Date(prev.startTime).toLocaleString('de-DE',{timeZone:'Europe/Berlin'}),
+                    endTime:new Date().toLocaleString('de-DE',{timeZone:'Europe/Berlin'}),
+                    km:Math.round(km*10)/10,
+                    durationMin,
+                    socUsed,
+                };
+                const stateId=`${vin}.trips.history_json`;
+                const cur=await this.getStateAsync(stateId);
+                let history=[];
+                try{history=JSON.parse(cur?.val||'[]')}catch{history=[]}
+                history.push(trip);
+                history=history.slice(-50);
+                await this.setStateAsync(stateId,{val:JSON.stringify(history),ack:true});
+                this.log.debug(`Trip ended: ${trip.km}km in ${durationMin}min`);
+            }
+            this._tripStates[vin]={wasActive:false,startMileage:null,startTime:null,startSoc:null};
+            await this.setStateAsync(`${vin}.trips.current_trip_active`,{val:false,ack:true});
+        }
+    }
+
+    async updateMessages(){
+        if(!this.client)return;
+        try{
+            const list=await this.client.getMessageList(1,10);
+            const messages=list.list||list.messages||[];
+            const unread=messages.filter(m=>m.readFlag===false||m.readFlag===0||m.read_flag===false||m.read_flag===0).length;
+            await this.setStateAsync('messages.unread_count',{val:unread,ack:true});
+            if(messages.length>0){
+                const latest=messages[0];
+                const time=latest.sendTime?new Date(Number(latest.sendTime)).toLocaleString('de-DE',{timeZone:'Europe/Berlin'}):'';
+                await this.setStateAsync('messages.latest_title',{val:latest.title||'',ack:true});
+                await this.setStateAsync('messages.latest_text',{val:latest.message||latest.content||'',ack:true});
+                await this.setStateAsync('messages.latest_time',{val:time,ack:true});
+            }
+            await this.setStateAsync('messages.json',{val:JSON.stringify(messages),ack:true});
+        }catch(e){this.log.debug(`Message list error: ${e}`)}
+    }
+
+    async updateSchedules(vehicle){
+        if(!this.client)return;
+        const vin=vehicle.vin;
+        try{
+            const climateData=await this.client.getAppointment(vehicle,'171');
+            const controls=climateData?.controls||[];
+            const active=controls.length>0&&controls.some(c=>c.on==='1'||c.on===1);
+            const dayNames=['So','Mo','Di','Mi','Do','Fr','Sa'];
+            const info=controls.length>0?controls.map(c=>{
+                const time=(c.start_time||'').split(' ')[1]||'';
+                const timeShort=time.slice(0,5);
+                const days=Array.isArray(c.days)?c.days.map(d=>dayNames[d]||d).join(', '):'täglich';
+                return `${c.mode} ${c.temperature}°C @ ${timeShort} (${days})`;
+            }).join(', '):'';
+            await this.setStateAsync(`${vin}.status.climate_schedule_active`,{val:active,ack:true});
+            await this.setStateAsync(`${vin}.status.climate_schedule_info`,{val:info,ack:true});
+        }catch(e){this.log.debug(`Climate schedule status error: ${e}`)}
+        try{
+            const chargeData=await this.client.getAppointment(vehicle,'190');
+            const active=chargeData&&Number(chargeData.chargeEnable)===1;
+            const info=chargeData?`${chargeData.starttime||''}-${chargeData.endtime||''} (${chargeData.chargesoc||''}%)`:'';
+            await this.setStateAsync(`${vin}.status.charge_schedule_active`,{val:!!active,ack:true});
+            await this.setStateAsync(`${vin}.status.charge_schedule_info`,{val:info,ack:true});
+        }catch(e){this.log.debug(`Charge schedule status error: ${e}`)}
     }
 
     async updateConsumption(vehicle){
@@ -83,23 +206,24 @@ class LeapmotorAdapter extends utils.Adapter{
         try{
             const m=await this.client.getMileageEnergyDetail(vehicle);
             const d=m.data||{};
-            await this.ensureAndSet(`${vin}.consumption.mileage_total_km`,d.totalmileage,'number','km','Gesamtkilometer');
-            await this.ensureAndSet(`${vin}.consumption.delivery_days`,d.deliveryDays,'number','Tage','Liefertage');
-        }catch(e){this.log.warn('Mileage Fehler: '+e)}
+            await this.ensureAndSet(`${vin}.consumption.mileage_total_km`,d.totalmileage,'number','km','Total Mileage');
+            await this.ensureAndSet(`${vin}.consumption.mileage_total_miles`,d.totalmileageMile,'string','mi','Total Mileage (miles)');
+            await this.ensureAndSet(`${vin}.consumption.delivery_days`,d.deliveryDays,'number','days','Days since Delivery');
+        }catch(e){this.log.debug(`Mileage error: ${e}`)}
         try{
             const w=await this.client.getConsumptionWeeklyRank(vehicle);
             const d=w.data||{};
             const rank=d.rankResult||d.rank||{};
-            await this.ensureAndSet(`${vin}.consumption.kwh_100km`,rank.hundredKmEC||rank.hundredKmEc||rank.hundred_km_ec,'number','kWh/100km','Ø Verbrauch');
-            await this.ensureAndSet(`${vin}.consumption.rank`,rank.rank,'string','','Ranking');
+            await this.ensureAndSet(`${vin}.consumption.kwh_100km`,rank.hundredKmEC||rank.hundredKmEc,'number','kWh/100km','Avg. Consumption');
+            await this.ensureAndSet(`${vin}.consumption.rank`,rank.rank,'string','','Efficiency Rank');
             const weekly=d.weeklyEC||d.weekly||[];
             for(let i=0;i<weekly.length;i++){
                 const wb=`${vin}.consumption.week_${i+1}`;
-                await this.ensureAndSet(`${wb}.week_start`,weekly[i].weekStart||weekly[i].week_start,'string','','Start');
-                await this.ensureAndSet(`${wb}.week_end`,weekly[i].weekEnd||weekly[i].week_end,'string','','Ende');
-                await this.ensureAndSet(`${wb}.kwh_100km`,weekly[i].hundredKmEC||weekly[i].hundredKmEc||weekly[i].hundred_km_ec,'number','kWh/100km','Verbrauch');
+                await this.ensureAndSet(`${wb}.week_start`,weekly[i].weekStart,'string','','Week Start');
+                await this.ensureAndSet(`${wb}.week_end`,weekly[i].weekEnd,'string','','Week End');
+                await this.ensureAndSet(`${wb}.kwh_100km`,weekly[i].hundredKmEC||weekly[i].hundredKmEc,'number','kWh/100km','Consumption');
             }
-        }catch(e){this.log.warn('Weekly Fehler: '+e)}
+        }catch(e){this.log.debug(`Weekly error: ${e}`)}
     }
 
     async ensureAndSet(id,val,type,unit,name){
@@ -108,23 +232,21 @@ class LeapmotorAdapter extends utils.Adapter{
         await this.setStateAsync(id,{val,ack:true});
     }
 
-    // ── Fahrzeugbilder ───────────────────────────────────────
-
     async updatePictures(vehicle){
         if(!this.client)return;
         const vin=vehicle.vin;
         let cache={};
         try{if(fs.existsSync(PICTURE_CACHE))cache=JSON.parse(fs.readFileSync(PICTURE_CACHE,'utf8'))}catch{}
         if(cache[vin]&&Object.keys(cache[vin]).length>0){
-            this.log.info(`${vin}: Bilder aus Cache (${Object.keys(cache[vin]).length} Bilder)`);
-            await this.writePictures(vin,cache[vin]);
-            return;
+            this.pictureCache[vin]=cache[vin];
+            this.log.info(`${vin}: Pictures from cache (${Object.keys(cache[vin]).length})`);
+            await this.writePictures(vin,cache[vin]);return;
         }
         try{
             const keyResp=await this.client.getCarPictureKey(vehicle);
             const key=(keyResp.data||{}).key;
-            if(!key){this.log.warn('Kein Bild-Key');return}
-            this.log.info(`${vin}: Lade Fahrzeugbilder...`);
+            if(!key){this.log.warn('No picture key');return}
+            this.log.info(`${vin}: Downloading vehicle pictures...`);
             const zipBuf=await this.client.downloadCarPictureZip(key);
             const AdmZip=require('adm-zip');
             const zip=new AdmZip(zipBuf);
@@ -137,38 +259,59 @@ class LeapmotorAdapter extends utils.Adapter{
             });
             cache[vin]=pics;
             fs.writeFileSync(PICTURE_CACHE,JSON.stringify(cache));
-            this.log.info(`${vin}: ${Object.keys(pics).length} Bilder gecacht`);
+            this.pictureCache[vin]=pics;
+            this.log.info(`${vin}: ${Object.keys(pics).length} pictures cached`);
             await this.writePictures(vin,pics);
-        }catch(e){this.log.warn('Bilder Fehler: '+e);}
+        }catch(e){this.log.warn('Pictures error: '+e);}
     }
 
     async writePictures(vin,pics){
         for(const[name,data]of Object.entries(pics)){
-            await this.ensureAndSet(`${vin}.pictures.${name}`,data,'string','','Bild: '+name);
+            await this.ensureAndSet(`${vin}.pictures.${name}`,data,'string','','Picture: '+name);
         }
     }
 
-    // ── Composite HTML ───────────────────────────────────────
+    _t(lang,key){
+        const t={
+            'OUTDOOR':    {'de':'AUSSEN',   'fr':'EXTÉRIEUR','it':'ESTERNO','es':'EXTERIOR','nl':'BUITEN'},
+            'RANGE':      {'de':'REICHWEITE','fr':'AUTONOMIE','it':'AUTONOMIA','es':'AUTONOMÍA','nl':'BEREIK'},
+            'STATUS':     {'de':'STATUS',   'fr':'STATUT',   'it':'STATO',   'es':'ESTADO',  'nl':'STATUS'},
+            'CHARGING':   {'de':'LADEN',    'fr':'CHARGE',   'it':'CARICA',  'es':'CARGA',   'nl':'LADEN'},
+            'DOORS':      {'de':'TÜREN',    'fr':'PORTES',   'it':'PORTE',   'es':'PUERTAS', 'nl':'DEUREN'},
+            'LOCK':       {'de':'SCHLOSS',  'fr':'VERROUILLAGE','it':'BLOCCO','es':'CERRADURA','nl':'SLOT'},
+            'Parked':     {'de':'Geparkt',  'fr':'Garé',     'it':'Parcheggiato','es':'Aparcado','nl':'Geparkeerd'},
+            'BATTERY':    {'de':'AKKU',     'fr':'BATTERIE', 'it':'BATTERIA','es':'BATERÍA', 'nl':'BATTERIJ'},
+            'LOCKED':     {'de':'GESPERRT', 'fr':'VERROUILLÉ','it':'BLOCCATO','es':'BLOQUEADO','nl':'VERGRENDELD'},
+            'CHARGING2':  {'de':'LÄDT',     'fr':'EN CHARGE','it':'IN CARICA','es':'CARGANDO','nl':'LADEN'},
+            'CLIMATE':    {'de':'KLIMA',    'fr':'CLIMAT',   'it':'CLIMA',   'es':'CLIMA',   'nl':'KLIMAAT'},
+            'WINDOWS':    {'de':'FENSTER',  'fr':'FENÊTRES', 'it':'FINESTRE','es':'VENTANAS','nl':'RAMEN'},
+            'Open':       {'de':'Offen',    'fr':'Ouvert',   'it':'Aperto',  'es':'Abierto', 'nl':'Open'},
+            'Closed':     {'de':'Zu',       'fr':'Fermé',    'it':'Chiuso',  'es':'Cerrado', 'nl':'Gesloten'},
+            'Heat':       {'de':'Heizung',  'fr':'Chauffage','it':'Riscaldamento','es':'Calefacción','nl':'Verwarming'},
+            'Cool':       {'de':'Kühlung',  'fr':'Refroidissement','it':'Raffreddamento','es':'Refrigeración','nl':'Koeling'},
+            'Vent':       {'de':'Lüftung',  'fr':'Ventilation','it':'Ventilazione','es':'Ventilación','nl':'Ventilatie'},
+            'Off':        {'de':'Aus',      'fr':'Arrêt',    'it':'Spento',  'es':'Apagado', 'nl':'Uit'},
+            'Target Temp':{'de':'Zieltemp.','fr':'Temp. cible','it':'Temp. target','es':'Temp. objetivo','nl':'Doeltemp.'},
+            'Lock':       {'de':'Sperren',  'fr':'Verrouiller','it':'Bloccare','es':'Bloquear','nl':'Vergrendelen'},
+            'Unlock':     {'de':'Öffnen',   'fr':'Déverrouiller','it':'Sbloccare','es':'Desbloquear','nl':'Ontgrendelen'},
+            'Refresh':    {'de':'Refresh',  'fr':'Actualiser','it':'Aggiorna','es':'Actualizar','nl':'Vernieuwen'},
+        };
+        const l=lang?lang.split('-')[0]:'en';
+        return (t[key]&&t[key][l])||key;
+    }
 
     async buildCompositeHtml(vin,s,vehicleName){
-        // Bilder aus Cache lesen
-        let pics={};
-        try{
-            let cache={};
-            if(fs.existsSync(PICTURE_CACHE))cache=JSON.parse(fs.readFileSync(PICTURE_CACHE,'utf8'));
-            pics=cache[vin]||{};
-        }catch{}
+        // Reines, animiertes Fahrzeugbild als eigenstaendiges HTML-Snippet.
+        // Gedacht zum direkten Einbetten in VIS oder andere Visualisierungen
+        // (z.B. per iframe-Widget), OHNE Dashboard-Buttons oder Statuswerte -
+        // die liefert das React Admin-Tab. Animationslogik identisch zur
+        // Lade-Animation in VehicleImage.jsx.
+        const pics=this.pictureCache[vin]||{};
         if(!pics['carpic_for_tripsum']&&!pics['carpic_body'])return;
-
-        const soc=s.soc||0;
-        const socColor=soc>50?C.green:soc>20?C.yellow:C.red;
         const anyDoor=s.lbcmDriverDoorStatus||s.rbcmDriverDoorStatus||s.lbcmLeftRearDoorStatus||s.rbcmRightRearDoorStatus;
         const anyOpen=anyDoor||s.bbcmBackDoorStatus;
-        const windowOpen=(s.leftFrontWindowPercent>0)||(s.rightFrontWindowPercent>0)||(s.leftRearWindowPercent>0)||(s.rightRearWindowPercent>0);
         const charging=s.chargeState!=null&&[1,2,3].includes(s.chargeState);
         const plugged=s.chargeState>0;
-
-        // Bild-Layer
         const lay='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;';
         const layers=[];
         if(!anyOpen&&!charging&&!plugged){
@@ -183,10 +326,7 @@ class LeapmotorAdapter extends utils.Adapter{
             if(s.bbcmBackDoorStatus)layers.push(pics['carpic_tailgate_open']||'');
             if(plugged||charging)layers.push(pics['carpic_charge_open']||'');
         }
-
         let imgTags=layers.filter(Boolean).map(src=>`<img src="${src}" style="${lay}">`).join('');
-
-        // Ladeanimation CSS
         if(charging){
             const n=15,dur=0.12,total=(n*dur).toFixed(2);
             const pOn=(1/n*100).toFixed(1),pOff=(2/n*100).toFixed(1);
@@ -199,173 +339,267 @@ class LeapmotorAdapter extends utils.Adapter{
             }
             imgTags+=`<style>${css}</style>${fImgs}`;
         }
-
-        // Badges
-        const locked=s.driverDoorLockStatus;
-        const acOn=s.acSwitch;
-        const badges=[
-            locked?`<span style="background:${C.accent}15;border:1px solid ${C.accent}33;border-radius:5px;padding:2px 7px;font-size:9px;color:${C.accent};font-family:monospace">🔒 GESPERRT</span>`:'',
-            charging?`<span style="background:${C.green}15;border:1px solid ${C.green}33;border-radius:5px;padding:2px 7px;font-size:9px;color:${C.green};font-family:monospace">⚡ LÄDT</span>`:'',
-            acOn?`<span style="background:${C.vent}15;border:1px solid ${C.vent}33;border-radius:5px;padding:2px 7px;font-size:9px;color:${C.vent};font-family:monospace">❄ KLIMA</span>`:'',
-            windowOpen?`<span style="background:${C.orange}15;border:1px solid ${C.orange}33;border-radius:5px;padding:2px 7px;font-size:9px;color:${C.orange};font-family:monospace">🪟 FENSTER</span>`:'',
-        ].filter(Boolean).join('');
-
-        // Temp
-        const temp=(s.outdoorTemp||0)+'&deg;C';
-        const range=(s.expectedMileage||0)+' km';
-
-        // Status-Kacheln
-        const tile=(label,val,color)=>`<div style="background:${C.bg2};border:1px solid ${C.border};border-radius:10px;padding:10px;text-align:center"><div style="font-size:8px;color:${C.textDim};letter-spacing:0.1em;margin-bottom:3px">${label}</div><div style="font-size:12px;font-weight:800;color:${color||C.text}">${val}</div></div>`;
-
-        const tiles=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px">
-            ${tile('AUSSEN',(s.outdoorTemp||0)+'°C',C.text)}
-            ${tile('REICHWEITE',(s.expectedMileage||0)+' km',C.accent)}
-            ${tile('STATUS',s.speed===0?'🅿 Geparkt':'▶ '+(s.speed||0)+' km/h',s.speed===0?C.green:C.yellow)}
-            ${tile('LADEN',charging?'⚡ '+(s.chargeRemainTime||0)+' min':'— —',charging?C.green:C.textDim)}
-            ${tile('TÜREN',anyOpen?'🚪 Offen':'✓ Zu',anyOpen?C.red:C.green)}
-            ${tile('SCHLOSS',locked?'🔒 Zu':'🔓 Offen',locked?C.accent:C.red)}
-        </div>`;
-
-        // Klima-Buttons (servConn.setState für VIS)
-        const ns=`leapmotor.${this.instance}.${vin}`;
-        const sdp=(dp,val)=>`servConn.setState('${ns}.${dp}',${val})`;
-        const acMode=acOn?(s.acSetting>=23?'kuehl':(s.acSetting<20?'heiz':'luft')):'';
-        const bs=(color,active)=>`background:${active?color+'22':C.bg2};border:1px solid ${active?color+'55':C.border};border-radius:10px;padding:10px 4px;color:${active?color:C.textDim};font-size:10px;font-weight:700;cursor:pointer;font-family:monospace;display:flex;flex-direction:column;align-items:center;gap:3px;width:100%`;
-
-        const acTemp=(()=>{try{return 22;}catch{return 22;}})();
-
-        const climateRow=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px">
-            <button style="${bs(C.heat,acMode==='heiz')}" onclick="${sdp('cmd.ac_heiz','true')}"><span style="font-size:16px">🔥</span>Heizung</button>
-            <button style="${bs(C.cool,acMode==='kuehl')}" onclick="${sdp('cmd.ac_kuehl','true')}"><span style="font-size:16px">❄️</span>Kühlung</button>
-            <button style="${bs(C.vent,acMode==='luft')}" onclick="${sdp('cmd.ac_luft','true')}"><span style="font-size:16px">💨</span>Lüftung</button>
-            <button style="${bs(C.red,!acOn)}" onclick="${sdp('cmd.ac_off','true')}"><span style="font-size:16px">⏹</span>Aus</button>
-        </div>`;
-
-        const tempRow=`<div style="display:flex;align-items:center;justify-content:space-between;background:${C.bg2};border-radius:10px;padding:8px 12px;margin-bottom:8px;border:1px solid ${C.border}">
-            <span style="font-size:9px;color:${C.textDim};letter-spacing:0.12em;text-transform:uppercase">Zieltemperatur</span>
-            <div style="display:flex;align-items:center;gap:12px">
-                <button onclick="${sdp('cmd.ac_temp',Math.max(16,(s.acSetting||22)-1))}" style="background:${C.border};border:none;border-radius:6px;color:${C.text};font-size:18px;width:30px;height:30px;cursor:pointer;font-weight:700">−</button>
-                <span style="font-size:18px;font-weight:800;color:${C.accent};min-width:40px;text-align:center">${s.acSetting||22}°C</span>
-                <button onclick="${sdp('cmd.ac_temp',Math.min(30,(s.acSetting||22)+1))}" style="background:${C.border};border:none;border-radius:6px;color:${C.text};font-size:18px;width:30px;height:30px;cursor:pointer;font-weight:700">+</button>
-            </div>
-        </div>`;
-
-        const lockRow=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
-            <button style="${bs(C.accent,locked)}" onclick="${sdp('cmd.lock','true')}"><span style="font-size:16px">🔒</span>Sperren</button>
-            <button style="${bs(C.orange,!locked)}" onclick="${sdp('cmd.unlock','true')}"><span style="font-size:16px">🔓</span>Öffnen</button>
-            <button style="${bs(C.textDim,false)}" onclick="${sdp('cmd.refresh','true')}"><span style="font-size:16px">🔄</span>Refresh</button>
-        </div>`;
-
-        const html=`<div style="font-family:monospace;background:${C.bg};border-radius:18px;overflow:hidden;border:1px solid #1a2a40;box-shadow:0 24px 64px rgba(0,0,0,0.6)">
-            <div style="padding:12px 14px 0;display:flex;justify-content:space-between;align-items:flex-end">
-                <div>
-                    <div style="font-size:9px;color:${C.textDim};letter-spacing:0.25em;text-transform:uppercase;margin-bottom:2px">LEAPMOTOR T03</div>
-                    <div style="font-size:20px;font-weight:800;color:${C.text}">${vehicleName||vin}</div>
-                </div>
-                <div style="text-align:right">
-                    <div style="font-size:9px;color:${C.textDim};letter-spacing:0.15em;margin-bottom:2px">AKKUSTAND</div>
-                    <div style="font-size:16px;font-weight:700;color:${socColor}">${soc}%</div>
-                </div>
-            </div>
-            <div style="position:relative;width:100%;padding-bottom:46%;background:radial-gradient(ellipse at center,${C.carBg1} 0%,${C.carBg2} 70%)">
-                ${imgTags}
-                <div style="position:absolute;bottom:8px;left:10px;display:flex;gap:5px">${badges}</div>
-                <div style="position:absolute;top:8px;right:10px;font-size:10px;color:${C.textDim}">${temp}</div>
-            </div>
-            <div style="padding:6px 14px 0">
-                <div style="background:${C.bg2};border-radius:3px;height:4px;overflow:hidden">
-                    <div style="height:100%;width:${soc}%;background:linear-gradient(90deg,${socColor}88,${socColor});border-radius:3px"></div>
-                </div>
-            </div>
-            <div style="padding:10px 14px 14px">
-                ${tiles}${climateRow}${tempRow}${lockRow}
-            </div>
-        </div>`;
-
-        await this.ensureAndSet(`${vin}.pictures.composite_html`,html,'string','','Fahrzeug Dashboard HTML');
+        const html=`<div style="position:relative;width:100%;padding-bottom:46%;background:transparent">${imgTags}</div>`;
+        await this.ensureAndSet(`${vin}.pictures.composite_html`,html,'string','','Vehicle Image (animated, embeddable)');
     }
-
-    // ── Objekte anlegen ──────────────────────────────────────
 
     async createVehicleObjects(vehicle){
         await this.setObjectNotExistsAsync(vehicle.vin,{type:'device',common:{name:`${vehicle.name} (${vehicle.carType})`},native:{vin:vehicle.vin,carType:vehicle.carType}});
-        const states=[
-            ['status.battery_soc','Ladestand','number','value.battery','%'],
-            ['status.battery_current','Batteriestrom','number','value','A'],
-            ['status.battery_voltage','Batteriespannung','number','value.voltage','V'],
-            ['status.battery_energy_kwh','Energie verbleibend','number','value','kWh'],
-            ['status.range_km','Reichweite','number','value.distance','km'],
-            ['status.mileage_total','Gesamtkilometer','number','value.distance','km'],
-            ['status.temp_outdoor','Außentemperatur','number','value.temperature','°C'],
-            ['status.temp_battery_min','Min. Zellentemp.','number','value.temperature','°C'],
-            ['status.charging_active','Lädt gerade','boolean','indicator.charging',''],
-            ['status.charging_state','Ladestatus','number','value',''],
-            ['status.charging_soc_limit','Ladelimit','number','value','%'],
-            ['status.charging_remain_min','Restladezeit','number','value','min'],
-            ['status.charging_plugged','Kabel eingesteckt','boolean','indicator',''],
-            ['status.dc_fast_charge','DC Schnellladen','boolean','indicator',''],
-            ['status.ac_on','Klimaanlage an','boolean','indicator',''],
-            ['status.ac_temp','Klima Solltemp.','number','value.temperature','°C'],
-            ['status.drive_speed','Geschwindigkeit','number','value.speed','km/h'],
-            ['status.drive_parked','Geparkt','boolean','indicator',''],
-            ['status.gear','Gang','number','value',''],
-            ['status.security_locked','Verriegelt','boolean','indicator',''],
-            ['status.door_driver','Fahrertür offen','boolean','indicator.door',''],
-            ['status.door_front_right','Vordertür re offen','boolean','indicator.door',''],
-            ['status.door_rear_left','Hintertür li offen','boolean','indicator.door',''],
-            ['status.door_rear_right','Hintertür re offen','boolean','indicator.door',''],
-            ['status.door_trunk','Kofferraum offen','boolean','indicator.door',''],
-            ['status.window_fl_pct','Fenster vl','number','value','%'],
-            ['status.window_fr_pct','Fenster vr','number','value','%'],
-            ['status.window_rl_pct','Fenster hl','number','value','%'],
-            ['status.window_rr_pct','Fenster hr','number','value','%'],
-            ['status.location_lat','GPS Breitengrad','number','value.gps.latitude',''],
-            ['status.location_lon','GPS Längengrad','number','value.gps.longitude',''],
-            ['status.tire_fl','Reifendruck vl','number','value','bar'],
-            ['status.tire_fr','Reifendruck vr','number','value','bar'],
-            ['status.tire_rl','Reifendruck hl','number','value','bar'],
-            ['status.tire_rr','Reifendruck hr','number','value','bar'],
-            ['status.bluetooth_on','Bluetooth aktiv','boolean','indicator',''],
-            ['status.hotspot_on','Hotspot aktiv','boolean','indicator',''],
-            ['status.collect_time','Fahrzeug-Zeitstempel','string','text',''],
+
+        // Info channel
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.info`,{type:'channel',common:{name:'Vehicle Information'},native:{}});
+        const infoStates=[
+            ['info.name','Vehicle Name','string','text',''],
+            ['info.vin','VIN','string','text',''],
+            ['info.model','Model','string','text',''],
+            ['info.year','Year','number','value',''],
+            ['info.rudder','Steering Side','string','text',''],
+            ['info.allocation_code','Allocation Code','number','value',''],
         ];
-        for(const[id,name,type,role,unit]of states){const common={name,type,role,read:true,write:false};if(unit)common.unit=unit;await this.setObjectNotExistsAsync(`${vehicle.vin}.${id}`,{type:'state',common,native:{}})}
-        const cmds=['ac_kuehl','ac_heiz','ac_luft','ac_off','defrost','windows_open','windows_close','find','battery_preheat','battery_preheat_off','lock','unlock','trunk_open','trunk_close','refresh'];
-        for(const cmd of cmds)await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.${cmd}`,{type:'state',common:{name:cmd,type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
-        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.ac_temp`,{type:'state',common:{name:'Zieltemperatur',type:'number',role:'value.temperature',read:true,write:true,min:16,max:30,unit:'°C',def:22},native:{}});
+        for(const[id,name,type,role,unit]of infoStates){
+            const common={name,type,role,read:true,write:false};if(unit)common.unit=unit;
+            await this.setObjectNotExistsAsync(`${vehicle.vin}.${id}`,{type:'state',common,native:{}});
+        }
+
+        // Status channel
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.status`,{type:'channel',common:{name:'Vehicle Status'},native:{}});
+        const statusStates=[
+            // Battery
+            ['status.battery_soc','Battery SOC','number','value.battery','%'],
+            ['status.battery_current','Battery Current','number','value','A'],
+            ['status.battery_voltage','Battery Voltage','number','value.voltage','V'],
+            ['status.battery_energy_kwh','Remaining Energy','number','value','kWh'],
+            // Range
+            ['status.range_km','Range','number','value.distance','km'],
+            ['status.range_miles','Range','number','value.distance','mi'],
+            ['status.mileage_total','Total Mileage','number','value.distance','km'],
+            // Temperature
+            ['status.temp_outdoor','Outdoor Temperature','number','value.temperature','°C'],
+            ['status.temp_battery_min','Min Cell Temperature','number','value.temperature','°C'],
+            // Charging
+            ['status.charging_active','Charging Active','boolean','indicator.charging',''],
+            ['status.charging_state','Charging State','number','value',''],
+            ['status.charging_soc_limit','Charge Limit','number','value','%'],
+            ['status.charging_remain_min','Charge Time Remaining','number','value','min'],
+            ['status.charging_plugged','Cable Connected','boolean','indicator',''],
+            ['status.dc_fast_charge','DC Fast Charging','boolean','indicator',''],
+            ['status.charge_time_setting','Scheduled Charge Time','string','text',''],
+            // Climate
+            ['status.ac_on','Climate Active','boolean','indicator',''],
+            ['status.ac_temp','Climate Target Temp','number','value.temperature','°C'],
+            ['status.ac_fan_speed','Fan Speed','number','value',''],
+            ['status.ac_fan_speed_setting','Fan Speed Setting','number','value',''],
+            ['status.ac_wind_direction','Air Direction','number','value',''],
+            ['status.ac_recirculate','Recirculate Air','boolean','indicator',''],
+            ['status.ac_cooling_heating','Climate Mode','number','value',''],
+            ['status.ptc_state','PTC Heater State','number','value',''],
+            ['status.ptc_power','PTC Heater Power','number','value',''],
+            // Drive
+            ['status.drive_speed','Speed','number','value.speed','km/h'],
+            ['status.drive_parked','Parked','boolean','indicator',''],
+            ['status.gear','Gear','number','value',''],
+            ['status.key_position','Ignition On','boolean','indicator',''],
+            // Security
+            ['status.security_locked','Locked','boolean','indicator',''],
+            ['status.door_ctrl_allow','Door Control Allowed','boolean','indicator',''],
+            // Doors
+            ['status.door_driver','Driver Door Open','boolean','indicator.door',''],
+            ['status.door_front_right','Front Right Door Open','boolean','indicator.door',''],
+            ['status.door_rear_left','Rear Left Door Open','boolean','indicator.door',''],
+            ['status.door_rear_right','Rear Right Door Open','boolean','indicator.door',''],
+            ['status.door_trunk','Trunk Open','boolean','indicator.door',''],
+            // Windows
+            ['status.window_fl_pct','Window Front Left','number','value','%'],
+            ['status.window_fr_pct','Window Front Right','number','value','%'],
+            ['status.window_rl_pct','Window Rear Left','number','value','%'],
+            ['status.window_rr_pct','Window Rear Right','number','value','%'],
+            ['status.window_driver_open','Driver Window Open','boolean','indicator.door',''],
+            ['status.window_fr_open','Front Right Window Open','boolean','indicator.door',''],
+            ['status.window_rl_open','Rear Left Window Open','boolean','indicator.door',''],
+            ['status.window_rr_open','Rear Right Window Open','boolean','indicator.door',''],
+            ['status.sun_shade','Sun Shade','number','value',''],
+            // Tires
+            ['status.tire_fl','Tire Pressure FL','number','value','bar'],
+            ['status.tire_fr','Tire Pressure FR','number','value','bar'],
+            ['status.tire_rl','Tire Pressure RL','number','value','bar'],
+            ['status.tire_rr','Tire Pressure RR','number','value','bar'],
+            ['status.tire_fl_state','Tire State FL','number','value',''],
+            ['status.tire_fr_state','Tire State FR','number','value',''],
+            ['status.tire_rl_state','Tire State RL','number','value',''],
+            ['status.tire_rr_state','Tire State RR','number','value',''],
+            // Location
+            ['status.location_lat','GPS Latitude','number','value.gps.latitude',''],
+            ['status.location_lon','GPS Longitude','number','value.gps.longitude',''],
+            ['status.privacy_gps','GPS Privacy','number','value',''],
+            ['status.privacy_data','Data Privacy','number','value',''],
+            // Connectivity
+            ['status.bluetooth_on','Bluetooth Active','boolean','indicator',''],
+            ['status.bluetooth_addr','Bluetooth Address','string','text',''],
+            ['status.hotspot_on','Hotspot Active','boolean','indicator',''],
+            // Timestamps
+            ['status.collect_time','Data Timestamp','string','text',''],
+            ['status.collect_time_ms','Data Timestamp ms','number','value',''],
+        ];
+        for(const[id,name,type,role,unit]of statusStates){
+            const common={name,type,role,read:true,write:false};if(unit)common.unit=unit;
+            await this.setObjectNotExistsAsync(`${vehicle.vin}.${id}`,{type:'state',common,native:{}});
+        }
+
+        // Commands channel
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd`,{type:'channel',common:{name:'Commands'},native:{}});
+        const cmds={
+            'ac_cool':            'Start Cooling',
+            'ac_heat':            'Start Heating',
+            'ac_vent':            'Start Ventilation',
+            'ac_off':             'Stop Climate',
+            'defrost':            'Windshield Defrost',
+            'windows_open':       'Open Windows',
+            'windows_close':      'Close Windows',
+            'find':               'Find Vehicle',
+            'battery_preheat':    'Battery Preheat On',
+            'battery_preheat_off':'Battery Preheat Off',
+            'lock':               'Lock Vehicle',
+            'unlock':             'Unlock Vehicle',
+            'trunk_open':         'Open Trunk',
+            'trunk_close':        'Close Trunk',
+            'refresh':            'Refresh Status',
+        };
+        for(const[cmd,name]of Object.entries(cmds)){
+            await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.${cmd}`,{type:'state',common:{name,type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
+        }
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.ac_temp`,{type:'state',common:{name:'Target Temperature',type:'number',role:'value.temperature',read:true,write:true,min:16,max:30,unit:'°C',def:22},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.ac_fan_speed`,{type:'state',common:{name:'Fan Speed',type:'number',role:'value',read:true,write:true,min:1,max:7,def:3},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.ac_position`,{type:'state',common:{name:'Air Position',type:'string',role:'value',read:true,write:true,states:{all:'All',up:'Upper',down:'Lower',front:'Front',rear:'Rear'},def:'all'},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.sunshade_open`,{type:'state',common:{name:'Sonnenblende öffnen',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.sunshade_close`,{type:'state',common:{name:'Sonnenblende schließen',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.hotspot_on`,{type:'state',common:{name:'Hotspot On',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.hotspot_off`,{type:'state',common:{name:'Hotspot Off',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
+        await this.extendObjectAsync(`${vehicle.vin}.cmd.defrost_level`,{type:'state',common:{name:'Windshield Defrost Stage (0=off,1=weak,2=strong)',type:'number',role:'value',read:true,write:true,min:0,max:2,def:0},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.windows_set`,{type:'state',common:{name:'Windows Position (0-100)',type:'number',role:'level.blind',read:true,write:true,min:0,max:100,def:0},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.charge_limit_set`,{type:'state',common:{name:'Charge Limit SOC (50-100)',type:'number',role:'level',read:true,write:true,min:50,max:100,def:80},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.charge_schedule_enable`,{type:'state',common:{name:'Charge Schedule Enabled',type:'boolean',role:'switch',read:true,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.charge_schedule_start`,{type:'state',common:{name:'Charge Schedule Start (HH:MM)',type:'string',role:'value',read:true,write:true,def:'00:00'},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.charge_schedule_end`,{type:'state',common:{name:'Charge Schedule End (HH:MM)',type:'string',role:'value',read:true,write:true,def:'08:00'},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.charge_schedule_apply`,{type:'state',common:{name:'Apply Charge Schedule',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.climate_schedule_enable`,{type:'state',common:{name:'Climate Schedule Enabled',type:'boolean',role:'switch',read:true,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.climate_schedule_time`,{type:'state',common:{name:'Climate Schedule Time (HH:MM)',type:'string',role:'value',read:true,write:true,def:'07:00'},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.climate_schedule_mode`,{type:'state',common:{name:'Climate Schedule Mode',type:'string',role:'value',read:true,write:true,states:{cold:'Kuehlen',hot:'Heizen',wind:'Lueften'},def:'hot'},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.climate_schedule_apply`,{type:'state',common:{name:'Apply Climate Schedule',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.climate_schedule_cancel`,{type:'state',common:{name:'Cancel Climate Schedule',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.climate_schedule_days`,{type:'state',common:{name:'Climate Schedule Days (comma-separated 0=Sun..6=Sat)',type:'string',role:'value',read:true,write:true,def:'0,1,2,3,4,5,6'},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.status.climate_schedule_active`,{type:'state',common:{name:'Climate Schedule Active',type:'boolean',role:'indicator',read:true,write:false,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.status.climate_schedule_info`,{type:'state',common:{name:'Climate Schedule Info',type:'string',role:'text',read:true,write:false,def:''},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.status.charge_schedule_active`,{type:'state',common:{name:'Charge Schedule Active',type:'boolean',role:'indicator',read:true,write:false,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.status.charge_schedule_info`,{type:'state',common:{name:'Charge Schedule Info',type:'string',role:'text',read:true,write:false,def:''},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.status.last_poll_time`,{type:'state',common:{name:'Last Successful Adapter Poll',type:'string',role:'value.datetime',read:true,write:false,def:''},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.sentry_mode_on`,{type:'state',common:{name:'Sentry Mode On',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.sentry_mode_off`,{type:'state',common:{name:'Sentry Mode Off',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.speed_limit_set`,{type:'state',common:{name:'Speed Limit (km/h, 0=off)',type:'number',role:'value',read:true,write:true,min:0,max:150,def:0},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.seat_heat_driver`,{type:'state',common:{name:'Driver Seat Heat Level (0-3)',type:'number',role:'level',read:true,write:true,min:0,max:3,def:0},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.seat_heat_copilot`,{type:'state',common:{name:'Copilot Seat Heat Level (0-3)',type:'number',role:'level',read:true,write:true,min:0,max:3,def:0},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.seat_ventilation_driver`,{type:'state',common:{name:'Driver Seat Ventilation Level (0-3)',type:'number',role:'level',read:true,write:true,min:0,max:3,def:0},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.seat_ventilation_copilot`,{type:'state',common:{name:'Copilot Seat Ventilation Level (0-3)',type:'number',role:'level',read:true,write:true,min:0,max:3,def:0},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.steering_wheel_heat_on`,{type:'state',common:{name:'Steering Wheel Heat On',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.steering_wheel_heat_off`,{type:'state',common:{name:'Steering Wheel Heat Off',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.mirror_heat_on`,{type:'state',common:{name:'Mirror/Rear Window Heat On',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.mirror_heat_off`,{type:'state',common:{name:'Mirror/Rear Window Heat Off',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`messages.unread_count`,{type:'state',common:{name:'Unread Messages',type:'number',role:'value',read:true,write:false,def:0},native:{}});
+        await this.setObjectNotExistsAsync(`messages.latest_title`,{type:'state',common:{name:'Latest Message Title',type:'string',role:'text',read:true,write:false,def:''},native:{}});
+        await this.setObjectNotExistsAsync(`messages.latest_text`,{type:'state',common:{name:'Latest Message Text',type:'string',role:'text',read:true,write:false,def:''},native:{}});
+        await this.setObjectNotExistsAsync(`messages.latest_time`,{type:'state',common:{name:'Latest Message Time',type:'string',role:'value.datetime',read:true,write:false,def:''},native:{}});
+        await this.setObjectNotExistsAsync(`messages.json`,{type:'state',common:{name:'All Messages (JSON, last 10)',type:'string',role:'json',read:true,write:false,def:''},native:{}});
+        await this.setObjectNotExistsAsync(`config.energy_price_eur_kwh`,{type:'state',common:{name:'Strompreis (Eur/kWh) - manuell editierbar',type:'number',role:'value',read:true,write:true,unit:'€/kWh',min:0,max:2,def:0.30},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.trips.daily_km_json`,{type:'state',common:{name:'Daily Kilometers (JSON, last 30 days)',type:'string',role:'json',read:true,write:false,def:'[]'},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.trips.today_km`,{type:'state',common:{name:'Kilometers Driven Today',type:'number',role:'value',read:true,write:false,unit:'km',def:0},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.trips.history_json`,{type:'state',common:{name:'Trip History (JSON, last 50 trips)',type:'string',role:'json',read:true,write:false,def:'[]'},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.trips.current_trip_active`,{type:'state',common:{name:'Trip Currently In Progress',type:'boolean',role:'indicator',read:true,write:false,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.defrost_cycle`,{type:'state',common:{name:'Cycle Windshield Defrost (off/weak/strong)',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.quick_cool`,{type:'state',common:{name:'Quick Cool',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.quick_heat`,{type:'state',common:{name:'Quick Heat',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.sunshade_set`,{type:'state',common:{name:'Sonnenblende Position (0-10)',type:'number',role:'level.blind',read:true,write:true,min:0,max:10,def:0},native:{}});
+                await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.ac_recirculate`,{type:'state',common:{name:'Recirculate Air',type:'boolean',role:'switch',read:true,write:true,def:false},native:{}});
     }
 
-    // ── Status schreiben ─────────────────────────────────────
-
     async writeStatusStates(vin,s){
+        this.lastStatus[vin]=s;
         const set=async(id,val)=>{if(val!==null&&val!==undefined)await this.setStateAsync(`${vin}.${id}`,{val,ack:true})};
         const tire=v=>v!=null?Math.round(v)/100:null;
-        await set('status.battery_soc',s.soc);await set('status.battery_current',s.batteryCurrent);
+        // Battery
+        await set('status.battery_soc',s.soc);
+        await set('status.battery_current',s.batteryCurrent);
         await set('status.battery_voltage',s.batteryVoltage);
         await set('status.battery_energy_kwh',s.dumpEnergy!=null?Math.round(s.dumpEnergy/100)/10:null);
-        await set('status.range_km',s.expectedMileage);await set('status.mileage_total',s.totalMileage);
-        await set('status.temp_outdoor',s.outdoorTemp);await set('status.temp_battery_min',s.minSingleTemp);
+        // Range
+        await set('status.range_km',s.expectedMileage);
+        await set('status.range_miles',s.expectedMileageMile!=null?parseFloat(s.expectedMileageMile):null);
+        await set('status.mileage_total',s.totalMileage);
+        // Temperature
+        await set('status.temp_outdoor',s.outdoorTemp);
+        await set('status.temp_battery_min',s.minSingleTemp);
+        // Charging
         await set('status.charging_active',s.chargeState!=null?[1,2,3].includes(s.chargeState):null);
-        await set('status.charging_state',s.chargeState);await set('status.charging_soc_limit',s.chargesocSetting);
+        await set('status.charging_state',s.chargeState);
+        await set('status.charging_soc_limit',s.chargesocSetting);
         await set('status.charging_remain_min',s.chargeRemainTime);
         await set('status.charging_plugged',s.chargeState!=null?s.chargeState>0:null);
         await set('status.dc_fast_charge',s.dcInputFastCharge!=null?s.dcInputFastCharge===1:null);
-        await set('status.ac_on',s.acSwitch);await set('status.ac_temp',s.acSetting);
-        await set('status.drive_speed',s.speed);await set('status.drive_parked',s.speed!=null?s.speed===0:null);
-        await set('status.gear',s.gearStatus);await set('status.security_locked',s.driverDoorLockStatus);
-        await set('status.door_driver',s.lbcmDriverDoorStatus);await set('status.door_front_right',s.rbcmDriverDoorStatus);
-        await set('status.door_rear_left',s.lbcmLeftRearDoorStatus);await set('status.door_rear_right',s.rbcmRightRearDoorStatus);
+        await set('status.charge_time_setting',s.chargeTimeSetting);
+        // Climate
+        await set('status.ac_on',s.acSwitch);
+        await set('status.ac_temp',s.acSetting);
+        await set('status.ac_fan_speed',s.acAirVolume);
+        await set('status.ac_fan_speed_setting',s.acAirVolumeSetting);
+        await set('status.ac_wind_direction',s.acWindDirection);
+        await set('status.ac_recirculate',s.acCircleMode);
+        await set('status.ac_cooling_heating',s.acCoolingAndHeating);
+        await set('status.ptc_state',s.ptcState);
+        await set('status.ptc_power',s.ptcPowerSettingValue);
+        // Drive
+        await set('status.drive_speed',s.speed);
+        await set('status.drive_parked',s.speed!=null?s.speed===0:null);
+        await set('status.gear',s.gearStatus);
+        await set('status.key_position',s.bcmKeyPositionOn1||s.bcmKeyPositionOn3);
+        // Security
+        await set('status.security_locked',s.driverDoorLockStatus);
+        await set('status.door_ctrl_allow',s.bcmDoorCtrlAllow);
+        // Doors
+        await set('status.door_driver',s.lbcmDriverDoorStatus);
+        await set('status.door_front_right',s.rbcmDriverDoorStatus);
+        await set('status.door_rear_left',s.lbcmLeftRearDoorStatus);
+        await set('status.door_rear_right',s.rbcmRightRearDoorStatus);
         await set('status.door_trunk',s.bbcmBackDoorStatus);
-        await set('status.window_fl_pct',s.leftFrontWindowPercent);await set('status.window_fr_pct',s.rightFrontWindowPercent);
-        await set('status.window_rl_pct',s.leftRearWindowPercent);await set('status.window_rr_pct',s.rightRearWindowPercent);
-        await set('status.location_lat',s.latitude);await set('status.location_lon',s.longitude);
-        await set('status.tire_fl',tire(s.leftFrontTirePressure));await set('status.tire_fr',tire(s.rightFrontTirePressure));
-        await set('status.tire_rl',tire(s.leftRearTirePressure));await set('status.tire_rr',tire(s.rightRearTirePressure));
-        await set('status.bluetooth_on',s.bluetoothState);await set('status.hotspot_on',s.hotspotState);
+        // Windows
+        await set('status.window_fl_pct',s.leftFrontWindowPercent);
+        await set('status.window_fr_pct',s.rightFrontWindowPercent);
+        await set('status.window_rl_pct',s.leftRearWindowPercent);
+        await set('status.window_rr_pct',s.rightRearWindowPercent);
+        await set('status.window_driver_open',s.driverWindowStatus);
+        await set('status.window_fr_open',s.rightFrontWindowStatus);
+        await set('status.window_rl_open',s.leftRearWindowStatus);
+        await set('status.window_rr_open',s.rightRearWindowStatus);
+        await set('status.sun_shade',s.sunShade);
+        // Tires
+        await set('status.tire_fl',tire(s.leftFrontTirePressure));
+        await set('status.tire_fr',tire(s.rightFrontTirePressure));
+        await set('status.tire_rl',tire(s.leftRearTirePressure));
+        await set('status.tire_rr',tire(s.rightRearTirePressure));
+        await set('status.tire_fl_state',s.leftFrontTirePressureState);
+        await set('status.tire_fr_state',s.rightFrontTirePressureState);
+        await set('status.tire_rl_state',s.leftRearTirePressureState);
+        await set('status.tire_rr_state',s.rightRearTirePressureState);
+        // Location
+        await set('status.location_lat',s.latitude);
+        await set('status.location_lon',s.longitude);
+        await set('status.privacy_gps',s.privacyGPS);
+        await set('status.privacy_data',s.privacyData);
+        // Connectivity
+        await set('status.bluetooth_on',s.bluetoothState);
+        await set('status.bluetooth_addr',s.bluetoothAddr);
+        await set('status.hotspot_on',s.hotspotState);
+        // Timestamps
         await set('status.collect_time',s.collectTime);
+        await set('status.collect_time_ms',s.collectTimeMs);
     }
-
-    // ── Befehle ──────────────────────────────────────────────
 
     async onStateChange(id,state){
         if(!state||state.ack||!this.client)return;
@@ -373,30 +607,404 @@ class LeapmotorAdapter extends utils.Adapter{
         if(parts.length<3||parts[1]!=='cmd')return;
         const vin=parts[0],cmd=parts[2];
         const vehicle=this.vehicles.find(v=>v.vin===vin);if(!vehicle)return;
-        if(cmd==='ac_temp'){await this.setStateAsync(id,{val:state.val,ack:true});return}
-        if(cmd==='refresh'&&state.val===true){
-            await this.updateVehicleStatus(vehicle);
-            await this.setStateAsync(id,{val:false,ack:true});
+        if(cmd==='ac_temp'||cmd==='ac_fan_speed'||cmd==='ac_position'||cmd==='ac_recirculate'){
+            await this.setStateAsync(id,{val:state.val,ack:true});
+            // Status-Datenpunkt synchron halten
+            if(cmd==='ac_temp'){
+                await this.setStateAsync(`${vin}.status.ac_temp`,{val:state.val,ack:true});
+                // HTML sofort neu bauen mit neuem Temp-Wert
+                const s=await this.client.getVehicleStatus(vehicle);
+                s.acSetting=state.val;
+                await this.buildCompositeHtml(vin,s,vehicle.name);
+            }
+            if(cmd==='ac_fan_speed')await this.setStateAsync(`${vin}.status.ac_fan_speed`,{val:state.val,ack:true});
             return;
+        }
+        if(cmd==='windows_set'){
+            await this.setStateAsync(id,{val:state.val,ack:true});
+            try{
+                try{
+                    await this.client.sendCommandWithPin(vehicle,'230',JSON.stringify({value:String(state.val)}));
+                }catch(e){
+                    if(String(e).includes('ngültig')||String(e).includes('token')){
+                        await this.client.login();
+                        await this.client.sendCommandWithPin(vehicle,'230',JSON.stringify({value:String(state.val)}));
+                    }else{throw e}
+                }
+                await this.setStateAsync(`${vin}.status.window_fl_pct`,{val:state.val,ack:true});
+                await this.setStateAsync(`${vin}.status.window_fr_pct`,{val:state.val,ack:true});
+            }catch(e){this.log.error(`windows_set failed: ${e}`)}
+            return;
+        }
+        if(cmd==='sunshade_set'){
+            await this.setStateAsync(id,{val:state.val,ack:true});
+            try{
+                try{
+                    await this.client.sendCommandWithPin(vehicle,'240',JSON.stringify({value:String(state.val)}));
+                }catch(e){
+                    if(String(e).includes('ngültig')||String(e).includes('token')){
+                        await this.client.login();
+                        await this.client.sendCommandWithPin(vehicle,'240',JSON.stringify({value:String(state.val)}));
+                    }else{throw e}
+                }
+                await this.setStateAsync(`${vin}.status.sun_shade`,{val:state.val,ack:true});
+            }catch(e){this.log.error(`sunshade_set failed: ${e}`)}
+            return;
+        }
+        if(cmd==='speed_limit_set'){
+            await this.setStateAsync(id,{val:state.val,ack:true});
+            try{
+                const content=JSON.stringify({value:String(state.val)});
+                try{
+                    await this.client.sendCommandWithPin(vehicle,'510',content);
+                }catch(e){
+                    if(String(e).includes('ngültig')||String(e).includes('token')){
+                        await new Promise(r=>setTimeout(r,500));
+                        await this.client.login();
+                        await this.client.sendCommandWithPin(vehicle,'510',content);
+                    }else{throw e}
+                }
+            }catch(e){this.log.error(`speed_limit_set failed: ${e}`)}
+            return;
+        }
+        if(cmd==='seat_heat_driver'||cmd==='seat_heat_copilot'){
+            await this.setStateAsync(id,{val:state.val,ack:true});
+            const seatPos=cmd==='seat_heat_driver'?'3':'2';
+            try{
+                const content=JSON.stringify({value:`${seatPos},${state.val}`});
+                try{
+                    await this.client.sendCommandWithPin(vehicle,'301',content);
+                }catch(e){
+                    if(String(e).includes('ngültig')||String(e).includes('token')){
+                        await new Promise(r=>setTimeout(r,500));
+                        await this.client.login();
+                        await this.client.sendCommandWithPin(vehicle,'301',content);
+                    }else{throw e}
+                }
+            }catch(e){this.log.error(`${cmd} failed: ${e}`)}
+            return;
+        }
+        if(cmd==='seat_ventilation_driver'||cmd==='seat_ventilation_copilot'){
+            await this.setStateAsync(id,{val:state.val,ack:true});
+            const seatPos=cmd==='seat_ventilation_driver'?'3':'2';
+            try{
+                const content=JSON.stringify({value:`${seatPos},${state.val}`});
+                try{
+                    await this.client.sendCommandWithPin(vehicle,'370',content);
+                }catch(e){
+                    if(String(e).includes('ngültig')||String(e).includes('token')){
+                        await new Promise(r=>setTimeout(r,500));
+                        await this.client.login();
+                        await this.client.sendCommandWithPin(vehicle,'370',content);
+                    }else{throw e}
+                }
+            }catch(e){this.log.error(`${cmd} failed: ${e}`)}
+            return;
+        }
+        if(cmd==='charge_limit_set'){
+            await this.setStateAsync(id,{val:state.val,ack:true});
+            try{
+                const content=JSON.stringify({chargeEnable:0,chargesoc:Number(state.val),circulation:0,cycles:'1,2,3,4,5,6,7',endtime:'08:00',recharge:0,starttime:'00:00'});
+                try{
+                    await this.client.sendCommandWithPin(vehicle,'190',content);
+                }catch(e){
+                    if(String(e).includes('ngültig')||String(e).includes('token')){
+                        await new Promise(r=>setTimeout(r,500));
+                        await this.client.login();
+                        await this.client.sendCommandWithPin(vehicle,'190',content);
+                    }else{throw e}
+                }
+                await this.setStateAsync(`${vin}.status.charging_soc_limit`,{val:state.val,ack:true});
+            }catch(e){this.log.error(`charge_limit_set failed: ${e}`)}
+            return;
+        }
+        if(cmd==='climate_schedule_enable'||cmd==='climate_schedule_time'||cmd==='climate_schedule_mode'||cmd==='climate_schedule_days'){
+            await this.setStateAsync(id,{val:state.val,ack:true});
+            return;
+        }
+        if(cmd==='climate_schedule_cancel'&&state.val===true){
+            await this.setStateAsync(id,{val:false,ack:true});
+            await this.setStateAsync(`${vin}.cmd.climate_schedule_enable`,{val:false,ack:true});
+            try{
+                const content=JSON.stringify({controls:[]});
+                try{
+                    await this.client.sendCommandWithPin(vehicle,'171',content);
+                }catch(e){
+                    if(String(e).includes('ngültig')||String(e).includes('token')){
+                        await new Promise(r=>setTimeout(r,500));
+                        await this.client.login();
+                        await this.client.sendCommandWithPin(vehicle,'171',content);
+                    }else{throw e}
+                }
+                this.log.debug('climate_schedule_cancel: alle Zeitplaene geloescht');
+            }catch(e){this.log.error(`climate_schedule_cancel failed: ${e}`)}
+            return;
+        }
+        if(cmd==='climate_schedule_apply'&&state.val===true){
+            await this.setStateAsync(id,{val:false,ack:true});
+            try{
+                const enState=await this.getStateAsync(`${vin}.cmd.climate_schedule_enable`);
+                const timeState=await this.getStateAsync(`${vin}.cmd.climate_schedule_time`);
+                const modeState=await this.getStateAsync(`${vin}.cmd.climate_schedule_mode`);
+                const daysState=await this.getStateAsync(`${vin}.cmd.climate_schedule_days`);
+                const tempState3=await this.getStateAsync(`${vin}.cmd.ac_temp`);
+                const fanState3=await this.getStateAsync(`${vin}.cmd.ac_fan_speed`);
+                const enabled=enState?.val?'1':'0';
+                const timeStr=String(timeState?.val??'07:00');
+                const mode=String(modeState?.val??'hot');
+                const temp=String(tempState3?.val??22);
+                const fan=String(fanState3?.val??3);
+                const daysStr=String(daysState?.val??'0,1,2,3,4,5,6');
+                const days=daysStr.split(',').map(d=>Number(d.trim())).filter(d=>!isNaN(d));
+                const now=new Date();
+                const startTime=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${timeStr}:00`;
+                const setId=`air_set${Date.now()}`;
+                const control={mode,on:enabled,operate:'manual',set_id:setId,start_time:startTime,temperature:temp,update_time:String(Date.now()),windlevel:fan,days:days.length>0?days:[0,1,2,3,4,5,6],circle:mode==='wind'?'out':'in',position:'all',wshld:'0'};
+                const content=JSON.stringify({controls:[control]});
+                try{
+                    await this.client.sendCommandWithPin(vehicle,'171',content);
+                }catch(e){
+                    if(String(e).includes('ngültig')||String(e).includes('token')){
+                        await new Promise(r=>setTimeout(r,500));
+                        await this.client.login();
+                        await this.client.sendCommandWithPin(vehicle,'171',content);
+                    }else{throw e}
+                }
+                this.log.debug(`climate_schedule_apply: ${JSON.stringify(control)}`);
+            }catch(e){this.log.error(`climate_schedule_apply failed: ${e}`)}
+            return;
+        }
+        if(cmd==='charge_schedule_enable'||cmd==='charge_schedule_start'||cmd==='charge_schedule_end'){
+            await this.setStateAsync(id,{val:state.val,ack:true});
+            return;
+        }
+        if(cmd==='charge_schedule_apply'&&state.val===true){
+            await this.setStateAsync(id,{val:false,ack:true});
+            try{
+                const enState=await this.getStateAsync(`${vin}.cmd.charge_schedule_enable`);
+                const startState=await this.getStateAsync(`${vin}.cmd.charge_schedule_start`);
+                const endState=await this.getStateAsync(`${vin}.cmd.charge_schedule_end`);
+                const limitState=await this.getStateAsync(`${vin}.cmd.charge_limit_set`);
+                const enabled=enState?.val?1:0;
+                const start=String(startState?.val??'00:00');
+                const end=String(endState?.val??'08:00');
+                const limit=Number(limitState?.val??80);
+                const content=JSON.stringify({chargeEnable:enabled,chargesoc:limit,circulation:0,cycles:'1,2,3,4,5,6,7',endtime:end,recharge:0,starttime:start});
+                try{
+                    await this.client.sendCommandWithPin(vehicle,'190',content);
+                }catch(e){
+                    if(String(e).includes('ngültig')||String(e).includes('token')){
+                        await new Promise(r=>setTimeout(r,500));
+                        await this.client.login();
+                        await this.client.sendCommandWithPin(vehicle,'190',content);
+                    }else{throw e}
+                }
+                this.log.debug(`charge_schedule_apply: enabled=${enabled} start=${start} end=${end} limit=${limit}`);
+            }catch(e){this.log.error(`charge_schedule_apply failed: ${e}`)}
+            return;
+        }
+        if(cmd==='climate_schedule_enable'||cmd==='climate_schedule_time'||cmd==='climate_schedule_mode'){
+            await this.setStateAsync(id,{val:state.val,ack:true});
+            return;
+        }
+        if(cmd==='climate_schedule_cancel'&&state.val===true){
+            await this.setStateAsync(id,{val:false,ack:true});
+            try{
+                const content=JSON.stringify({controls:[]});
+                try{
+                    await this.client.sendCommandWithPin(vehicle,'171',content);
+                }catch(e){
+                    if(String(e).includes('ngültig')||String(e).includes('token')){
+                        await new Promise(r=>setTimeout(r,500));
+                        await this.client.login();
+                        await this.client.sendCommandWithPin(vehicle,'171',content);
+                    }else{throw e}
+                }
+                this.log.debug('climate_schedule_cancel: alle Zeitplaene geloescht');
+            }catch(e){this.log.error(`climate_schedule_cancel failed: ${e}`)}
+            return;
+        }
+        if(cmd==='climate_schedule_apply'&&state.val===true){
+            await this.setStateAsync(id,{val:false,ack:true});
+            try{
+                const enState=await this.getStateAsync(`${vin}.cmd.climate_schedule_enable`);
+                const timeState=await this.getStateAsync(`${vin}.cmd.climate_schedule_time`);
+                const modeState=await this.getStateAsync(`${vin}.cmd.climate_schedule_mode`);
+                const daysState=await this.getStateAsync(`${vin}.cmd.climate_schedule_days`);
+                const tempState3=await this.getStateAsync(`${vin}.cmd.ac_temp`);
+                const fanState3=await this.getStateAsync(`${vin}.cmd.ac_fan_speed`);
+                const enabled=enState?.val?'1':'0';
+                const timeStr=String(timeState?.val??'07:00');
+                const mode=String(modeState?.val??'hot');
+                const temp=String(tempState3?.val??22);
+                const fan=String(fanState3?.val??3);
+                const daysStr=String(daysState?.val??'0,1,2,3,4,5,6');
+                const days=daysStr.split(',').map(d=>Number(d.trim())).filter(d=>!isNaN(d));
+                const now=new Date();
+                const startTime=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${timeStr}:00`;
+                const setId=`air_set${this.deviceIdShort||'app'}${Date.now()}`;
+                const control={
+                    mode,on:enabled,operate:'manual',set_id:setId,
+                    start_time:startTime,temperature:temp,
+                    update_time:String(Date.now()),windlevel:fan,
+                    days:days.length>0?days:[0,1,2,3,4,5,6],circle:mode==='wind'?'out':'in',
+                    position:'all',wshld:'0'
+                };
+                const content=JSON.stringify({controls:[control]});
+                try{
+                    await this.client.sendCommandWithPin(vehicle,'171',content);
+                }catch(e){
+                    if(String(e).includes('ngültig')||String(e).includes('token')){
+                        await new Promise(r=>setTimeout(r,500));
+                        await this.client.login();
+                        await this.client.sendCommandWithPin(vehicle,'171',content);
+                    }else{throw e}
+                }
+                this.log.debug(`climate_schedule_apply: ${JSON.stringify(control)}`);
+            }catch(e){this.log.error(`climate_schedule_apply failed: ${e}`)}
+            return;
+        }
+        if(cmd==='defrost_level'){
+            await this.setStateAsync(id,{val:state.val,ack:true});
+            return;
+        }
+        if(cmd==='defrost_cycle'&&state.val===true){
+            const curState=await this.getStateAsync(`${vin}.cmd.defrost_level`);
+            const cur=curState?.val??0;
+            const next=(cur+1)%2;
+            await this.setStateAsync(id,{val:false,ack:true});
+            await this.setStateAsync(`${vin}.cmd.defrost_level`,{val:next,ack:true});
+            const acOnState=await this.getStateAsync(`${vin}.status.ac_on`);
+            const acModeState=await this.getStateAsync(`${vin}.status.ac_cooling_heating`);
+            const tempState2=await this.getStateAsync(`${vin}.cmd.ac_temp`);
+            const fanState2=await this.getStateAsync(`${vin}.cmd.ac_fan_speed`);
+            const posState2=await this.getStateAsync(`${vin}.cmd.ac_position`);
+            const reciState2=await this.getStateAsync(`${vin}.cmd.ac_recirculate`);
+            const temp2=String(tempState2?.val??22);
+            const fan2=String(fanState2?.val??3);
+            const pos2=String(posState2?.val??'all');
+            const reci2=(reciState2?.val===true)?'in':'out';
+            const acOn2=acOnState?.val??false;
+            const acMode2=acModeState?.val;
+            let mode2='wind',circle2=reci2;
+            if(acOn2&&acMode2===2){mode2='hot';circle2='in';}
+            else if(acOn2&&acMode2===1){mode2='cold';circle2='in';}
+            try{
+                const sendDefrost=async(payload)=>{
+                    try{
+                        await this.client.sendCommandWithPin(vehicle,'170',payload);
+                    }catch(e){
+                        if(String(e).includes('ngültig')||String(e).includes('token')){
+                            await this.client.login();
+                            await this.client.sendCommandWithPin(vehicle,'170',payload);
+                        }else{throw e}
+                    }
+                };
+                const wshldVal=next===1?'1':'0';
+                const operate2=acOn2?'manual':'off';
+                await sendDefrost(JSON.stringify({circle:circle2,mode:mode2,operate:operate2,position:pos2,temperature:temp2,windlevel:fan2,wshld:wshldVal}));
+                this.log.debug(`defrost_cycle: stage ${cur} -> ${next} (wshld=${wshldVal}, mode=${mode2})`);
+            }catch(e){this.log.error(`defrost_cycle failed: ${e}`)}
+            return;
+        }
+        if(cmd==='refresh'&&state.val===true){this._lastScheduleCheck=0;
+            await this.updateVehicleStatus(vehicle);
+            await this.setStateAsync(id,{val:false,ack:true});return;
         }
         if(state.val===true){await this.executeCommand(vehicle,cmd);await this.setStateAsync(id,{val:false,ack:true})}
     }
 
     async executeCommand(vehicle,cmd){
         if(!this.client)return;
-        this.log.info(`Befehl: ${cmd} für ${vehicle.vin}`);
         const tempState=await this.getStateAsync(`${vehicle.vin}.cmd.ac_temp`);
+        const fanState=await this.getStateAsync(`${vehicle.vin}.cmd.ac_fan_speed`);
         const temp=String(tempState?.val??22);
-        const ac=(mode,op)=>JSON.stringify({circle:'out',mode,operate:op,position:'all',temperature:temp,windlevel:'3',wshld:'0'});
-        const noPinCmds={'find':['120','{}'],'windows_open':['230','{"value":"100"}'],'windows_close':['230','{"value":"0"}']};
-        const pinCmds={'ac_kuehl':['170',ac('cold','manual')],'ac_heiz':['170',ac('hot','manual')],'ac_luft':['170',ac('wind','manual')],'ac_off':['170',ac('wind','off')],'defrost':['170',ac('wind','manual')],'battery_preheat':['190','{"operate":"on"}'],'battery_preheat_off':['190','{"operate":"off"}'],'lock':['110','{}'],'unlock':['110','{"operate":"unlock"}'],'trunk_open':['130','{"operate":"open"}'],'trunk_close':['130','{"operate":"close"}']};
-        try{
+        const fan=String(fanState?.val??3);
+        const posState=await this.getStateAsync(`${vehicle.vin}.cmd.ac_position`);
+        const reciState=await this.getStateAsync(`${vehicle.vin}.cmd.ac_recirculate`);
+        const pos=String(posState?.val??'all');
+        const reci=(reciState?.val===true)?'in':'out';
+        this.log.debug(`Command: ${cmd} for ${vehicle.vin} (temp=${temp}, fan=${fan}, pos=${pos}, recirc=${reci})`);
+        const wshldState=await this.getStateAsync(`${vehicle.vin}.cmd.defrost_level`);
+        const wshld=(wshldState?.val===2)?'1':'0';
+        const noPinCmds={};
+        const pinCmds={
+            'find':                ['120','{"value":"true"}'],
+            'windows_open':        ['230','{"value":"100"}'],
+            'windows_close':       ['230','{"value":"0"}'],
+            'sunshade_open':       ['240','{"value":"10"}'],
+            'sunshade_close':      ['240','{"value":"0"}'],
+            'hotspot_on':          ['140','{"value":"on"}'],
+            'hotspot_off':         ['140','{"value":"off"}'],
+            'ac_cool':             ['170','{"circle":"in","mode":"cold","operate":"manual","position":"'+pos+'","temperature":"'+temp+'","windlevel":"'+fan+'","wshld":"'+wshld+'"}'],
+            'ac_heat':             ['170','{"circle":"in","mode":"hot","operate":"manual","position":"'+pos+'","temperature":"'+temp+'","windlevel":"'+fan+'","wshld":"'+wshld+'"}'],
+            'ac_vent':             ['170','{"circle":"out","mode":"wind","operate":"manual","position":"'+pos+'","temperature":"'+temp+'","windlevel":"'+fan+'","wshld":"'+wshld+'"}'],
+            'ac_off':              ['170','{"circle":"'+reci+'","mode":"wind","operate":"off","position":"'+pos+'","temperature":"'+temp+'","windlevel":"'+fan+'","wshld":"0"}'],
+            'defrost':             ['170','{"circle":"in","mode":"hot","operate":"manual","position":"all","temperature":"32","windlevel":"7","wshld":"1"}'],
+            'sentry_mode_on':      ['220','{"value":"1"}'],
+            'sentry_mode_off':     ['220','{"value":"0"}'],
+            'steering_wheel_heat_on':  ['320','{"value":"on"}'],
+            'steering_wheel_heat_off': ['320','{"value":"off"}'],
+            'mirror_heat_on':      ['440','{"value":"on"}'],
+            'mirror_heat_off':     ['440','{"value":"off"}'],
+            'quick_cool':          ['170','{"circle":"in","mode":"cold","operate":"manual","position":"all","temperature":"18","windlevel":"7","wshld":"0"}'],
+            'quick_heat':          ['170','{"circle":"in","mode":"hot","operate":"manual","position":"all","temperature":"32","windlevel":"7","wshld":"0"}'],
+            'battery_preheat':     ['160','{"value":"ptcon"}'],
+            'battery_preheat_off': ['160','{"value":"ptcoff"}'],
+            'lock':                ['110','{"value":"lock"}'],
+            'unlock':              ['110','{"value":"unlock"}'],
+            'trunk_open':          ['130','{"value":"true"}'],
+            'trunk_close':         ['130','{"value":"false"}'],
+        };
+        const runCmd=async()=>{
             if(noPinCmds[cmd])await this.client.sendCommandWithoutPin(vehicle,...noPinCmds[cmd]);
             else if(pinCmds[cmd])await this.client.sendCommandWithPin(vehicle,...pinCmds[cmd]);
-            else{this.log.warn(`Unbekannter Befehl: ${cmd}`);return}
-            this.log.info(`${cmd} erfolgreich.`);
-            setTimeout(()=>this.updateVehicleStatus(vehicle),15000);
-        }catch(e){this.log.error(`Befehl ${cmd} fehlgeschlagen: ${e}`)}
+            else{this.log.warn(`Unknown command: ${cmd}`);return false}
+            return true;
+        };
+        try{
+            let ran;
+            try{
+                ran=await runCmd();
+            }catch(e){
+                if(String(e).includes('Token ist ung')||String(e).includes('token')){
+                    this.log.debug(`Token invalid for ${cmd}, re-logging in and retrying once...`);
+                    await this.client.login();
+                    ran=await runCmd();
+                }else{
+                    throw e;
+                }
+            }
+            if(!ran)return;
+            this.log.debug(`${cmd} successful (without PIN: ${!!noPinCmds[cmd]}).`);
+            // Optimistisch sofort setzen + HTML neu bauen
+            const optState={};
+            if(cmd==='ac_cool'){optState['status.ac_on']=true;optState['status.ac_cooling_heating']=1;}
+            if(cmd==='ac_heat'){optState['status.ac_on']=true;optState['status.ac_cooling_heating']=2;}
+            if(cmd==='ac_vent'){optState['status.ac_on']=true;optState['status.ac_cooling_heating']=0;}
+            if(cmd==='ac_off'){optState['status.ac_on']=false;}
+            if(cmd==='lock'){optState['status.security_locked']=true;}
+            if(cmd==='unlock'){optState['status.security_locked']=false;}
+            if(cmd==='trunk_open'){optState['status.door_trunk']=true;}
+            if(cmd==='trunk_close'){optState['status.door_trunk']=false;}
+            if(cmd==='windows_open'){optState['status.window_fl_pct']=100;optState['status.window_fr_pct']=100;}
+            if(cmd==='windows_close'){optState['status.window_fl_pct']=0;optState['status.window_fr_pct']=0;}
+            for(const[k,v]of Object.entries(optState)){
+                await this.setStateAsync(`${vehicle.vin}.${k}`,{val:v,ack:true});
+            }
+            // Letzten bekannten Status für HTML holen und optimistisch überschreiben
+            // Aus gecachtem Status - sofort ohne API
+            const ls=this.lastStatus[vehicle.vin]||{};
+            const fakeS=Object.assign({},ls);
+            if('status.ac_on' in optState)fakeS.acSwitch=optState['status.ac_on'];
+            if('status.ac_cooling_heating' in optState)fakeS.acCoolingAndHeating=optState['status.ac_cooling_heating'];
+            if('status.security_locked' in optState)fakeS.driverDoorLockStatus=optState['status.security_locked'];
+            if('status.door_trunk' in optState)fakeS.bbcmBackDoorStatus=optState['status.door_trunk'];
+            if('status.window_fl_pct' in optState){fakeS.leftFrontWindowPercent=optState['status.window_fl_pct'];fakeS.rightFrontWindowPercent=optState['status.window_fr_pct'];}
+            await this.buildCompositeHtml(vehicle.vin,fakeS,vehicle.name);
+            // Im Hintergrund nach 10s echten Status holen
+            setTimeout(()=>this.updateVehicleStatus(vehicle),10000);
+        }catch(e){this.log.error(`Command ${cmd} failed: ${e}`)}
     }
 
     onUnload(callback){if(this.pollTimer){clearInterval(this.pollTimer);this.pollTimer=null}this.setState('info.connection',false,true);callback()}

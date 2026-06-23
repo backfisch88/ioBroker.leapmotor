@@ -3,3 +3,5 @@ pictures_cache.json
 *.log
 .DS_Store
 .commitinfo
+admin-tab/node_modules
+admin-tab/dist

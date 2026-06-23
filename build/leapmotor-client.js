@@ -54,6 +54,10 @@ class LeapmotorClient{
             vin:i.vin,
             carType:i.carType||i.carAlias||'T03',
             name:i.vinNickname||i.name||i.vin,
+            year:i.year||null,
+            carAlias:i.carAlias||'',
+            rudder:i.rudder||'',
+            allocationCode:i.allocationCode||0,
             raw:i
         }));
     }
@@ -80,6 +84,17 @@ class LeapmotorClient{
         const result=this._parseResponse(resp.data,`remote ${cmdId}`);await this._pollResult(result);return result;
     }
 
+    async getAppointment(vehicle,cmdId){
+        const h={...this._h(buildSignedHeaders({signKey:this._signKey,deviceId:this.deviceId,vin:vehicle.vin,language:this.config.language,bodyParams:{cmdId}})),...this._authHeaders()};
+        const body=`vin=${encodeURIComponent(vehicle.vin)}&cmdId=${encodeURIComponent(cmdId)}`;
+        const resp=await this.http.post('/carownerservice/oversea/vehicle/v1/app/remote/ctl/getAppointment',body,{headers:h});
+        const result=this._parseResponse(resp.data,'getAppointment');
+        let parsed=result.data;
+        if(typeof parsed==='string'){
+            try{parsed=JSON.parse(parsed)}catch{parsed=null}
+        }
+        return parsed;
+    }
     async getMileageEnergyDetail(vehicle){
         const h={...this._h(require('./leapmotor-crypto').buildSignedHeaders({signKey:this._signKey,deviceId:this.deviceId,vin:vehicle.vin,language:this.config.language})),...this._authHeaders()};
         const resp=await this.http.post('/carownerservice/oversea/drivingRecord/v1/mileage/energy/detail',`vin=${encodeURIComponent(vehicle.vin)}`,{headers:h});
