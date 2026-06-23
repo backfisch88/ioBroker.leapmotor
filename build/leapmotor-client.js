@@ -13,6 +13,7 @@ class LeapmotorClient{
         this.config={baseUrl:config.baseUrl||'https://appgateway.leapmotor-international.de',timeout:config.timeout||30000,language:config.language||'en-GB',operationPassword:config.operationPassword||'',...config};
         this.deviceId=crypto.randomUUID().replace(/-/g,'');
         this.appCertPem=config.appCertPem;
+        this._adapter=config.adapterInstance||null;
         this.appKeyPem=config.appKeyPem;
         this.http=this._createHttpClient(config.appCertPem,config.appKeyPem);
     }
@@ -84,6 +85,19 @@ class LeapmotorClient{
         const result=this._parseResponse(resp.data,`remote ${cmdId}`);await this._pollResult(result);return result;
     }
 
+    async getMessageList(pageNo,pageSize){
+        const h={...this._h(buildSignedHeaders({signKey:this._signKey,deviceId:this.deviceId,language:this.config.language,bodyParams:{pageNo:String(pageNo),pageSize:String(pageSize)}})),...this._authHeaders()};
+        const body=`pageNo=${pageNo}&pageSize=${pageSize}`;
+        const resp=await this.http.post('/carownerservice/oversea/message/v1/list',body,{headers:h});
+        const result=this._parseResponse(resp.data,'message list');
+        return result.data||{};
+    }
+    async getUnreadMessageCount(){
+        const h={...this._h(buildSignedHeaders({signKey:this._signKey,deviceId:this.deviceId,language:this.config.language})),...this._authHeaders()};
+        const resp=await this.http.post('/carownerservice/oversea/message/v1/unreadCount','',{headers:h});
+        const result=this._parseResponse(resp.data,'unread count');
+        return Number(result.data||0);
+    }
     async getAppointment(vehicle,cmdId){
         const h={...this._h(buildSignedHeaders({signKey:this._signKey,deviceId:this.deviceId,vin:vehicle.vin,language:this.config.language,bodyParams:{cmdId}})),...this._authHeaders()};
         const body=`vin=${encodeURIComponent(vehicle.vin)}&cmdId=${encodeURIComponent(cmdId)}`;
@@ -166,7 +180,7 @@ class LeapmotorClient{
         const deadline=Date.now()+Math.max(Number(rd.queryRemoteCtlResultTimeout||30000),1000);
         const interval=Number(rd.queryInterval||2000);
         while(Date.now()<deadline){
-            await new Promise(r=>setTimeout(r,interval));
+            await new Promise(r=>{if(this._adapter&&this._adapter.setTimeout)this._adapter.setTimeout(r,interval);else setTimeout(r,interval);});
             const h={...this._h(buildRemoteCtlResultHeaders({signKey:this._signKey,deviceId:this.deviceId,remoteCtlId:id,language:this.config.language})),...this._authHeaders()};
             const resp=await this.http.post('/carownerservice/oversea/vehicle/v1/app/remote/ctl/result/query',`remoteCtlId=${encodeURIComponent(id)}`,{headers:h});
             if(this._parseResponse(resp.data,'remote poll').data===1)return;

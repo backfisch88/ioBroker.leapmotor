@@ -28,15 +28,17 @@ jobs:
 
   adapter-tests:
     needs: check-and-lint
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         node-version: [22.x, 24.x]
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
       - uses: actions/checkout@v4
       - uses: ioBroker/testing-action-adapter@v1
         with:
           node-version: ${{ matrix.node-version }}
+          os: ${{ matrix.os }}
           build: false
 
   deploy:
@@ -51,5 +53,4 @@ jobs:
       - uses: ioBroker/testing-action-deploy@v1
         with:
           node-version: '24.x'
-          npm-token: ${{ secrets.NPM_TOKEN }}
           build: false

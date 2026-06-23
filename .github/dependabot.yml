@@ -3,15 +3,24 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "cron"
+      cronjob: "0 3 * * 1"
     cooldown:
       default: 7
     ignore:
       - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
+  - package-ecosystem: "npm"
+    directory: "/admin-tab"
+    schedule:
+      interval: "cron"
+      cronjob: "0 4 * * 3"
+    cooldown:
+      default: 7
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "cron"
+      cronjob: "0 5 * * 5"
     cooldown:
       default: 7

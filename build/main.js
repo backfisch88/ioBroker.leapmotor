@@ -15,6 +15,15 @@ const C={
     carBg1:'#111f35',carBg2:'#070d1a',
 };
 
+const DEFAULT_BATTERY_CAPACITY_KWH={
+    T03:36.0,   // 37.3 kWh brutto / 36.0 kWh netto
+    B10:56.2,   // Basisversion; Pro Max Variante hat 67.1 kWh
+    C10:69.9,   // Standardversion; AWD-Variante hat 81.9 kWh, REEV-Variante 52.9 kWh
+    C16:69.9,   // Vorlaeufige Schaetzung basierend auf C10 Plattform-Aehnlichkeit, noch nicht verifiziert
+};
+function getDefaultBatteryCapacity(carType){
+    return DEFAULT_BATTERY_CAPACITY_KWH[String(carType||'').toUpperCase()]||36.0;
+}
 class LeapmotorAdapter extends utils.Adapter{
     constructor(options={}){
         super({...options,name:'leapmotor'});
@@ -31,7 +40,7 @@ class LeapmotorAdapter extends utils.Adapter{
         let appCertPem,appKeyPem;
         try{appCertPem=fs.readFileSync(path.join(CERT_DIR,'app.crt'),'utf8');appKeyPem=fs.readFileSync(path.join(CERT_DIR,'app.key'),'utf8')}
         catch(e){this.log.error(`Certificates not found: ${e}`);return}
-        this.client=new LeapmotorClient({username:cfg.email,password:cfg.password,appCertPem,appKeyPem,operationPassword:cfg.operationPassword||undefined,language:cfg.language||'en-GB'});
+        this.client=new LeapmotorClient({username:cfg.email,password:cfg.password,appCertPem,appKeyPem,operationPassword:cfg.operationPassword||undefined,language:cfg.language||'en-GB',adapterInstance:this});
         try{this.log.debug(`Adapter config: language=${cfg.language||'en-GB'}, polling=${cfg.pollingInterval||5}min, pin=${cfg.operationPassword?'set':'NOT SET'}`);
         this.log.info('Connecting to Leapmotor cloud...');await this.client.login();this.log.info('Login successful.');this.setState('info.connection',true,true)}
         catch(e){this.log.error(`Login failed: ${e}`);return}
@@ -82,6 +91,7 @@ class LeapmotorAdapter extends utils.Adapter{
             await this.setStateAsync(`${vehicle.vin}.status.last_poll_time`,{val:pollTime,ack:true});
             try{await this.updateDailyMileage(vehicle.vin,s.totalMileage)}catch(e){this.log.debug(`Daily mileage error: ${e}`)}
             try{await this.updateTripDetection(vehicle.vin,s.totalMileage,s.speed,s.soc)}catch(e){this.log.debug(`Trip detection error: ${e}`)}
+            try{await this.updateChargingCost(vehicle.vin,s.soc,s.chargeState)}catch(e){this.log.debug(`Charging cost error: ${e}`)}
             this.log.debug(`${vehicle.vin}: SOC=${s.soc}% Range=${s.expectedMileage}km Temp=${s.outdoorTemp}°C Locked=${s.driverDoorLockStatus} AC=${s.acSwitch}`);
             await this.buildCompositeHtml(vehicle.vin,s,vehicle.name);
         }catch(e){
@@ -153,6 +163,48 @@ class LeapmotorAdapter extends utils.Adapter{
             }
             this._tripStates[vin]={wasActive:false,startMileage:null,startTime:null,startSoc:null};
             await this.setStateAsync(`${vin}.trips.current_trip_active`,{val:false,ack:true});
+        }
+    }
+
+    async updateChargingCost(vin,soc,chargeState){
+        const charging=chargeState!=null&&[1,2,3].includes(chargeState);
+        if(!this._chargingSessions)this._chargingSessions={};
+        const prev=this._chargingSessions[vin]||{wasCharging:false,startSoc:null,accumulatedCost:0,accumulatedKwh:0,lastSoc:null};
+
+        // Batteriekapazitaet: Default 31.9kWh (T03 Bruttowert), via Datenpunkt ueberschreibbar
+        const capState=await this.getStateAsync(`${vin}.config.battery_capacity_kwh`);
+        const capacity=Number(capState?.val)||31.9;
+
+        if(charging&&!prev.wasCharging){
+            // Neue Ladesession beginnt
+            this._chargingSessions[vin]={wasCharging:true,startSoc:soc,accumulatedCost:0,accumulatedKwh:0,lastSoc:soc};
+            await this.setStateAsync(`${vin}.charging.session_active`,{val:true,ack:true});
+            await this.setStateAsync(`${vin}.charging.session_cost`,{val:0,ack:true});
+            await this.setStateAsync(`${vin}.charging.session_kwh`,{val:0,ack:true});
+            this.log.debug(`Charging session started at SOC=${soc}%`);
+        }else if(charging&&prev.wasCharging){
+            // Laufende Session: Energie seit letztem Poll mit AKTUELLEM Preis verrechnen
+            const socDelta=soc!=null&&prev.lastSoc!=null?Math.max(0,soc-prev.lastSoc):0;
+            const kwhDelta=(socDelta/100)*capacity;
+            const currentPriceState=await this.getStateAsync(`config.energy_price_eur_kwh`);
+            const currentPrice=Number(currentPriceState?.val)||0.30;
+            const costDelta=kwhDelta*currentPrice;
+
+            const updated={
+                wasCharging:true,
+                startSoc:prev.startSoc,
+                accumulatedCost:prev.accumulatedCost+costDelta,
+                accumulatedKwh:prev.accumulatedKwh+kwhDelta,
+                lastSoc:soc,
+            };
+            this._chargingSessions[vin]=updated;
+            await this.setStateAsync(`${vin}.charging.session_cost`,{val:Math.round(updated.accumulatedCost*100)/100,ack:true});
+            await this.setStateAsync(`${vin}.charging.session_kwh`,{val:Math.round(updated.accumulatedKwh*100)/100,ack:true});
+        }else if(!charging&&prev.wasCharging){
+            // Session beendet
+            await this.setStateAsync(`${vin}.charging.session_active`,{val:false,ack:true});
+            this.log.debug(`Charging session ended: ${prev.accumulatedKwh.toFixed(2)}kWh, ${prev.accumulatedCost.toFixed(2)}€`);
+            this._chargingSessions[vin]={wasCharging:false,startSoc:null,accumulatedCost:0,accumulatedKwh:0,lastSoc:null};
         }
     }
 
@@ -509,10 +561,15 @@ class LeapmotorAdapter extends utils.Adapter{
         await this.setObjectNotExistsAsync(`messages.latest_time`,{type:'state',common:{name:'Latest Message Time',type:'string',role:'value.datetime',read:true,write:false,def:''},native:{}});
         await this.setObjectNotExistsAsync(`messages.json`,{type:'state',common:{name:'All Messages (JSON, last 10)',type:'string',role:'json',read:true,write:false,def:''},native:{}});
         await this.setObjectNotExistsAsync(`config.energy_price_eur_kwh`,{type:'state',common:{name:'Strompreis (Eur/kWh) - manuell editierbar',type:'number',role:'value',read:true,write:true,unit:'€/kWh',min:0,max:2,def:0.30},native:{}});
+        const defaultCapacity=getDefaultBatteryCapacity(vehicle.carType);
+        await this.setObjectNotExistsAsync(`config.battery_capacity_kwh`,{type:'state',common:{name:`Batteriekapazitaet (kWh, netto) - Standard fuer ${vehicle.carType||'?'}: ${defaultCapacity}kWh. Bei abweichender Akkuvariante (z.B. B10/C10 Pro Max/AWD) bitte manuell anpassen!`,type:'number',role:'value',read:true,write:true,unit:'kWh',min:10,max:150,def:defaultCapacity},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.trips.daily_km_json`,{type:'state',common:{name:'Daily Kilometers (JSON, last 30 days)',type:'string',role:'json',read:true,write:false,def:'[]'},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.trips.today_km`,{type:'state',common:{name:'Kilometers Driven Today',type:'number',role:'value',read:true,write:false,unit:'km',def:0},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.trips.history_json`,{type:'state',common:{name:'Trip History (JSON, last 50 trips)',type:'string',role:'json',read:true,write:false,def:'[]'},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.trips.current_trip_active`,{type:'state',common:{name:'Trip Currently In Progress',type:'boolean',role:'indicator',read:true,write:false,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.charging.session_cost`,{type:'state',common:{name:'Current/Last Charging Session Cost',type:'number',role:'value',read:true,write:false,unit:'€',def:0},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.charging.session_kwh`,{type:'state',common:{name:'Current/Last Charging Session Energy (estimated)',type:'number',role:'value',read:true,write:false,unit:'kWh',def:0},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.charging.session_active`,{type:'state',common:{name:'Charging Session In Progress',type:'boolean',role:'indicator',read:true,write:false,def:false},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.defrost_cycle`,{type:'state',common:{name:'Cycle Windshield Defrost (off/weak/strong)',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.quick_cool`,{type:'state',common:{name:'Quick Cool',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.quick_heat`,{type:'state',common:{name:'Quick Heat',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
@@ -659,7 +716,7 @@ class LeapmotorAdapter extends utils.Adapter{
                     await this.client.sendCommandWithPin(vehicle,'510',content);
                 }catch(e){
                     if(String(e).includes('ngültig')||String(e).includes('token')){
-                        await new Promise(r=>setTimeout(r,500));
+                        await new Promise(r=>this.setTimeout(r,500));
                         await this.client.login();
                         await this.client.sendCommandWithPin(vehicle,'510',content);
                     }else{throw e}
@@ -676,7 +733,7 @@ class LeapmotorAdapter extends utils.Adapter{
                     await this.client.sendCommandWithPin(vehicle,'301',content);
                 }catch(e){
                     if(String(e).includes('ngültig')||String(e).includes('token')){
-                        await new Promise(r=>setTimeout(r,500));
+                        await new Promise(r=>this.setTimeout(r,500));
                         await this.client.login();
                         await this.client.sendCommandWithPin(vehicle,'301',content);
                     }else{throw e}
@@ -693,7 +750,7 @@ class LeapmotorAdapter extends utils.Adapter{
                     await this.client.sendCommandWithPin(vehicle,'370',content);
                 }catch(e){
                     if(String(e).includes('ngültig')||String(e).includes('token')){
-                        await new Promise(r=>setTimeout(r,500));
+                        await new Promise(r=>this.setTimeout(r,500));
                         await this.client.login();
                         await this.client.sendCommandWithPin(vehicle,'370',content);
                     }else{throw e}
@@ -709,7 +766,7 @@ class LeapmotorAdapter extends utils.Adapter{
                     await this.client.sendCommandWithPin(vehicle,'190',content);
                 }catch(e){
                     if(String(e).includes('ngültig')||String(e).includes('token')){
-                        await new Promise(r=>setTimeout(r,500));
+                        await new Promise(r=>this.setTimeout(r,500));
                         await this.client.login();
                         await this.client.sendCommandWithPin(vehicle,'190',content);
                     }else{throw e}
@@ -731,7 +788,7 @@ class LeapmotorAdapter extends utils.Adapter{
                     await this.client.sendCommandWithPin(vehicle,'171',content);
                 }catch(e){
                     if(String(e).includes('ngültig')||String(e).includes('token')){
-                        await new Promise(r=>setTimeout(r,500));
+                        await new Promise(r=>this.setTimeout(r,500));
                         await this.client.login();
                         await this.client.sendCommandWithPin(vehicle,'171',content);
                     }else{throw e}
@@ -765,7 +822,7 @@ class LeapmotorAdapter extends utils.Adapter{
                     await this.client.sendCommandWithPin(vehicle,'171',content);
                 }catch(e){
                     if(String(e).includes('ngültig')||String(e).includes('token')){
-                        await new Promise(r=>setTimeout(r,500));
+                        await new Promise(r=>this.setTimeout(r,500));
                         await this.client.login();
                         await this.client.sendCommandWithPin(vehicle,'171',content);
                     }else{throw e}
@@ -794,7 +851,7 @@ class LeapmotorAdapter extends utils.Adapter{
                     await this.client.sendCommandWithPin(vehicle,'190',content);
                 }catch(e){
                     if(String(e).includes('ngültig')||String(e).includes('token')){
-                        await new Promise(r=>setTimeout(r,500));
+                        await new Promise(r=>this.setTimeout(r,500));
                         await this.client.login();
                         await this.client.sendCommandWithPin(vehicle,'190',content);
                     }else{throw e}
@@ -815,7 +872,7 @@ class LeapmotorAdapter extends utils.Adapter{
                     await this.client.sendCommandWithPin(vehicle,'171',content);
                 }catch(e){
                     if(String(e).includes('ngültig')||String(e).includes('token')){
-                        await new Promise(r=>setTimeout(r,500));
+                        await new Promise(r=>this.setTimeout(r,500));
                         await this.client.login();
                         await this.client.sendCommandWithPin(vehicle,'171',content);
                     }else{throw e}
@@ -855,7 +912,7 @@ class LeapmotorAdapter extends utils.Adapter{
                     await this.client.sendCommandWithPin(vehicle,'171',content);
                 }catch(e){
                     if(String(e).includes('ngültig')||String(e).includes('token')){
-                        await new Promise(r=>setTimeout(r,500));
+                        await new Promise(r=>this.setTimeout(r,500));
                         await this.client.login();
                         await this.client.sendCommandWithPin(vehicle,'171',content);
                     }else{throw e}
