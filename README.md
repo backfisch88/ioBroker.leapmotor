@@ -90,7 +90,7 @@ leapmotor.0.<VIN>.pictures.composite_html
 | cmd.refresh | Trigger immediate status update | – |
 
 ## Changelog
-### **WORK IN PROGRESS**
+### 0.5.1 (2026-06-24)
 - (placeholder for next release)
 
 ### 0.5.0 (2026-06-23)
@@ -112,15 +112,6 @@ leapmotor.0.<VIN>.pictures.composite_html
 
 ### 0.2.4 (2026-06-12)
 - Fix: GitHub release permissions in workflow
-
-### 0.2.3 (2026-06-12)
-- Fix: add missing news entries
-
-### 0.2.2 (2026-06-11)
-- Fix: workflow, test scripts
-
-### 0.2.1 (2026-06-10)
-- Fix: release script, logo size, workflow improvements
 
 Older changes can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 
