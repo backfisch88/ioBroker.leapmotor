@@ -1,4 +1,7 @@
 # Older Changelog
+## 0.2.4 (2026-06-12)
+- Fix: GitHub release permissions in workflow
+
 ## 0.2.3 (2026-06-12)
 - Fix: add missing news entries
 
