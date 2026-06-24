@@ -90,6 +90,9 @@ leapmotor.0.<VIN>.pictures.composite_html
 | cmd.refresh | Trigger immediate status update | – |
 
 ## Changelog
+### **WORK IN PROGRESS**
+- (placeholder for next release)
+
 ### 0.5.0 (2026-06-23)
 - New: React admin dashboard with full vehicle control
 - New: climate and charging schedules
