@@ -46,7 +46,9 @@
   "scripts": {
     "test:package": "mocha test/package.test.js --exit",
     "test": "npm run test:package",
-    "release": "release-script"
+    "release": "release-script",
+    "test:integration": "echo \"No integration tests configured\" && exit 0",
+    "test:unit": "echo \"No unit tests configured\" && exit 0"
   },
   "engines": {
     "node": ">=22"
