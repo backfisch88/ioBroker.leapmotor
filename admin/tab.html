@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Leapmotor</title>
+    <script>
+        // Stelle sicher, dass ioBrokers eigene socket.io Client-Library
+        // geladen ist, bevor AdminConnection versucht sich zu verbinden.
+        (function() {
+            var script = document.createElement('script');
+            script.src = window.location.protocol + '//' + window.location.hostname + ':' + (window.location.port || 8081) + '/lib/js/socket.io.js';
+            document.head.appendChild(script);
+        })();
+    </script>
+  <script type="module" crossorigin src="./tab.js"></script>
+</head>
+<body style="margin:0;padding:0;background:#070d1a">
+    <div id="root"></div>
+</body>
+</html>
