@@ -90,7 +90,7 @@ leapmotor.0.<VIN>.pictures.composite_html
 | cmd.refresh | Trigger immediate status update | – |
 
 ## Changelog
-### **WORK IN PROGRESS**
+### 0.5.4 (2026-06-26)
 - (placeholder for next release)
 
 ### 0.5.3 (2026-06-26)
@@ -112,9 +112,6 @@ leapmotor.0.<VIN>.pictures.composite_html
 - New: vehicle messages and unread count
 - New: vehicle-model-specific feature capability system
 - New: embeddable animated vehicle image for VIS
-
-### 0.2.7 (2026-06-13)
-- (see previous release notes)
 
 Older changes can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

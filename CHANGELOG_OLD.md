@@ -1,4 +1,7 @@
 # Older Changelog
+## 0.2.7 (2026-06-13)
+- (see previous release notes)
+
 ## 0.2.5 (2026-06-12)
 - fix: use dynamic vehicle name from API in HTML dashboard
 - fix: remove debug log messages

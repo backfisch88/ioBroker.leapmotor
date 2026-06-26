@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "leapmotor",
-    "version": "0.5.3",
+    "version": "0.5.4",
     "news": {
+      "0.5.4": {
+        "en": "Fix: include previously missing admin tab files (index_m.html, tab.html, tab.js, tab_m.html) in the published package",
+        "de": "Fix: zuvor fehlende Admin-Tab-Dateien (index_m.html, tab.html, tab.js, tab_m.html) im veröffentlichten Paket ergänzt",
+        "ru": "Исправление: добавлены ранее отсутствующие файлы вкладки администратора в опубликованный пакет",
+        "pt": "Correção: incluídos arquivos da aba admin anteriormente ausentes no pacote publicado",
+        "nl": "Fix: voorheen ontbrekende admin-tab bestanden toegevoegd aan het gepubliceerde pakket",
+        "fr": "Correction : ajout des fichiers de l'onglet admin précédemment manquants dans le package publié",
+        "it": "Correzione: aggiunti i file della scheda admin precedentemente mancanti nel pacchetto pubblicato",
+        "es": "Corrección: se incluyeron los archivos de la pestaña admin que faltaban en el paquete publicado",
+        "pl": "Poprawka: dodano wcześniej brakujące pliki karty administratora do opublikowanego pakietu",
+        "uk": "Виправлення: додано раніше відсутні файли вкладки адміністратора до опублікованого пакета",
+        "zh-cn": "修复：在已发布的包中包含之前缺失的管理标签文件"
+      },
       "0.5.3": {
         "en": "New: standard package.test.js test suite using @iobroker/testing for repository compliance",
         "de": "Neu: Standard-Test-Suite (package.test.js) mit @iobroker/testing für Repository-Konformität",
@@ -80,19 +93,6 @@
         "pl": "Poprawka: workflow",
         "uk": "Виправлення: робочий процес",
         "zh-cn": "修复：工作流程"
-      },
-      "0.2.3": {
-        "en": "Fix: add missing news entries",
-        "de": "Fix: fehlende News-Einträge hinzugefügt",
-        "ru": "Исправление",
-        "pt": "Correção",
-        "nl": "Fix",
-        "fr": "Correction",
-        "it": "Correzione",
-        "es": "Corrección",
-        "pl": "Poprawka",
-        "uk": "Виправлення",
-        "zh-cn": "修复"
       }
     },
     "titleLang": {
