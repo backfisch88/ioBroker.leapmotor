@@ -1,4 +1,8 @@
 # Older Changelog
+## 0.2.5 (2026-06-12)
+- fix: use dynamic vehicle name from API in HTML dashboard
+- fix: remove debug log messages
+
 ## 0.2.4 (2026-06-12)
 - Fix: GitHub release permissions in workflow
 

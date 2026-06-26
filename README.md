@@ -90,7 +90,7 @@ leapmotor.0.<VIN>.pictures.composite_html
 | cmd.refresh | Trigger immediate status update | – |
 
 ## Changelog
-### **WORK IN PROGRESS**
+### 0.5.3 (2026-06-26)
 - (placeholder for next release)
 
 ### 0.5.2 (2026-06-24)
@@ -112,10 +112,6 @@ leapmotor.0.<VIN>.pictures.composite_html
 
 ### 0.2.7 (2026-06-13)
 - (see previous release notes)
-
-### 0.2.5 (2026-06-12)
-- fix: use dynamic vehicle name from API in HTML dashboard
-- fix: remove debug log messages
 
 Older changes can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 
