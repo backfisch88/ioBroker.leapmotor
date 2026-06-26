@@ -44,12 +44,9 @@
     "LICENSE"
   ],
   "scripts": {
-    "lint": "echo \"No linting configured\"",
-    "test": "echo \"No tests configured\"",
-    "release": "release-script",
-    "test:package": "echo \"No package tests configured\"",
-    "test:unit": "echo \"No unit tests configured\"",
-    "test:integration": "echo \"No integration tests configured\""
+    "test:package": "mocha test/package.test.js --exit",
+    "test": "npm run test:package",
+    "release": "release-script"
   },
   "engines": {
     "node": ">=22"
