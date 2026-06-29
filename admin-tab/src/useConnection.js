@@ -5,12 +5,12 @@ function waitForSocketIo(timeoutMs = 8000) {
     return new Promise((resolve, reject) => {
         if (window.io) return resolve();
         const start = Date.now();
-        const interval = window.setInterval(() => {
+        const interval = setInterval(() => {
             if (window.io) {
-                window.clearInterval(interval);
+                clearInterval(interval);
                 resolve();
             } else if (Date.now() - start > timeoutMs) {
-                window.clearInterval(interval);
+                clearInterval(interval);
                 reject(new Error('socket.io.js nicht geladen nach ' + timeoutMs + 'ms'));
             }
         }, 100);
@@ -57,7 +57,7 @@ export function useConnection(adapterInstance) {
                 if (!cancelled) setError('startSocket failed: ' + (err?.message || err));
             });
 
-            const timeout = window.setTimeout(() => {
+            const timeout = setTimeout(() => {
                 if (!cancelled && !conn.isConnected?.()) {
                     setError('Timeout: Keine Verbindung nach 10 Sekunden');
                 }
@@ -72,7 +72,7 @@ export function useConnection(adapterInstance) {
         return () => {
             cancelled = true;
             if (cleanupConn) {
-                window.clearTimeout(cleanupConn._timeout);
+                clearTimeout(cleanupConn._timeout);
                 try { cleanupConn.destroy?.(); } catch (e) { /* ignore */ }
             }
         };

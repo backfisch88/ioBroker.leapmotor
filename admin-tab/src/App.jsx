@@ -7,12 +7,14 @@ import DashboardIcon from '@mui/icons-material/DirectionsCar';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import BuildIcon from '@mui/icons-material/Build';
+import MapIcon from '@mui/icons-material/Map';
 
 import { useConnection } from './useConnection';
 import DashboardTab from './components/DashboardTab';
 import DatapointsTab from './components/DatapointsTab';
 import ConsumptionTab from './components/ConsumptionTab';
 import DiagnosticsTab from './components/DiagnosticsTab';
+import TripsTab from './components/TripsTab';
 
 const theme = createTheme({
     palette: {
@@ -104,6 +106,7 @@ export default function App() {
                     >
                         <Tab icon={<DashboardIcon />} label="Dashboard" />
                         <Tab icon={<BarChartIcon />} label="Verbrauch" />
+                        <Tab icon={<MapIcon />} label="Fahrten" />
                         <Tab icon={<ListAltIcon />} label="Datenpunkte" />
                         <Tab icon={<BuildIcon />} label="Diagnose" />
                     </Tabs>
@@ -113,8 +116,9 @@ export default function App() {
                     {!base && <Typography color="text.secondary">Kein Fahrzeug gefunden. Ist der Adapter gestartet?</Typography>}
                     {base && tab === 0 && <DashboardTab base={base} states={states} setState={setState} />}
                     {base && tab === 1 && <ConsumptionTab base={base} states={states} />}
-                    {base && tab === 2 && <DatapointsTab base={base} states={states} />}
-                    {base && tab === 3 && <DiagnosticsTab base={base} states={states} setState={setState} adapter={ADAPTER} />}
+                    {base && tab === 2 && <TripsTab base={base} states={states} />}
+                    {base && tab === 3 && <DatapointsTab base={base} states={states} />}
+                    {base && tab === 4 && <DiagnosticsTab base={base} states={states} setState={setState} adapter={ADAPTER} />}
                 </Box>
             </Box>
         </ThemeProvider>

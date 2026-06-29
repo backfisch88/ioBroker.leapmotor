@@ -167,7 +167,8 @@
         "de": "Leapmotor"
       },
       "link": "/adapter/leapmotor/tab/tab.html"
-    }
+    },
+    "installedFrom": "backfisch88/ioBroker.leapmotor"
   },
   "native": {
     "email": "",

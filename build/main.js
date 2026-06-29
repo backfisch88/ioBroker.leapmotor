@@ -133,12 +133,36 @@ class LeapmotorAdapter extends utils.Adapter{
         if(totalMileage==null)return;
         const isDriving=speed!=null&&speed>0;
         if(!this._tripStates)this._tripStates={};
+        if(!this._lastKnownMileage)this._lastKnownMileage={};
         const prev=this._tripStates[vin]||{wasActive:false,startMileage:null,startTime:null,startSoc:null};
+        const lastMileage=this._lastKnownMileage[vin];
 
         if(isDriving&&!prev.wasActive){
-            this._tripStates[vin]={wasActive:true,startMileage:totalMileage,startTime:Date.now(),startSoc:soc};
+            // Die Fahrt wird erst jetzt erkannt, aber der Kilometerstand kann sich
+            // bereits seit dem letzten Poll (bis zu 5 Minuten zuvor) erhoeht haben,
+            // ohne dass wir es als Fahrt erfasst hatten ("Sonstige" km im Dashboard).
+            // Wir rechnen den Fahrtbeginn auf den letzten bekannten Kilometerstand
+            // zurueck, damit diese km der Fahrt zugeschlagen werden, und schaetzen
+            // die Startzeit anhand der durchschnittlichen Geschwindigkeit zurueck.
+            let startMileage=totalMileage;
+            let startTime=Date.now();
+            if(lastMileage!=null&&lastMileage.mileage<totalMileage){
+                const missedKm=totalMileage-lastMileage.mileage;
+                const elapsedMs=Date.now()-lastMileage.ts;
+                // Nur zurueckrechnen wenn die Luecke plausibel ist (max. 15 Minuten,
+                // sonst war es vermutlich keine durchgehende Fahrt sondern ein Stop)
+                if(elapsedMs<=900000&&missedKm>0&&missedKm<50){
+                    startMileage=lastMileage.mileage;
+                    // Geschaetzte Startzeit: aktuelle Geschwindigkeit als Annahme fuer
+                    // die Durchschnittsgeschwindigkeit der verpassten Strecke nutzen
+                    const avgSpeedKmh=speed>0?speed:30;
+                    const missedTimeMs=Math.min(elapsedMs,(missedKm/avgSpeedKmh)*3600000);
+                    startTime=Date.now()-missedTimeMs;
+                }
+            }
+            this._tripStates[vin]={wasActive:true,startMileage,startTime,startSoc:soc};
             await this.setStateAsync(`${vin}.trips.current_trip_active`,{val:true,ack:true});
-            this.log.debug(`Trip started at ${totalMileage}km`);
+            this.log.debug(`Trip started at ${startMileage}km (current: ${totalMileage}km)`);
         }else if(!isDriving&&prev.wasActive){
             const km=Math.max(0,totalMileage-(prev.startMileage??totalMileage));
             const durationMin=Math.round((Date.now()-(prev.startTime??Date.now()))/60000);
@@ -164,6 +188,7 @@ class LeapmotorAdapter extends utils.Adapter{
             this._tripStates[vin]={wasActive:false,startMileage:null,startTime:null,startSoc:null};
             await this.setStateAsync(`${vin}.trips.current_trip_active`,{val:false,ack:true});
         }
+        this._lastKnownMileage[vin]={mileage:totalMileage,ts:Date.now()};
     }
 
     async updateChargingCost(vin,soc,chargeState){
