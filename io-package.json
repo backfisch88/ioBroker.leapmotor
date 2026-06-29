@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "leapmotor",
-    "version": "0.5.5",
+    "version": "0.5.6",
     "news": {
+      "0.5.6": {
+        "en": "New: Trips tab showing daily kilometers with individual detected trips. Fix: trip detection now backfills kilometers driven before the trip was first detected (5-minute polling gap).",
+        "de": "Neu: Fahrten-Tab mit Tageskilometern und erkannten Einzelfahrten. Fix: Fahrt-Erkennung berücksichtigt jetzt nachträglich Kilometer, die vor der ersten Erkennung gefahren wurden (5-Minuten-Polling-Lücke).",
+        "ru": "Новое: вкладка поездок с ежедневным пробегом и обнаруженными отдельными поездками. Исправление: обнаружение поездок теперь учитывает километры, пройденные до первого обнаружения.",
+        "pt": "Novo: aba de viagens mostrando quilômetros diários com viagens individuais detectadas. Correção: a detecção de viagens agora preenche os quilômetros percorridos antes da primeira detecção.",
+        "nl": "Nieuw: Ritten-tabblad met dagelijkse kilometers en gedetecteerde individuele ritten. Fix: rit-detectie vult nu kilometers aan die zijn gereden voor de eerste detectie.",
+        "fr": "Nouveau : onglet Trajets affichant les kilomètres quotidiens avec les trajets individuels détectés. Correction : la détection des trajets comble désormais les kilomètres parcourus avant la première détection.",
+        "it": "Nuovo: scheda Viaggi che mostra i chilometri giornalieri con i singoli viaggi rilevati. Correzione: il rilevamento dei viaggi ora recupera i chilometri percorsi prima del primo rilevamento.",
+        "es": "Nuevo: pestaña de viajes que muestra los kilómetros diarios con los viajes individuales detectados. Corrección: la detección de viajes ahora completa los kilómetros recorridos antes de la primera detección.",
+        "pl": "Nowość: karta Podróże pokazująca dzienne kilometry z wykrytymi pojedynczymi podróżami. Poprawka: wykrywanie podróży uzupełnia teraz kilometry przejechane przed pierwszym wykryciem.",
+        "uk": "Нове: вкладка Поїздки з щоденним пробігом та виявленими окремими поїздками. Виправлення: виявлення поїздок тепер враховує кілометри, пройдені до першого виявлення.",
+        "zh-cn": "新增：行程标签显示每日公里数和检测到的单独行程。修复：行程检测现在会补充首次检测前行驶的公里数。"
+      },
       "0.5.5": {
         "en": "Critical fix: adminTab.link used a relative path causing 404 errors when opening the tab for all users. Now uses an absolute path to the React app.",
         "de": "Kritischer Fix: adminTab.link nutzte einen relativen Pfad, der beim Öffnen des Tabs zu 404-Fehlern bei allen Nutzern führte. Jetzt wird ein absoluter Pfad zur React-App verwendet.",
@@ -80,19 +93,6 @@
         "pl": "Nowość: panel administracyjny React z pełną kontrolą pojazdu\nNowość: harmonogramy klimatyzacji i ładowania\nNowość: funkcje komfortu (tryb strażnika, ogrzewanie/wentylacja siedzeń, ogrzewanie kierownicy, ogranicznik prędkości, ogrzewanie lusterek)\nNowość: wykrywanie przejazdów i śledzenie dziennego przebiegu\nNowość: szacowanie kosztów ładowania z dynamiczną ceną energii\nNowość: wiadomości pojazdu i licznik nieprzeczytanych\nNowość: system możliwości zależny od modelu pojazdu\nNowość: animowany obraz pojazdu do osadzenia w VIS",
         "uk": "Нове: React-панель адміністратора з повним керуванням автомобілем\nНове: розклади клімату та зарядки\nНове: функції комфорту (режим охорони, підігрів/вентиляція сидінь, підігрів керма, обмеження швидкості, підігрів дзеркал)\nНове: виявлення поїздок та облік щоденного пробігу\nНове: оцінка вартості зарядки з динамічним тарифом\nНове: повідомлення автомобіля та лічильник непрочитаних\nНове: система можливостей залежно від моделі автомобіля\nНове: вбудовуване анімоване зображення автомобіля для VIS",
         "zh-cn": "新增：具有完整车辆控制功能的 React 管理仪表板\n新增：气候和充电计划\n新增：舒适功能（哨兵模式、座椅加热/通风、方向盘加热、速度限制、镜子加热）\n新增：行程检测和每日里程跟踪\n新增：动态电价的充电成本估算\n新增：车辆消息和未读计数\n新增：特定车型功能能力系统\n新增：可嵌入 VIS 的动画车辆图像"
-      },
-      "0.2.1": {
-        "en": "Fix: release script, logo size, workflow improvements",
-        "de": "Fix: Release-Script, Logo-Größe, Workflow-Verbesserungen",
-        "ru": "Исправление: скрипт выпуска, размер логотипа",
-        "pt": "Correção: script de lançamento, tamanho do logotipo",
-        "nl": "Fix: release script, logo grootte",
-        "fr": "Correction: script de version, taille du logo",
-        "it": "Correzione: script di rilascio, dimensione logo",
-        "es": "Corrección: script de lanzamiento, tamaño del logo",
-        "pl": "Poprawka: skrypt wydania, rozmiar logo",
-        "uk": "Виправлення: скрипт випуску, розмір логотипу",
-        "zh-cn": "修复：发布脚本、徽标大小"
       }
     },
     "titleLang": {

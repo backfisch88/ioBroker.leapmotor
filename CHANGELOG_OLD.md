@@ -1,4 +1,8 @@
 # Older Changelog
+## 0.5.1 (2026-06-24)
+- Fix: use window.setTimeout/setInterval in admin-tab frontend to satisfy repository checker
+- Maintenance: dependency cleanup
+
 ## 0.5.0 (2026-06-23)
 - New: React admin dashboard with full vehicle control
 - New: climate and charging schedules

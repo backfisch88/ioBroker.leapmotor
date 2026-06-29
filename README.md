@@ -90,7 +90,7 @@ leapmotor.0.<VIN>.pictures.composite_html
 | cmd.refresh | Trigger immediate status update | – |
 
 ## Changelog
-### **WORK IN PROGRESS**
+### 0.5.6 (2026-06-29)
 - (placeholder for next release)
 
 ### 0.5.5 (2026-06-29)
@@ -104,10 +104,6 @@ leapmotor.0.<VIN>.pictures.composite_html
 
 ### 0.5.2 (2026-06-24)
 - (placeholder for next release)
-
-### 0.5.1 (2026-06-24)
-- Fix: use window.setTimeout/setInterval in admin-tab frontend to satisfy repository checker
-- Maintenance: dependency cleanup
 
 Older changes can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 
