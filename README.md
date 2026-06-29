@@ -90,6 +90,9 @@ leapmotor.0.<VIN>.pictures.composite_html
 | cmd.refresh | Trigger immediate status update | – |
 
 ## Changelog
+### **WORK IN PROGRESS**
+- (placeholder for next release)
+
 ### 0.5.6 (2026-06-29)
 - (placeholder for next release)
 
