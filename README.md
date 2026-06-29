@@ -64,38 +64,85 @@ Install via ioBroker Admin UI.
 ```
 leapmotor.0.<VIN>.status.*                → Vehicle status (read-only)
 leapmotor.0.<VIN>.consumption.*           → Consumption & statistics (read-only)
-leapmotor.0.<VIN>.pictures.*              → Vehicle images (read-only)
-leapmotor.0.<VIN>.pictures.composite_html → Full dashboard HTML widget
+leapmotor.0.<VIN>.trips.*                 → Daily kilometers and trip history (read-only)
+leapmotor.0.<VIN>.charging.*              → Current charging session cost/kWh (read-only)
+leapmotor.0.<VIN>.pictures.*              → Vehicle images, including an animated composite image (read-only)
 leapmotor.0.<VIN>.cmd.*                   → Commands (writable)
+leapmotor.0.<VIN>.info.*                  → Static vehicle info (read-only)
+leapmotor.0.messages.*                    → Vehicle messages from the Leapmotor app (read-only)
+leapmotor.0.config.*                      → Electricity price / battery capacity used for cost estimation
 ```
 
-### VIS Dashboard Widget
+The full set of available datapoints, including all writable command states, is best explored
+directly in the ioBroker object tree, or via the **Datapoints** tab in the adapter's own admin UI
+— it lists every datapoint with its current value and a short description.
 
-Add a **basic - string (unescaped)** widget in VIS and set the Object ID to:
+### Admin Dashboard
+
+The adapter ships its own React-based admin tab (click the adapter icon in the instance list) with
+five sub-tabs: **Dashboard** (live status and remote control), **Consumption** (weekly energy use
+and cost estimate), **Trips** (daily kilometers and individual detected trips), **Datapoints**
+(full datapoint browser), and **Diagnostics**.
+
+### Animated Vehicle Image for VIS
+
+`leapmotor.0.<VIN>.pictures.composite_html` now contains a simple, embeddable animated vehicle
+image (transparent background, no buttons or dashboard chrome — that has moved into the admin
+tab). Add a **basic - string (unescaped)** widget in VIS, or embed it via `<iframe>`, and set the
+Object ID to:
 ```
 leapmotor.0.<VIN>.pictures.composite_html
 ```
 
-### Available Commands
+### Available Commands (selection)
+
+Simple on/off buttons under `cmd.*` (role `button`, set to `true` to trigger):
 
 | Command | Description | PIN required |
 |---------|-------------|:------------:|
-| cmd.ac_heiz | Start heating | ✅ |
-| cmd.ac_kuehl | Start cooling | ✅ |
-| cmd.ac_luft | Start ventilation | ✅ |
+| cmd.ac_heat | Start heating | ✅ |
+| cmd.ac_cool | Start cooling | ✅ |
+| cmd.ac_vent | Start ventilation | ✅ |
 | cmd.ac_off | Stop climate | ✅ |
-| cmd.ac_temp | Target temperature (16–30°C) | – |
 | cmd.defrost | Windshield defrost | ✅ |
-| cmd.lock | Lock vehicle | ✅ |
-| cmd.unlock | Unlock vehicle | ✅ |
-| cmd.trunk_open | Open trunk | ✅ |
-| cmd.trunk_close | Close trunk | ✅ |
 | cmd.windows_open | Open windows | – |
 | cmd.windows_close | Close windows | – |
 | cmd.find | Find vehicle (horn/lights) | – |
 | cmd.battery_preheat | Battery preheat on | ✅ |
 | cmd.battery_preheat_off | Battery preheat off | ✅ |
+| cmd.lock | Lock vehicle | ✅ |
+| cmd.unlock | Unlock vehicle | ✅ |
+| cmd.trunk_open | Open trunk | ✅ |
+| cmd.trunk_close | Close trunk | ✅ |
 | cmd.refresh | Trigger immediate status update | – |
+
+Value-based commands:
+
+| Command | Description |
+|---------|-------------|
+| cmd.ac_temp | Target temperature, 16–30 °C |
+| cmd.ac_fan_speed | Fan speed, 1–7 |
+| cmd.ac_position | Air position: all / up / down / front / rear |
+| cmd.windows_set | Window position, 0–100 % |
+| cmd.sunshade_set / sunshade_open / sunshade_close | Sunshade position (T03), 0–10 |
+| cmd.charge_limit_set | Charge limit, 50–100 % |
+| cmd.charge_schedule_enable / start / end / apply | Charging schedule |
+| cmd.climate_schedule_enable / mode / time / days / apply / cancel | Recurring climate schedule |
+| cmd.speed_limit_set | Speed limit, if supported by the vehicle |
+
+Comfort commands (only created/shown if the vehicle model supports the feature):
+
+| Command | Description |
+|---------|-------------|
+| cmd.sentry_mode_on / off | Sentry mode |
+| cmd.seat_heat_driver / copilot | Seat heating |
+| cmd.seat_ventilation_driver / copilot | Seat ventilation |
+| cmd.steering_wheel_heat_on / off | Steering wheel heating |
+| cmd.mirror_heat_on / off | Mirror heating |
+| cmd.hotspot_on / off | Wi-Fi hotspot (no effect on T03) |
+
+Which comfort commands actually appear depends on the detected vehicle model — see
+`src/vehicleCapabilities.js` in the repository for the current capability matrix per model.
 
 ## Changelog
 ### **WORK IN PROGRESS**
