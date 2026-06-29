@@ -1,4 +1,14 @@
 # Older Changelog
+## 0.5.0 (2026-06-23)
+- New: React admin dashboard with full vehicle control
+- New: climate and charging schedules
+- New: comfort features (sentry mode, seat heat/ventilation, steering wheel heat, speed limit, mirror heat)
+- New: trip detection and daily mileage tracking
+- New: charging cost estimation with dynamic electricity pricing
+- New: vehicle messages and unread count
+- New: vehicle-model-specific feature capability system
+- New: embeddable animated vehicle image for VIS
+
 ## 0.2.7 (2026-06-13)
 - (see previous release notes)
 

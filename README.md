@@ -90,7 +90,7 @@ leapmotor.0.<VIN>.pictures.composite_html
 | cmd.refresh | Trigger immediate status update | – |
 
 ## Changelog
-### **WORK IN PROGRESS**
+### 0.5.5 (2026-06-29)
 - (placeholder for next release)
 
 ### 0.5.4 (2026-06-26)
@@ -105,16 +105,6 @@ leapmotor.0.<VIN>.pictures.composite_html
 ### 0.5.1 (2026-06-24)
 - Fix: use window.setTimeout/setInterval in admin-tab frontend to satisfy repository checker
 - Maintenance: dependency cleanup
-
-### 0.5.0 (2026-06-23)
-- New: React admin dashboard with full vehicle control
-- New: climate and charging schedules
-- New: comfort features (sentry mode, seat heat/ventilation, steering wheel heat, speed limit, mirror heat)
-- New: trip detection and daily mileage tracking
-- New: charging cost estimation with dynamic electricity pricing
-- New: vehicle messages and unread count
-- New: vehicle-model-specific feature capability system
-- New: embeddable animated vehicle image for VIS
 
 Older changes can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

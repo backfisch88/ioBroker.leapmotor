@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "leapmotor",
-    "version": "0.5.4",
+    "version": "0.5.5",
     "news": {
+      "0.5.5": {
+        "en": "Critical fix: adminTab.link used a relative path causing 404 errors when opening the tab for all users. Now uses an absolute path to the React app.",
+        "de": "Kritischer Fix: adminTab.link nutzte einen relativen Pfad, der beim Öffnen des Tabs zu 404-Fehlern bei allen Nutzern führte. Jetzt wird ein absoluter Pfad zur React-App verwendet.",
+        "ru": "Критическое исправление: adminTab.link использовал относительный путь, вызывающий ошибки 404 при открытии вкладки. Теперь используется абсолютный путь.",
+        "pt": "Correção crítica: adminTab.link usava um caminho relativo causando erros 404 ao abrir a aba. Agora usa um caminho absoluto.",
+        "nl": "Kritieke fix: adminTab.link gebruikte een relatief pad wat 404-fouten veroorzaakte bij het openen van het tabblad. Gebruikt nu een absoluut pad.",
+        "fr": "Correction critique : adminTab.link utilisait un chemin relatif causant des erreurs 404 à l'ouverture de l'onglet. Utilise maintenant un chemin absolu.",
+        "it": "Correzione critica: adminTab.link utilizzava un percorso relativo causando errori 404 all'apertura della scheda. Ora utilizza un percorso assoluto.",
+        "es": "Corrección crítica: adminTab.link usaba una ruta relativa que causaba errores 404 al abrir la pestaña. Ahora usa una ruta absoluta.",
+        "pl": "Krytyczna poprawka: adminTab.link używał względnej ścieżki powodującej błędy 404 podczas otwierania karty. Teraz używa ścieżki absolutnej.",
+        "uk": "Критичне виправлення: adminTab.link використовував відносний шлях, що викликало помилки 404 під час відкриття вкладки. Тепер використовується абсолютний шлях.",
+        "zh-cn": "重要修复：adminTab.link 使用相对路径导致所有用户打开标签时出现404错误。现在使用绝对路径。"
+      },
       "0.5.4": {
         "en": "Fix: include previously missing admin tab files (index_m.html, tab.html, tab.js, tab_m.html) in the published package",
         "de": "Fix: zuvor fehlende Admin-Tab-Dateien (index_m.html, tab.html, tab.js, tab_m.html) im veröffentlichten Paket ergänzt",
@@ -80,19 +93,6 @@
         "pl": "Poprawka: skrypt wydania, rozmiar logo",
         "uk": "Виправлення: скрипт випуску, розмір логотипу",
         "zh-cn": "修复：发布脚本、徽标大小"
-      },
-      "0.2.2": {
-        "en": "Fix: workflow, test scripts, package-lock sync",
-        "de": "Fix: Workflow, Test-Scripts, package-lock Sync",
-        "ru": "Исправление: рабочий процесс",
-        "pt": "Correção: fluxo de trabalho",
-        "nl": "Fix: workflow",
-        "fr": "Correction: workflow",
-        "it": "Correzione: workflow",
-        "es": "Corrección: workflow",
-        "pl": "Poprawka: workflow",
-        "uk": "Виправлення: робочий процес",
-        "zh-cn": "修复：工作流程"
       }
     },
     "titleLang": {
