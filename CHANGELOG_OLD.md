@@ -1,4 +1,7 @@
 # Older Changelog
+## 0.5.2 (2026-06-24)
+- (placeholder for next release)
+
 ## 0.5.1 (2026-06-24)
 - Fix: use window.setTimeout/setInterval in admin-tab frontend to satisfy repository checker
 - Maintenance: dependency cleanup
