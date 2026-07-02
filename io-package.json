@@ -3,19 +3,6 @@
     "name": "leapmotor",
     "version": "0.5.8",
     "news": {
-      "0.5.8": {
-        "en": "Fix: repository checker compliance - added missing intermediate object structure (charging/consumption/pictures/trips channels), corrected invalid state roles, added real integration test.",
-        "de": "Fix: Repository-Checker-Konformitaet - fehlende Zwischenobjekte ergaenzt (charging/consumption/pictures/trips), ungueltige State-Rollen korrigiert, echten Integrationstest hinzugefuegt.",
-        "ru": "Fix: repository checker compliance - added missing intermediate object structure (charging/consumption/pictures/trips channels), corrected invalid state roles, added real integration test.",
-        "pt": "Fix: repository checker compliance - added missing intermediate object structure (charging/consumption/pictures/trips channels), corrected invalid state roles, added real integration test.",
-        "nl": "Fix: repository checker compliance - added missing intermediate object structure (charging/consumption/pictures/trips channels), corrected invalid state roles, added real integration test.",
-        "fr": "Fix: repository checker compliance - added missing intermediate object structure (charging/consumption/pictures/trips channels), corrected invalid state roles, added real integration test.",
-        "it": "Fix: repository checker compliance - added missing intermediate object structure (charging/consumption/pictures/trips channels), corrected invalid state roles, added real integration test.",
-        "es": "Fix: repository checker compliance - added missing intermediate object structure (charging/consumption/pictures/trips channels), corrected invalid state roles, added real integration test.",
-        "pl": "Fix: repository checker compliance - added missing intermediate object structure (charging/consumption/pictures/trips channels), corrected invalid state roles, added real integration test.",
-        "uk": "Fix: repository checker compliance - added missing intermediate object structure (charging/consumption/pictures/trips channels), corrected invalid state roles, added real integration test.",
-        "zh-cn": "Fix: repository checker compliance - added missing intermediate object structure (charging/consumption/pictures/trips channels), corrected invalid state roles, added real integration test."
-      },
       "0.5.7": {
         "en": "New: Trips tab showing daily kilometers with individual detected trips. Fix: trip detection now backfills kilometers driven before the trip was first detected (5-minute polling gap).",
         "de": "Neu: Fahrten-Tab mit Tageskilometern und erkannten Einzelfahrten. Fix: Fahrt-Erkennung berücksichtigt jetzt nachträglich Kilometer, die vor der ersten Erkennung gefahren wurden (5-Minuten-Polling-Lücke).",
