@@ -1,52 +1,31 @@
 {
   "type": "panel",
-  "i18n": true,
+  "i18n": false,
   "items": {
     "email": {
       "type": "text",
-      "label": {
-        "en": "Leapmotor E-Mail",
-        "de": "Leapmotor E-Mail"
-      },
-      "help": {
-        "en": "Use a dedicated second account (see README)",
-        "de": "Bitte ein separates Zweitkonto verwenden (siehe README)"
-      },
+      "label": "Leapmotor E-Mail",
+      "help": "Use a dedicated second account (see README)",
       "newLine": true,
       "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12
     },
     "password": {
       "type": "password",
-      "label": {
-        "en": "Password",
-        "de": "Passwort"
-      },
+      "label": "Password",
       "newLine": false,
       "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12
     },
     "operationPassword": {
       "type": "password",
-      "label": {
-        "en": "Vehicle PIN",
-        "de": "Fahrzeug-PIN"
-      },
-      "help": {
-        "en": "4-digit PIN required for all remote commands",
-        "de": "4-stellige PIN, erforderlich für alle Fernbefehle"
-      },
+      "label": "Vehicle PIN",
+      "help": "4-digit PIN required for all remote commands",
       "newLine": true,
       "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12
     },
     "pollingInterval": {
       "type": "number",
-      "label": {
-        "en": "Polling interval (minutes)",
-        "de": "Abfrageintervall (Minuten)"
-      },
-      "help": {
-        "en": "How often to fetch vehicle status (1-60)",
-        "de": "Wie oft der Fahrzeugstatus abgefragt wird (1-60)"
-      },
+      "label": "Polling interval (minutes)",
+      "help": "How often to fetch vehicle status (1-60)",
       "min": 1,
       "max": 60,
       "newLine": true,
@@ -54,15 +33,12 @@
     },
     "language": {
       "type": "select",
-      "label": {
-        "en": "Language",
-        "de": "Sprache"
-      },
+      "label": "Language",
       "options": [
-        {"label": {"en": "English", "de": "English"}, "value": "en-GB"},
-        {"label": {"en": "Deutsch", "de": "Deutsch"}, "value": "de"},
-        {"label": {"en": "Français", "de": "Français"}, "value": "fr"},
-        {"label": {"en": "Italiano", "de": "Italiano"}, "value": "it"}
+        {"label": "English", "value": "en-GB"},
+        {"label": "Deutsch", "value": "de"},
+        {"label": "Français", "value": "fr"},
+        {"label": "Italiano", "value": "it"}
       ],
       "newLine": false,
       "xs": 12, "sm": 6, "md": 6, "lg": 6, "xl": 6
