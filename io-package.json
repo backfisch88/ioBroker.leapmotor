@@ -3,6 +3,19 @@
     "name": "leapmotor",
     "version": "0.5.8",
     "news": {
+      "0.5.8": {
+        "en": "Fix: repository checker compliance - added missing intermediate object structure (charging/consumption/pictures/trips channels), corrected invalid state roles, added real integration test.",
+        "de": "Fix: Repository-Checker-Konformitaet - fehlende Zwischenobjekte ergaenzt (charging/consumption/pictures/trips), ungueltige State-Rollen korrigiert, echten Integrationstest hinzugefuegt.",
+        "ru": "Исправление: соответствие проверке репозитория - добавлены недостающие промежуточные объекты (charging/consumption/pictures/trips), исправлены недопустимые роли состояний, добавлен реальный интеграционный тест.",
+        "pt": "Correção: conformidade com o verificador do repositório - adicionada estrutura de objetos intermediários ausente (canais charging/consumption/pictures/trips), corrigidas funções de estado inválidas, adicionado teste de integração real.",
+        "nl": "Fix: naleving van de repository-checker - ontbrekende tussenliggende objectstructuur toegevoegd (charging/consumption/pictures/trips-kanalen), ongeldige statusrollen gecorrigeerd, echte integratietest toegevoegd.",
+        "fr": "Correction : conformité au vérificateur de dépôt - ajout de la structure d'objets intermédiaires manquante (canaux charging/consumption/pictures/trips), correction des rôles d'état invalides, ajout d'un véritable test d'intégration.",
+        "it": "Correzione: conformità al controllo del repository - aggiunta la struttura di oggetti intermedi mancante (canali charging/consumption/pictures/trips), corretti i ruoli di stato non validi, aggiunto un vero test di integrazione.",
+        "es": "Corrección: cumplimiento del verificador del repositorio - se añadió la estructura de objetos intermedios faltante (canales charging/consumption/pictures/trips), se corrigieron roles de estado inválidos, se añadió una prueba de integración real.",
+        "pl": "Poprawka: zgodność z weryfikatorem repozytorium - dodano brakującą strukturę obiektów pośrednich (kanały charging/consumption/pictures/trips), poprawiono nieprawidłowe role stanów, dodano rzeczywisty test integracyjny.",
+        "uk": "Виправлення: відповідність перевірці репозиторію - додано відсутню проміжну структуру об'єктів (канали charging/consumption/pictures/trips), виправлено недійсні ролі станів, додано реальний інтеграційний тест.",
+        "zh-cn": "修复：符合仓库检查器规范 - 添加了缺失的中间对象结构（charging/consumption/pictures/trips 通道），修正了无效的状态角色，添加了真实的集成测试。"
+      },
       "0.5.7": {
         "en": "New: Trips tab showing daily kilometers with individual detected trips. Fix: trip detection now backfills kilometers driven before the trip was first detected (5-minute polling gap).",
         "de": "Neu: Fahrten-Tab mit Tageskilometern und erkannten Einzelfahrten. Fix: Fahrt-Erkennung berücksichtigt jetzt nachträglich Kilometer, die vor der ersten Erkennung gefahren wurden (5-Minuten-Polling-Lücke).",
