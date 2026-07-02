@@ -144,8 +144,8 @@ export default function TripsTab({ base, states }) {
                                     <Divider sx={{ borderColor: '#1e2d45', my: 1.5 }} />
                                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                                         {day.trips.map((trip, i) => {
-                                            const startClock = trip.startTime.split(', ')[1] || trip.startTime;
-                                            const endClock = trip.endTime.split(', ')[1] || trip.endTime;
+                                            const startClock = (trip.startTime.split(', ')[1] || trip.startTime).slice(0, 5);
+                                            const endClock = (trip.endTime.split(', ')[1] || trip.endTime).slice(0, 5);
                                             return (
                                                 <Box
                                                     key={i}
