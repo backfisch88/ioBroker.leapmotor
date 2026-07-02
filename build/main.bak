@@ -283,7 +283,6 @@ class LeapmotorAdapter extends utils.Adapter{
         try{
             const m=await this.client.getMileageEnergyDetail(vehicle);
             const d=m.data||{};
-            await this.setObjectNotExistsAsync(`${vin}.consumption`,{type:'channel',common:{name:'Consumption & Statistics'},native:{}});
             await this.ensureAndSet(`${vin}.consumption.mileage_total_km`,d.totalmileage,'number','km','Total Mileage');
             await this.ensureAndSet(`${vin}.consumption.mileage_total_miles`,d.totalmileageMile,'string','mi','Total Mileage (miles)');
             await this.ensureAndSet(`${vin}.consumption.delivery_days`,d.deliveryDays,'number','days','Days since Delivery');
@@ -292,13 +291,11 @@ class LeapmotorAdapter extends utils.Adapter{
             const w=await this.client.getConsumptionWeeklyRank(vehicle);
             const d=w.data||{};
             const rank=d.rankResult||d.rank||{};
-            await this.setObjectNotExistsAsync(`${vin}.consumption`,{type:'channel',common:{name:'Consumption & Statistics'},native:{}});
             await this.ensureAndSet(`${vin}.consumption.kwh_100km`,rank.hundredKmEC||rank.hundredKmEc,'number','kWh/100km','Avg. Consumption');
             await this.ensureAndSet(`${vin}.consumption.rank`,rank.rank,'string','','Efficiency Rank');
             const weekly=d.weeklyEC||d.weekly||[];
             for(let i=0;i<weekly.length;i++){
                 const wb=`${vin}.consumption.week_${i+1}`;
-                await this.setObjectNotExistsAsync(wb,{type:'channel',common:{name:`Week ${i+1}`},native:{}});
                 await this.ensureAndSet(`${wb}.week_start`,weekly[i].weekStart,'string','','Week Start');
                 await this.ensureAndSet(`${wb}.week_end`,weekly[i].weekEnd,'string','','Week End');
                 await this.ensureAndSet(`${wb}.kwh_100km`,weekly[i].hundredKmEC||weekly[i].hundredKmEc,'number','kWh/100km','Consumption');
@@ -306,10 +303,9 @@ class LeapmotorAdapter extends utils.Adapter{
         }catch(e){this.log.debug(`Weekly error: ${e}`)}
     }
 
-    async ensureAndSet(id,val,type,unit,name,role){
+    async ensureAndSet(id,val,type,unit,name){
         if(val===null||val===undefined)return;
-        if(!role)role=type==='string'?'text':'value';
-        await this.setObjectNotExistsAsync(id,{type:'state',common:{name,type,unit,role,read:true,write:false},native:{}});
+        await this.setObjectNotExistsAsync(id,{type:'state',common:{name,type,unit,role:'value',read:true,write:false},native:{}});
         await this.setStateAsync(id,{val,ack:true});
     }
 
@@ -347,7 +343,6 @@ class LeapmotorAdapter extends utils.Adapter{
     }
 
     async writePictures(vin,pics){
-        await this.setObjectNotExistsAsync(`${vin}.pictures`,{type:'channel',common:{name:'Vehicle Pictures'},native:{}});
         for(const[name,data]of Object.entries(pics)){
             await this.ensureAndSet(`${vin}.pictures.${name}`,data,'string','','Picture: '+name);
         }
@@ -422,7 +417,6 @@ class LeapmotorAdapter extends utils.Adapter{
             imgTags+=`<style>${css}</style>${fImgs}`;
         }
         const html=`<div style="position:relative;width:100%;padding-bottom:46%;background:transparent">${imgTags}</div>`;
-        await this.setObjectNotExistsAsync(`${vin}.pictures`,{type:'channel',common:{name:'Vehicle Pictures'},native:{}});
         await this.ensureAndSet(`${vin}.pictures.composite_html`,html,'string','','Vehicle Image (animated, embeddable)');
     }
 
@@ -460,7 +454,7 @@ class LeapmotorAdapter extends utils.Adapter{
             ['status.temp_outdoor','Outdoor Temperature','number','value.temperature','°C'],
             ['status.temp_battery_min','Min Cell Temperature','number','value.temperature','°C'],
             // Charging
-            ['status.charging_active','Charging Active','boolean','indicator',''],
+            ['status.charging_active','Charging Active','boolean','indicator.charging',''],
             ['status.charging_state','Charging State','number','value',''],
             ['status.charging_soc_limit','Charge Limit','number','value','%'],
             ['status.charging_remain_min','Charge Time Remaining','number','value','min'],
@@ -486,20 +480,20 @@ class LeapmotorAdapter extends utils.Adapter{
             ['status.security_locked','Locked','boolean','indicator',''],
             ['status.door_ctrl_allow','Door Control Allowed','boolean','indicator',''],
             // Doors
-            ['status.door_driver','Driver Door Open','boolean','indicator',''],
-            ['status.door_front_right','Front Right Door Open','boolean','indicator',''],
-            ['status.door_rear_left','Rear Left Door Open','boolean','indicator',''],
-            ['status.door_rear_right','Rear Right Door Open','boolean','indicator',''],
-            ['status.door_trunk','Trunk Open','boolean','indicator',''],
+            ['status.door_driver','Driver Door Open','boolean','indicator.door',''],
+            ['status.door_front_right','Front Right Door Open','boolean','indicator.door',''],
+            ['status.door_rear_left','Rear Left Door Open','boolean','indicator.door',''],
+            ['status.door_rear_right','Rear Right Door Open','boolean','indicator.door',''],
+            ['status.door_trunk','Trunk Open','boolean','indicator.door',''],
             // Windows
             ['status.window_fl_pct','Window Front Left','number','value','%'],
             ['status.window_fr_pct','Window Front Right','number','value','%'],
             ['status.window_rl_pct','Window Rear Left','number','value','%'],
             ['status.window_rr_pct','Window Rear Right','number','value','%'],
-            ['status.window_driver_open','Driver Window Open','boolean','indicator',''],
-            ['status.window_fr_open','Front Right Window Open','boolean','indicator',''],
-            ['status.window_rl_open','Rear Left Window Open','boolean','indicator',''],
-            ['status.window_rr_open','Rear Right Window Open','boolean','indicator',''],
+            ['status.window_driver_open','Driver Window Open','boolean','indicator.door',''],
+            ['status.window_fr_open','Front Right Window Open','boolean','indicator.door',''],
+            ['status.window_rl_open','Rear Left Window Open','boolean','indicator.door',''],
+            ['status.window_rr_open','Rear Right Window Open','boolean','indicator.door',''],
             ['status.sun_shade','Sun Shade','number','value',''],
             // Tires
             ['status.tire_fl','Tire Pressure FL','number','value','bar'],
@@ -550,34 +544,34 @@ class LeapmotorAdapter extends utils.Adapter{
         for(const[cmd,name]of Object.entries(cmds)){
             await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.${cmd}`,{type:'state',common:{name,type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
         }
-        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.ac_temp`,{type:'state',common:{name:'Target Temperature',type:'number',role:'level.temperature',read:true,write:true,min:16,max:30,unit:'°C',def:22},native:{}});
-        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.ac_fan_speed`,{type:'state',common:{name:'Fan Speed',type:'number',role:'level',read:true,write:true,min:1,max:7,def:3},native:{}});
-        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.ac_position`,{type:'state',common:{name:'Air Position',type:'string',role:'text',read:true,write:true,states:{all:'All',up:'Upper',down:'Lower',front:'Front',rear:'Rear'},def:'all'},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.ac_temp`,{type:'state',common:{name:'Target Temperature',type:'number',role:'value.temperature',read:true,write:true,min:16,max:30,unit:'°C',def:22},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.ac_fan_speed`,{type:'state',common:{name:'Fan Speed',type:'number',role:'value',read:true,write:true,min:1,max:7,def:3},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.ac_position`,{type:'state',common:{name:'Air Position',type:'string',role:'value',read:true,write:true,states:{all:'All',up:'Upper',down:'Lower',front:'Front',rear:'Rear'},def:'all'},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.sunshade_open`,{type:'state',common:{name:'Sonnenblende öffnen',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.sunshade_close`,{type:'state',common:{name:'Sonnenblende schließen',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.hotspot_on`,{type:'state',common:{name:'Hotspot On',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.hotspot_off`,{type:'state',common:{name:'Hotspot Off',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
-        await this.extendObjectAsync(`${vehicle.vin}.cmd.defrost_level`,{type:'state',common:{name:'Windshield Defrost Stage (0=off,1=weak,2=strong)',type:'number',role:'level',read:true,write:true,min:0,max:2,def:0},native:{}});
+        await this.extendObjectAsync(`${vehicle.vin}.cmd.defrost_level`,{type:'state',common:{name:'Windshield Defrost Stage (0=off,1=weak,2=strong)',type:'number',role:'value',read:true,write:true,min:0,max:2,def:0},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.windows_set`,{type:'state',common:{name:'Windows Position (0-100)',type:'number',role:'level.blind',read:true,write:true,min:0,max:100,def:0},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.charge_limit_set`,{type:'state',common:{name:'Charge Limit SOC (50-100)',type:'number',role:'level',read:true,write:true,min:50,max:100,def:80},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.charge_schedule_enable`,{type:'state',common:{name:'Charge Schedule Enabled',type:'boolean',role:'switch',read:true,write:true,def:false},native:{}});
-        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.charge_schedule_start`,{type:'state',common:{name:'Charge Schedule Start (HH:MM)',type:'string',role:'text',read:true,write:true,def:'00:00'},native:{}});
-        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.charge_schedule_end`,{type:'state',common:{name:'Charge Schedule End (HH:MM)',type:'string',role:'text',read:true,write:true,def:'08:00'},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.charge_schedule_start`,{type:'state',common:{name:'Charge Schedule Start (HH:MM)',type:'string',role:'value',read:true,write:true,def:'00:00'},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.charge_schedule_end`,{type:'state',common:{name:'Charge Schedule End (HH:MM)',type:'string',role:'value',read:true,write:true,def:'08:00'},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.charge_schedule_apply`,{type:'state',common:{name:'Apply Charge Schedule',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.climate_schedule_enable`,{type:'state',common:{name:'Climate Schedule Enabled',type:'boolean',role:'switch',read:true,write:true,def:false},native:{}});
-        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.climate_schedule_time`,{type:'state',common:{name:'Climate Schedule Time (HH:MM)',type:'string',role:'text',read:true,write:true,def:'07:00'},native:{}});
-        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.climate_schedule_mode`,{type:'state',common:{name:'Climate Schedule Mode',type:'string',role:'text',read:true,write:true,states:{cold:'Kuehlen',hot:'Heizen',wind:'Lueften'},def:'hot'},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.climate_schedule_time`,{type:'state',common:{name:'Climate Schedule Time (HH:MM)',type:'string',role:'value',read:true,write:true,def:'07:00'},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.climate_schedule_mode`,{type:'state',common:{name:'Climate Schedule Mode',type:'string',role:'value',read:true,write:true,states:{cold:'Kuehlen',hot:'Heizen',wind:'Lueften'},def:'hot'},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.climate_schedule_apply`,{type:'state',common:{name:'Apply Climate Schedule',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.climate_schedule_cancel`,{type:'state',common:{name:'Cancel Climate Schedule',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
-        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.climate_schedule_days`,{type:'state',common:{name:'Climate Schedule Days (comma-separated 0=Sun..6=Sat)',type:'string',role:'text',read:true,write:true,def:'0,1,2,3,4,5,6'},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.climate_schedule_days`,{type:'state',common:{name:'Climate Schedule Days (comma-separated 0=Sun..6=Sat)',type:'string',role:'value',read:true,write:true,def:'0,1,2,3,4,5,6'},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.status.climate_schedule_active`,{type:'state',common:{name:'Climate Schedule Active',type:'boolean',role:'indicator',read:true,write:false,def:false},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.status.climate_schedule_info`,{type:'state',common:{name:'Climate Schedule Info',type:'string',role:'text',read:true,write:false,def:''},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.status.charge_schedule_active`,{type:'state',common:{name:'Charge Schedule Active',type:'boolean',role:'indicator',read:true,write:false,def:false},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.status.charge_schedule_info`,{type:'state',common:{name:'Charge Schedule Info',type:'string',role:'text',read:true,write:false,def:''},native:{}});
-        await this.setObjectNotExistsAsync(`${vehicle.vin}.status.last_poll_time`,{type:'state',common:{name:'Last Successful Adapter Poll',type:'string',role:'date',read:true,write:false,def:''},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.status.last_poll_time`,{type:'state',common:{name:'Last Successful Adapter Poll',type:'string',role:'value.datetime',read:true,write:false,def:''},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.sentry_mode_on`,{type:'state',common:{name:'Sentry Mode On',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.sentry_mode_off`,{type:'state',common:{name:'Sentry Mode Off',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
-        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.speed_limit_set`,{type:'state',common:{name:'Speed Limit (km/h, 0=off)',type:'number',role:'level',read:true,write:true,min:0,max:150,def:0},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.speed_limit_set`,{type:'state',common:{name:'Speed Limit (km/h, 0=off)',type:'number',role:'value',read:true,write:true,min:0,max:150,def:0},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.seat_heat_driver`,{type:'state',common:{name:'Driver Seat Heat Level (0-3)',type:'number',role:'level',read:true,write:true,min:0,max:3,def:0},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.seat_heat_copilot`,{type:'state',common:{name:'Copilot Seat Heat Level (0-3)',type:'number',role:'level',read:true,write:true,min:0,max:3,def:0},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.seat_ventilation_driver`,{type:'state',common:{name:'Driver Seat Ventilation Level (0-3)',type:'number',role:'level',read:true,write:true,min:0,max:3,def:0},native:{}});
@@ -586,22 +580,18 @@ class LeapmotorAdapter extends utils.Adapter{
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.steering_wheel_heat_off`,{type:'state',common:{name:'Steering Wheel Heat Off',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.mirror_heat_on`,{type:'state',common:{name:'Mirror/Rear Window Heat On',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.mirror_heat_off`,{type:'state',common:{name:'Mirror/Rear Window Heat Off',type:'boolean',role:'button',read:true,write:true,def:false},native:{}});
-        await this.setObjectNotExistsAsync(`messages`,{type:'channel',common:{name:'Vehicle Messages'},native:{}});
         await this.setObjectNotExistsAsync(`messages.unread_count`,{type:'state',common:{name:'Unread Messages',type:'number',role:'value',read:true,write:false,def:0},native:{}});
         await this.setObjectNotExistsAsync(`messages.latest_title`,{type:'state',common:{name:'Latest Message Title',type:'string',role:'text',read:true,write:false,def:''},native:{}});
         await this.setObjectNotExistsAsync(`messages.latest_text`,{type:'state',common:{name:'Latest Message Text',type:'string',role:'text',read:true,write:false,def:''},native:{}});
-        await this.setObjectNotExistsAsync(`messages.latest_time`,{type:'state',common:{name:'Latest Message Time',type:'string',role:'date',read:true,write:false,def:''},native:{}});
+        await this.setObjectNotExistsAsync(`messages.latest_time`,{type:'state',common:{name:'Latest Message Time',type:'string',role:'value.datetime',read:true,write:false,def:''},native:{}});
         await this.setObjectNotExistsAsync(`messages.json`,{type:'state',common:{name:'All Messages (JSON, last 10)',type:'string',role:'json',read:true,write:false,def:''},native:{}});
-        await this.setObjectNotExistsAsync(`config`,{type:'channel',common:{name:'Adapter Configuration Values'},native:{}});
-        await this.setObjectNotExistsAsync(`config.energy_price_eur_kwh`,{type:'state',common:{name:'Strompreis (Eur/kWh) - manuell editierbar',type:'number',role:'level',read:true,write:true,unit:'€/kWh',min:0,max:2,def:0.30},native:{}});
+        await this.setObjectNotExistsAsync(`config.energy_price_eur_kwh`,{type:'state',common:{name:'Strompreis (Eur/kWh) - manuell editierbar',type:'number',role:'value',read:true,write:true,unit:'€/kWh',min:0,max:2,def:0.30},native:{}});
         const defaultCapacity=getDefaultBatteryCapacity(vehicle.carType);
-        await this.setObjectNotExistsAsync(`config.battery_capacity_kwh`,{type:'state',common:{name:`Batteriekapazitaet (kWh, netto) - Standard fuer ${vehicle.carType||'?'}: ${defaultCapacity}kWh. Bei abweichender Akkuvariante (z.B. B10/C10 Pro Max/AWD) bitte manuell anpassen!`,type:'number',role:'level',read:true,write:true,unit:'kWh',min:10,max:150,def:defaultCapacity},native:{}});
-        await this.setObjectNotExistsAsync(`${vehicle.vin}.trips`,{type:'channel',common:{name:'Trips & Daily Kilometers'},native:{}});
+        await this.setObjectNotExistsAsync(`config.battery_capacity_kwh`,{type:'state',common:{name:`Batteriekapazitaet (kWh, netto) - Standard fuer ${vehicle.carType||'?'}: ${defaultCapacity}kWh. Bei abweichender Akkuvariante (z.B. B10/C10 Pro Max/AWD) bitte manuell anpassen!`,type:'number',role:'value',read:true,write:true,unit:'kWh',min:10,max:150,def:defaultCapacity},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.trips.daily_km_json`,{type:'state',common:{name:'Daily Kilometers (JSON, last 30 days)',type:'string',role:'json',read:true,write:false,def:'[]'},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.trips.today_km`,{type:'state',common:{name:'Kilometers Driven Today',type:'number',role:'value',read:true,write:false,unit:'km',def:0},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.trips.history_json`,{type:'state',common:{name:'Trip History (JSON, last 50 trips)',type:'string',role:'json',read:true,write:false,def:'[]'},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.trips.current_trip_active`,{type:'state',common:{name:'Trip Currently In Progress',type:'boolean',role:'indicator',read:true,write:false,def:false},native:{}});
-        await this.setObjectNotExistsAsync(`${vehicle.vin}.charging`,{type:'channel',common:{name:'Charging Session'},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.charging.session_cost`,{type:'state',common:{name:'Current/Last Charging Session Cost',type:'number',role:'value',read:true,write:false,unit:'€',def:0},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.charging.session_kwh`,{type:'state',common:{name:'Current/Last Charging Session Energy (estimated)',type:'number',role:'value',read:true,write:false,unit:'kWh',def:0},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.charging.session_active`,{type:'state',common:{name:'Charging Session In Progress',type:'boolean',role:'indicator',read:true,write:false,def:false},native:{}});
