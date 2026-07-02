@@ -24,16 +24,18 @@
   },
   "dependencies": {
     "@iobroker/adapter-core": "^3.4.1",
-    "axios": "^1.17.0",
-    "node-forge": "^1.4.0",
-    "adm-zip": "^0.5.17"
+    "adm-zip": "^0.5.17",
+    "axios": "^1.18.1",
+    "node-forge": "^1.4.0"
   },
   "devDependencies": {
     "@alcalzone/release-script": "^5.2.1",
     "@alcalzone/release-script-plugin-iobroker": "^5.2.0",
     "@alcalzone/release-script-plugin-license": "^5.2.0",
     "@alcalzone/release-script-plugin-manual-review": "^5.2.0",
-    "@iobroker/testing": "^5.2.2"
+    "@iobroker/testing": "^5.2.2",
+    "react": "^18.3.1",
+    "@iobroker/adapter-react-v5": "^7.4.15"
   },
   "main": "build/main.js",
   "files": [
@@ -48,7 +50,8 @@
     "test": "npm run test:package",
     "release": "release-script",
     "test:integration": "echo \"No integration tests configured\" && exit 0",
-    "test:unit": "echo \"No unit tests configured\" && exit 0"
+    "test:unit": "echo \"No unit tests configured\" && exit 0",
+    "lint": "echo \"No lint configured yet\" && exit 0"
   },
   "engines": {
     "node": ">=22"
