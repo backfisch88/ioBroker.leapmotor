@@ -1,25 +1,38 @@
 {
   "type": "panel",
+  "i18n": false,
   "items": {
     "email": {
       "type": "text",
       "label": "Leapmotor E-Mail",
       "help": "Use a dedicated second account (see README)",
       "newLine": true,
-      "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12
+      "xs": 12,
+      "sm": 12,
+      "md": 12,
+      "lg": 12,
+      "xl": 12
     },
     "password": {
       "type": "password",
       "label": "Password",
       "newLine": false,
-      "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12
+      "xs": 12,
+      "sm": 12,
+      "md": 12,
+      "lg": 12,
+      "xl": 12
     },
     "operationPassword": {
       "type": "password",
       "label": "Vehicle PIN",
       "help": "4-digit PIN required for all remote commands",
       "newLine": true,
-      "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12
+      "xs": 12,
+      "sm": 12,
+      "md": 12,
+      "lg": 12,
+      "xl": 12
     },
     "pollingInterval": {
       "type": "number",
@@ -28,19 +41,39 @@
       "min": 1,
       "max": 60,
       "newLine": true,
-      "xs": 12, "sm": 6, "md": 6, "lg": 6, "xl": 6
+      "xs": 12,
+      "sm": 6,
+      "md": 6,
+      "lg": 6,
+      "xl": 6
     },
     "language": {
       "type": "select",
       "label": "Language",
       "options": [
-        {"label": "English", "value": "en-GB"},
-        {"label": "Deutsch", "value": "de"},
-        {"label": "Français", "value": "fr"},
-        {"label": "Italiano", "value": "it"}
+        {
+          "label": "English",
+          "value": "en-GB"
+        },
+        {
+          "label": "Deutsch",
+          "value": "de"
+        },
+        {
+          "label": "Français",
+          "value": "fr"
+        },
+        {
+          "label": "Italiano",
+          "value": "it"
+        }
       ],
       "newLine": false,
-      "xs": 12, "sm": 6, "md": 6, "lg": 6, "xl": 6
+      "xs": 12,
+      "sm": 6,
+      "md": 6,
+      "lg": 6,
+      "xl": 6
     }
   }
 }

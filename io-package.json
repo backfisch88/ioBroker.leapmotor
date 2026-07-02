@@ -16,19 +16,6 @@
         "uk": "Нове: вкладка Поїздки з щоденним пробігом та виявленими окремими поїздками. Виправлення: виявлення поїздок тепер враховує кілометри, пройдені до першого виявлення.",
         "zh-cn": "新增：行程标签显示每日公里数和检测到的单独行程。修复：行程检测现在会补充首次检测前行驶的公里数。"
       },
-      "0.5.6": {
-        "en": "New: Trips tab showing daily kilometers with individual detected trips. Fix: trip detection now backfills kilometers driven before the trip was first detected (5-minute polling gap).",
-        "de": "Neu: Fahrten-Tab mit Tageskilometern und erkannten Einzelfahrten. Fix: Fahrt-Erkennung berücksichtigt jetzt nachträglich Kilometer, die vor der ersten Erkennung gefahren wurden (5-Minuten-Polling-Lücke).",
-        "ru": "Новое: вкладка поездок с ежедневным пробегом и обнаруженными отдельными поездками. Исправление: обнаружение поездок теперь учитывает километры, пройденные до первого обнаружения.",
-        "pt": "Novo: aba de viagens mostrando quilômetros diários com viagens individuais detectadas. Correção: a detecção de viagens agora preenche os quilômetros percorridos antes da primeira detecção.",
-        "nl": "Nieuw: Ritten-tabblad met dagelijkse kilometers en gedetecteerde individuele ritten. Fix: rit-detectie vult nu kilometers aan die zijn gereden voor de eerste detectie.",
-        "fr": "Nouveau : onglet Trajets affichant les kilomètres quotidiens avec les trajets individuels détectés. Correction : la détection des trajets comble désormais les kilomètres parcourus avant la première détection.",
-        "it": "Nuovo: scheda Viaggi che mostra i chilometri giornalieri con i singoli viaggi rilevati. Correzione: il rilevamento dei viaggi ora recupera i chilometri percorsi prima del primo rilevamento.",
-        "es": "Nuevo: pestaña de viajes que muestra los kilómetros diarios con los viajes individuales detectados. Corrección: la detección de viajes ahora completa los kilómetros recorridos antes de la primera detección.",
-        "pl": "Nowość: karta Podróże pokazująca dzienne kilometry z wykrytymi pojedynczymi podróżami. Poprawka: wykrywanie podróży uzupełnia teraz kilometry przejechane przed pierwszym wykryciem.",
-        "uk": "Нове: вкладка Поїздки з щоденним пробігом та виявленими окремими поїздками. Виправлення: виявлення поїздок тепер враховує кілометри, пройдені до першого виявлення.",
-        "zh-cn": "新增：行程标签显示每日公里数和检测到的单独行程。修复：行程检测现在会补充首次检测前行驶的公里数。"
-      },
       "0.5.5": {
         "en": "Critical fix: adminTab.link used a relative path causing 404 errors when opening the tab for all users. Now uses an absolute path to the React app.",
         "de": "Kritischer Fix: adminTab.link nutzte einen relativen Pfad, der beim Öffnen des Tabs zu 404-Fehlern bei allen Nutzern führte. Jetzt wird ein absoluter Pfad zur React-App verwendet.",
@@ -167,8 +154,7 @@
         "de": "Leapmotor"
       },
       "link": "/adapter/leapmotor/tab/tab.html"
-    },
-    "installedFrom": "backfisch88/ioBroker.leapmotor"
+    }
   },
   "native": {
     "email": "",
