@@ -49,7 +49,7 @@
     "test:package": "mocha test/package.test.js --exit",
     "test": "npm run test:package",
     "release": "release-script",
-    "test:integration": "echo \"No integration tests configured\" && exit 0",
+    "test:integration": "mocha test/integration.js --exit --timeout 60000",
     "test:unit": "echo \"No unit tests configured\" && exit 0",
     "lint": "echo \"No lint configured yet\" && exit 0"
   },
