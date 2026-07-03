@@ -145,8 +145,8 @@ Which comfort commands actually appear depends on the detected vehicle model —
 `admin-tab/src/vehicleCapabilities.js` in the repository for the current capability matrix per model.
 
 ## Changelog
-### **WORK IN PROGRESS**
-- (placeholder for next release)
+### 0.6.1 (2026-07-03)
+- Fix: repository checker findings - node: prefix for built-in modules, removed raw setTimeout fallback, included admin-tab i18n source in npm package, trimmed news list to 7 entries
 
 ### 0.6.0 (2026-07-03)
 - Refactor: moved to standard plain-JS repository layout (main.js at repository root, supporting modules under lib/ instead of build/)
@@ -166,13 +166,6 @@ Which comfort commands actually appear depends on the detected vehicle model —
 - Fix: critical bug where `adminTab.link` used a relative path, causing a 404 error when opening the tab for all users — now uses an absolute path
 - Fix: admin tab files (`index_m.html`, `tab.html`, `tab.js`, `tab_m.html`) were missing from the published package; they are now included
 - Fix: `index_m.html` contained leftover placeholder content instead of the real mobile tab loader
-
-### 0.5.5 (2026-06-26)
-- Maintenance: dependency cleanup and repository checker compliance fixes
-
-### 0.5.4 (2026-06-26)
-- Fix: use `window.setTimeout`/`window.setInterval` in the admin tab frontend to satisfy the repository checker
-- Maintenance: dependency cleanup
 
 Older changes can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

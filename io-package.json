@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "leapmotor",
-    "version": "0.6.0",
+    "version": "0.6.1",
     "news": {
+      "0.6.1": {
+        "en": "Fix: repository checker findings - use node: prefix for built-in modules, remove raw setTimeout fallback, include admin-tab i18n source in npm package, trim news list to 7 entries.",
+        "de": "Fix: Repository-Checker-Befunde behoben - node:-Praefix fuer eingebaute Module verwendet, rohen setTimeout-Fallback entfernt, admin-tab-i18n-Quellcode ins npm-Paket aufgenommen, News-Liste auf 7 Eintraege gekuerzt.",
+        "ru": "Fix: repository checker findings - use node: prefix for built-in modules, remove raw setTimeout fallback, include admin-tab i18n source in npm package, trim news list to 7 entries.",
+        "pt": "Fix: repository checker findings - use node: prefix for built-in modules, remove raw setTimeout fallback, include admin-tab i18n source in npm package, trim news list to 7 entries.",
+        "nl": "Fix: repository checker findings - use node: prefix for built-in modules, remove raw setTimeout fallback, include admin-tab i18n source in npm package, trim news list to 7 entries.",
+        "fr": "Fix: repository checker findings - use node: prefix for built-in modules, remove raw setTimeout fallback, include admin-tab i18n source in npm package, trim news list to 7 entries.",
+        "it": "Fix: repository checker findings - use node: prefix for built-in modules, remove raw setTimeout fallback, include admin-tab i18n source in npm package, trim news list to 7 entries.",
+        "es": "Fix: repository checker findings - use node: prefix for built-in modules, remove raw setTimeout fallback, include admin-tab i18n source in npm package, trim news list to 7 entries.",
+        "pl": "Fix: repository checker findings - use node: prefix for built-in modules, remove raw setTimeout fallback, include admin-tab i18n source in npm package, trim news list to 7 entries.",
+        "uk": "Fix: repository checker findings - use node: prefix for built-in modules, remove raw setTimeout fallback, include admin-tab i18n source in npm package, trim news list to 7 entries.",
+        "zh-cn": "Fix: repository checker findings - use node: prefix for built-in modules, remove raw setTimeout fallback, include admin-tab i18n source in npm package, trim news list to 7 entries."
+      },
       "0.6.0": {
         "en": "Refactor: moved to standard plain-JS repository layout (main.js at repository root, supporting modules under lib/ instead of build/). Fix: removed dead/duplicate code, added VIN sanitization for object IDs, subscribed and acknowledged config.* states, enforced upper bound on polling interval in code, switched picture cache from package-directory file to adapter's own file storage, translated remaining German backend strings to English, enabled compact mode support, adapter-managed timers used throughout.",
         "de": "Refactor: Umstellung auf Standard-Repository-Layout fuer reines JavaScript (main.js im Repository-Root, unterstuetzende Module unter lib/ statt build/). Fix: doppelten/toten Code entfernt, VIN-Sanitisierung fuer Objekt-IDs ergaenzt, config.*-States werden nun subscribed und quittiert, Obergrenze fuer Abfrageintervall im Code erzwungen, Bilder-Cache von Datei im Package-Verzeichnis auf adaptereigene Dateispeicherung umgestellt, verbliebene deutsche Backend-Texte ins Englische uebersetzt, Compact-Mode-Unterstuetzung aktiviert, durchgaengig adaptereigene Timer verwendet.",
@@ -80,19 +93,6 @@
         "pl": "Nowość: standardowy zestaw testów package.test.js z @iobroker/testing",
         "uk": "Нове: стандартний набір тестів package.test.js з використанням @iobroker/testing",
         "zh-cn": "新增：使用 @iobroker/testing 的标准测试套件 package.test.js"
-      },
-      "0.5.2": {
-        "en": "Fix: complete translations for changelog entries",
-        "de": "Fix: vollständige Übersetzungen für Changelog-Einträge",
-        "ru": "Исправление: полные переводы для записей журнала изменений",
-        "pt": "Correção: traduções completas para entradas do changelog",
-        "nl": "Fix: volledige vertalingen voor changelog-items",
-        "fr": "Correction : traductions complètes pour les entrées du changelog",
-        "it": "Correzione: traduzioni complete per le voci del changelog",
-        "es": "Corrección: traducciones completas para las entradas del changelog",
-        "pl": "Poprawka: kompletne tłumaczenia dla wpisów dziennika zmian",
-        "uk": "Виправлення: повні переклади для записів журналу змін",
-        "zh-cn": "修复：完整的更新日志条目翻译"
       }
     },
     "titleLang": {

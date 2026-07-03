@@ -1,4 +1,11 @@
 # Older Changelog
+## 0.5.5 (2026-06-26)
+- Maintenance: dependency cleanup and repository checker compliance fixes
+
+## 0.5.4 (2026-06-26)
+- Fix: use `window.setTimeout`/`window.setInterval` in the admin tab frontend to satisfy the repository checker
+- Maintenance: dependency cleanup
+
 ## 0.5.3 (2026-06-26)
 - New: standard `package.test.js` test suite using `@iobroker/testing` for repository compliance
 
