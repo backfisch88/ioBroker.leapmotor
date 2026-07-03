@@ -145,6 +145,9 @@ Which comfort commands actually appear depends on the detected vehicle model —
 `admin-tab/src/vehicleCapabilities.js` in the repository for the current capability matrix per model.
 
 ## Changelog
+### **WORK IN PROGRESS**
+- (placeholder for next release)
+
 ### 0.6.0 (2026-07-03)
 - Refactor: moved to standard plain-JS repository layout (main.js at repository root, supporting modules under lib/ instead of build/)
 - Fix: removed dead/duplicate code, added VIN sanitization for object IDs, subscribed and acknowledged config.* states
