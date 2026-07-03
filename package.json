@@ -41,6 +41,7 @@
   "main": "main.js",
   "files": [
     "admin/",
+    "admin-tab/src/i18n/",
     "lib/",
     "certs/",
     "main.js",

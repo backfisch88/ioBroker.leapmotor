@@ -93,19 +93,6 @@
         "pl": "Poprawka: kompletne tłumaczenia dla wpisów dziennika zmian",
         "uk": "Виправлення: повні переклади для записів журналу змін",
         "zh-cn": "修复：完整的更新日志条目翻译"
-      },
-      "0.5.1": {
-        "en": "Fix: use window.setTimeout/setInterval in admin-tab frontend to satisfy repository checker\nMaintenance: dependency cleanup",
-        "de": "Fix: window.setTimeout/setInterval im Admin-Tab-Frontend verwendet, um den Repository-Checker zu erfüllen\nWartung: Abhängigkeiten bereinigt",
-        "ru": "Исправление: использование window.setTimeout/setInterval в интерфейсе admin-tab\nОбслуживание: очистка зависимостей",
-        "pt": "Correção: uso de window.setTimeout/setInterval no frontend admin-tab\nManutenção: limpeza de dependências",
-        "nl": "Fix: window.setTimeout/setInterval gebruikt in admin-tab frontend\nOnderhoud: dependency opschoning",
-        "fr": "Correction : utilisation de window.setTimeout/setInterval dans le frontend admin-tab\nMaintenance : nettoyage des dépendances",
-        "it": "Correzione: utilizzo di window.setTimeout/setInterval nel frontend admin-tab\nManutenzione: pulizia delle dipendenze",
-        "es": "Corrección: uso de window.setTimeout/setInterval en el frontend admin-tab\nMantenimiento: limpieza de dependencias",
-        "pl": "Poprawka: użycie window.setTimeout/setInterval w interfejsie admin-tab\nUtrzymanie: czyszczenie zależności",
-        "uk": "Виправлення: використання window.setTimeout/setInterval у фронтенді admin-tab\nОбслуговування: очищення залежностей",
-        "zh-cn": "修复：在 admin-tab 前端使用 window.setTimeout/setInterval\n维护：清理依赖项"
       }
     },
     "titleLang": {
