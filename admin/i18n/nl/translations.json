@@ -1,0 +1,10 @@
+{
+  "4-digit PIN required for all remote commands": "4-cijferige pincode vereist voor alle afstandsbedieningsopdrachten",
+  "How often to fetch vehicle status (1-60)": "Hoe vaak voertuigstatus ophalen (1-60)",
+  "Language": "Taal",
+  "Leapmotor E-Mail": "Leapmotor-e-mail",
+  "Password": "Wachtwoord",
+  "Polling interval (minutes)": "Polling-interval (minuten)",
+  "Use a dedicated second account (see README)": "Gebruik een speciaal tweede account (zie README)",
+  "Vehicle PIN": "Voertuigpincode"
+}

@@ -1,0 +1,10 @@
+{
+  "4-digit PIN required for all remote commands": "Для всех удаленных команд требуется 4-значный PIN-код.",
+  "How often to fetch vehicle status (1-60)": "Как часто получать статус автомобиля (1-60)",
+  "Language": "Язык",
+  "Leapmotor E-Mail": "Электронная почта Leapmotor",
+  "Password": "Пароль",
+  "Polling interval (minutes)": "Интервал опроса (минуты)",
+  "Use a dedicated second account (see README)": "Используйте выделенную вторую учетную запись (см. README).",
+  "Vehicle PIN": "PIN-код автомобиля"
+}

@@ -9,4 +9,4 @@ jobs:
         with:
           node-version: '20'
       - run: npm install --production
-      - run: node build/main.js --version || true
+      - run: node main.js --version || true

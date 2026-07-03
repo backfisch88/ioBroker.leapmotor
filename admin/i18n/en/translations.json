@@ -1,0 +1,10 @@
+{
+  "Leapmotor E-Mail": "Leapmotor E-Mail",
+  "Use a dedicated second account (see README)": "Use a dedicated second account (see README)",
+  "Password": "Password",
+  "Vehicle PIN": "Vehicle PIN",
+  "4-digit PIN required for all remote commands": "4-digit PIN required for all remote commands",
+  "Polling interval (minutes)": "Polling interval (minutes)",
+  "How often to fetch vehicle status (1-60)": "How often to fetch vehicle status (1-60)",
+  "Language": "Language"
+}

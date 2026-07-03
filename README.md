@@ -2,10 +2,10 @@
 
 # ioBroker.leapmotor
 
-[![Version](https://img.shields.io/badge/version-0.5.7-blue.svg)](https://github.com/backfisch88/ioBroker.leapmotor)
+[![Version](https://img.shields.io/badge/version-0.6.0-blue.svg)](https://github.com/backfisch88/ioBroker.leapmotor)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Unofficial Leapmotor electric vehicle integration for ioBroker. Tested on T03.
+Unofficial [Leapmotor](https://www.leapmotor.com/) electric vehicle integration for ioBroker. Tested on T03.
 
 ## ⚠️ Important: Use a Second Account
 
@@ -142,9 +142,15 @@ Comfort commands (only created/shown if the vehicle model supports the feature):
 | cmd.hotspot_on / off | Wi-Fi hotspot (no effect on T03) |
 
 Which comfort commands actually appear depends on the detected vehicle model — see
-`src/vehicleCapabilities.js` in the repository for the current capability matrix per model.
+`admin-tab/src/vehicleCapabilities.js` in the repository for the current capability matrix per model.
 
 ## Changelog
+### 0.6.0 (2026-07-03)
+- Refactor: moved to standard plain-JS repository layout (main.js at repository root, supporting modules under lib/ instead of build/)
+- Fix: removed dead/duplicate code, added VIN sanitization for object IDs, subscribed and acknowledged config.* states
+- Fix: enforced upper bound on polling interval in code, switched picture cache from package-directory file to adapter's own file storage
+- Fix: translated remaining German backend strings to English, enabled compact mode support, adapter-managed timers used throughout
+
 ### 0.5.8 (2026-07-02)
 - Fix: repository checker compliance - added missing intermediate object structure (charging/consumption/pictures/trips channels), corrected invalid state roles, added real integration test
 

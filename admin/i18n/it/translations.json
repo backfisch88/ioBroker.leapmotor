@@ -1,0 +1,10 @@
+{
+  "4-digit PIN required for all remote commands": "PIN di 4 cifre richiesto per tutti i comandi remoti",
+  "How often to fetch vehicle status (1-60)": "Con quale frequenza recuperare lo stato del veicolo (1-60)",
+  "Language": "Lingua",
+  "Leapmotor E-Mail": "E-mail di Leapmotor",
+  "Password": "Password",
+  "Polling interval (minutes)": "Intervallo di polling (minuti)",
+  "Use a dedicated second account (see README)": "Utilizza un secondo account dedicato (vedi README)",
+  "Vehicle PIN": "PIN del veicolo"
+}

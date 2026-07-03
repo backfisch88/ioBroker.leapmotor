@@ -1,0 +1,10 @@
+{
+  "4-digit PIN required for all remote commands": "所有远程命令都需要 4 位 PIN",
+  "How often to fetch vehicle status (1-60)": "获取车辆状态的频率 (1-60)",
+  "Language": "语言",
+  "Leapmotor E-Mail": "零跑电子邮箱",
+  "Password": "密码",
+  "Polling interval (minutes)": "轮询间隔（分钟）",
+  "Use a dedicated second account (see README)": "使用专用的第二个帐户（请参阅自述文件）",
+  "Vehicle PIN": "车辆密码"
+}
