@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { Box, Card, CardContent, Typography, Grid, Divider } from '@mui/material';
+import { I18n } from '@iobroker/adapter-react-v5';
 import {
     ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList, ReferenceLine,
 } from 'recharts';
@@ -67,7 +68,7 @@ export default function ConsumptionTab({ base, states }) {
         const max = Math.max(...vals);
         const best = weeklyData.find(d => d.kwh100km === min);
         const worst = weeklyData.find(d => d.kwh100km === max);
-        // einfacher Trend: letzter Wert vs. Durchschnitt der vorherigen
+        // simple trend: last value vs. average of the previous ones
         const last = vals[vals.length - 1];
         const prevAvg = vals.length > 1 ? vals.slice(0, -1).reduce((a, b) => a + b, 0) / (vals.length - 1) : last;
         const trend = last - prevAvg;
@@ -83,29 +84,29 @@ export default function ConsumptionTab({ base, states }) {
         <Box>
             <Grid container spacing={1.5} sx={{ mb: 2 }}>
                 <Grid item xs={4}>
-                    <StatBox label="Ø VERBRAUCH" value={avgKwh !== null ? `${avgKwh}` : '—'} sub={avgKwh !== null ? `kWh/100km · ≈${(avgKwh * energyPrice).toFixed(2)}€` : 'kWh/100km (Cloud)'} color="#00d4ff" />
+                    <StatBox label={I18n.t('AVG CONSUMPTION')} value={avgKwh !== null ? `${avgKwh}` : '—'} sub={avgKwh !== null ? `kWh/100km · ≈${(avgKwh * energyPrice).toFixed(2)}€` : 'kWh/100km (Cloud)'} color="#00d4ff" />
                 </Grid>
                 <Grid item xs={4}>
-                    <StatBox label="RANKING" value={rank ?? '—'} />
+                    <StatBox label={I18n.t('RANKING')} value={rank ?? '—'} />
                 </Grid>
                 <Grid item xs={4}>
-                    <StatBox label="GESAMT" value={totalKm !== null ? `${totalKm}` : '—'} sub={totalMiles ? `km · ${totalMiles} mi` : 'km'} />
+                    <StatBox label={I18n.t('TOTAL')} value={totalKm !== null ? `${totalKm}` : '—'} sub={totalMiles ? `km · ${totalMiles} mi` : 'km'} />
                 </Grid>
             </Grid>
 
             {stats && (
                 <Grid container spacing={1.5} sx={{ mb: 2 }}>
                     <Grid item xs={4}>
-                        <StatBox label="BESTE WOCHE" value={`${stats.min}`} sub={stats.best?.week} color="#00ff88" />
+                        <StatBox label={I18n.t('BEST WEEK')} value={`${stats.min}`} sub={stats.best?.week} color="#00ff88" />
                     </Grid>
                     <Grid item xs={4}>
-                        <StatBox label="SCHLECHTESTE" value={`${stats.max}`} sub={stats.worst?.week} color="#ff6644" />
+                        <StatBox label={I18n.t('WORST WEEK')} value={`${stats.max}`} sub={stats.worst?.week} color="#ff6644" />
                     </Grid>
                     <Grid item xs={4}>
                         <StatBox
-                            label="TREND"
+                            label={I18n.t('TREND')}
                             value={`${stats.trend > 0 ? '+' : ''}${stats.trend.toFixed(1)}`}
-                            sub="vs. Schnitt"
+                            sub={I18n.t('vs. average')}
                             color={stats.trend > 0 ? '#ff6644' : '#00ff88'}
                         />
                     </Grid>
@@ -115,10 +116,10 @@ export default function ConsumptionTab({ base, states }) {
             <Card sx={{ bgcolor: '#0d1520', border: '1px solid #1e2d45' }}>
                 <CardContent>
                     <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>
-                        Verbrauch der letzten 6 Wochen
+                        {I18n.t('Consumption over the last 6 weeks')}
                     </Typography>
                     {weeklyData.length === 0 ? (
-                        <Typography color="text.secondary">Noch keine Wochendaten verfügbar.</Typography>
+                        <Typography color="text.secondary">{I18n.t('No weekly data available yet.')}</Typography>
                     ) : (
                         <>
                             <ResponsiveContainer width="100%" height={300}>
@@ -130,7 +131,7 @@ export default function ConsumptionTab({ base, states }) {
                                         contentStyle={{ background: '#0d1520', border: '1px solid #2a4060', borderRadius: 10, color: '#c8ddf0', fontSize: 13 }}
                                         labelStyle={{ color: '#00d4ff', fontWeight: 700, marginBottom: 4 }}
                                         itemStyle={{ color: '#c8ddf0' }}
-                                        formatter={(v, name) => name === 'kwh100km' ? [`${v} kWh/100km`, 'Verbrauch'] : [null, null]}
+                                        formatter={(v, name) => name === 'kwh100km' ? [`${v} kWh/100km`, I18n.t('Consumption')] : [null, null]}
                                         labelFormatter={(label, payload) => payload?.[0]?.payload?.fullRange || label}
                                     />
                                     {stats && (

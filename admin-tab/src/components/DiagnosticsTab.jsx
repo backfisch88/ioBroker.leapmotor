@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Card, CardContent, Typography, Chip, Button, Grid, Divider } from '@mui/material';
+import { I18n } from '@iobroker/adapter-react-v5';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import WifiIcon from '@mui/icons-material/Wifi';
 import WifiOffIcon from '@mui/icons-material/WifiOff';
@@ -24,16 +25,16 @@ export default function DiagnosticsTab({ base, states, setState, adapter }) {
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                         {connection ? <WifiIcon sx={{ color: '#00ff88' }} /> : <WifiOffIcon sx={{ color: '#ff4444' }} />}
                         <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                            Cloud-Verbindung
+                            {I18n.t('Cloud Connection')}
                         </Typography>
                         <Chip
                             size="small"
-                            label={connection ? 'Verbunden' : 'Getrennt'}
+                            label={connection ? I18n.t('Connected') : I18n.t('Disconnected')}
                             sx={{ bgcolor: connection ? '#00ff8822' : '#ff444422', color: connection ? '#00ff88' : '#ff4444' }}
                         />
                     </Box>
                     <Typography variant="body2" sx={{ color: '#5a7090' }}>
-                        Letztes Daten-Update: {collectTime}
+                        {I18n.t('Last data update')}: {collectTime}
                     </Typography>
                     <Button
                         startIcon={<RefreshIcon />}
@@ -41,7 +42,7 @@ export default function DiagnosticsTab({ base, states, setState, adapter }) {
                         variant="outlined"
                         onClick={() => setState(`${base}.cmd.refresh`, true)}
                     >
-                        Status jetzt aktualisieren
+                        {I18n.t('Refresh Status Now')}
                     </Button>
                 </CardContent>
             </Card>
@@ -49,16 +50,16 @@ export default function DiagnosticsTab({ base, states, setState, adapter }) {
             <Card sx={{ bgcolor: '#0d1520', border: '1px solid #1e2d45' }}>
                 <CardContent>
                     <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1.5 }}>
-                        Fahrzeuginformationen
+                        {I18n.t('Vehicle Information')}
                     </Typography>
                     <Divider sx={{ borderColor: '#1e2d45', mb: 1.5 }} />
                     <Grid container spacing={1.5}>
                         {[
                             ['VIN', vin],
-                            ['Modell', model],
-                            ['Baujahr', year],
-                            ['Lenkrad', rudder],
-                            ['Ausstattungscode', allocationCode],
+                            [I18n.t('Model'), model],
+                            [I18n.t('Year'), year],
+                            [I18n.t('Steering'), rudder],
+                            [I18n.t('Allocation Code'), allocationCode],
                         ].map(([label, value]) => (
                             <Grid item xs={6} key={label}>
                                 <Typography variant="caption" sx={{ color: '#3a5070' }}>{label}</Typography>

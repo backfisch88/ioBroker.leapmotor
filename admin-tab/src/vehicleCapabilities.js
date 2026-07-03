@@ -1,44 +1,44 @@
-// Fahrzeugspezifische Feature-Unterstützung
-// Basis: eigene Tests + leapconnect/leapmotor_api Referenzen
+// Vehicle-specific feature support
+// Basis: own testing + leapconnect/leapmotor_api references
 //
-// Status pro Feature:
-//   true  = bestätigt funktionierend
-//   false = bestätigt NICHT funktionierend (Befehl wird angenommen, aber wirkungslos)
-//   undefined = unbekannt/ungetestet -> wird wie 'true' behandelt (optimistisch anzeigen)
+// Status per feature:
+//   true  = confirmed working
+//   false = confirmed NOT working (command is accepted but has no effect)
+//   undefined = unknown/untested -> treated like 'true' (shown optimistically)
 
 const CAPABILITIES = {
-    // T03: vollständig durch eigene Tests verifiziert (siehe Kommentare unten)
+    // T03: fully verified through own testing (see comments below)
     T03: {
         lock: true,
         find: true,
         trunk: true,
         windows: true,
-        sunshade: true, // Sonnenblende unter festem Glasdach (kein bewegliches Dach beim T03)
-        sunroof: false, // T03 hat kein bewegliches Glasdach
+        sunshade: true, // sunshade under fixed glass roof (no movable roof on the T03)
+        sunroof: false, // T03 has no movable glass roof
         climate: true,
         quickClimate: true,
         climateSchedule: true,
         chargeLimit: true,
         chargeSchedule: true,
         batteryPreheat: true,
-        defrost: true, // sendet Befehl, aber Frontscheiben-Symbol im Display reagiert nicht nachweislich
-        hotspot: false, // Befehl wird angenommen, aber wirkungslos
-        mirrorHeat: false, // bestätigt wirkungslos beim T03 (Test 2026-06-19)
-        sentryMode: false, // T03 hat keinen Wächter-/Sentry-Modus verbaut
-        speedLimit: false, // bestätigt wirkungslos beim T03 (Test 2026-06-19)
-        seatHeat: false, // T03 hat keine Sitzheizung verbaut
-        seatVentilation: false, // T03 hat keine Sitzbelüftung verbaut
-        steeringWheelHeat: false, // T03 hat keine Lenkradheizung verbaut
-        windDirection: false, // nachweislich nicht über Cloud-API steuerbar (mehrfach systematisch getestet)
-        rearWindowHeating: false, // Signal existiert beim T03 nicht (nur bei C10/B10)
+        defrost: true, // sends the command, but the windshield icon in the display doesn't demonstrably react
+        hotspot: false, // command is accepted but has no effect
+        mirrorHeat: false, // confirmed no effect on the T03 (tested 2026-06-19)
+        sentryMode: false, // T03 has no sentry/watch mode installed
+        speedLimit: false, // confirmed no effect on the T03 (tested 2026-06-19)
+        seatHeat: false, // T03 has no seat heating installed
+        seatVentilation: false, // T03 has no seat ventilation installed
+        steeringWheelHeat: false, // T03 has no steering wheel heating installed
+        windDirection: false, // demonstrably not controllable via cloud API (tested systematically multiple times)
+        rearWindowHeating: false, // signal doesn't exist on the T03 (only on C10/B10)
     },
-    // B10, C10, C16: noch UNGETESTET. Andere Nutzer können über die Debug-Logs
-    // (z.B. "remote 301 failed: ..." oder Erfolg ohne Wirkung) Rückmeldung geben,
-    // welche Funktionen bei ihrem Modell tatsächlich funktionieren. Bis dahin
-    // werden alle Features optimistisch angezeigt (siehe hasCapability() Fallback).
+    // B10, C10, C16: still UNTESTED. Other users can provide feedback via debug
+    // logs (e.g. "remote 301 failed: ..." or success without effect) on which
+    // features actually work on their model. Until then, all features are
+    // shown optimistically (see hasCapability() fallback).
 };
 
-// Liste aller bekannten Feature-Keys, für unbekannte Modelle als "alles erlaubt" Fallback
+// List of all known feature keys, used as an "everything allowed" fallback for unknown models
 const ALL_FEATURES = [
     'lock', 'find', 'trunk', 'windows', 'sunshade', 'sunroof', 'climate',
     'quickClimate', 'climateSchedule', 'chargeLimit', 'chargeSchedule',
@@ -48,17 +48,17 @@ const ALL_FEATURES = [
 ];
 
 /**
- * Gibt true/false zurück ob ein Feature für das gegebene Fahrzeugmodell
- * angezeigt/aktiviert werden soll.
- * - Bekanntes Modell + Feature explizit false -> false (ausblenden)
- * - Bekanntes Modell + Feature explizit true oder undefined -> true (anzeigen)
- * - Unbekanntes Modell -> immer true (anzeigen, da wir nicht wissen was geht)
+ * Returns true/false whether a feature should be shown/enabled for the given
+ * vehicle model.
+ * - Known model + feature explicitly false -> false (hide)
+ * - Known model + feature explicitly true or undefined -> true (show)
+ * - Unknown model -> always true (show, since we don't know what works)
  */
 export function hasCapability(carType, feature) {
     const model = CAPABILITIES[carType];
-    if (!model) return true; // unbekanntes Modell: optimistisch alles zeigen
-    if (!(feature in model)) return true; // Feature für dieses Modell nicht dokumentiert: optimistisch zeigen
-    return model[feature] !== false; // nur explizites false blendet aus
+    if (!model) return true; // unknown model: optimistically show everything
+    if (!(feature in model)) return true; // feature not documented for this model: show optimistically
+    return model[feature] !== false; // only an explicit false hides it
 }
 
 export { ALL_FEATURES };

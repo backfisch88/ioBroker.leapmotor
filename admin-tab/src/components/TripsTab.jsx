@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import {
     Box, Card, CardContent, Typography, Divider, Chip, Collapse, IconButton,
 } from '@mui/material';
+import { I18n } from '@iobroker/adapter-react-v5';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
@@ -47,7 +48,7 @@ export default function TripsTab({ base, states }) {
     const todayKm = val(states, `${base}.trips.today_km`, 0);
     const currentTripActive = val(states, `${base}.trips.current_trip_active`, false);
 
-    // Gruppiere Einzelfahrten nach Tag
+    // Group individual trips by day
     const tripsByDay = useMemo(() => {
         const map = {};
         tripHistory.forEach((t) => {
@@ -57,9 +58,9 @@ export default function TripsTab({ base, states }) {
         return map;
     }, [tripHistory]);
 
-    // Kombiniere Tagessummen mit den dazugehörigen Einzelfahrten,
-    // berechne die Differenz als "Sonstige" (nicht erfasste km, z.B. kurze
-    // Fahrten zwischen zwei 5-Minuten-Polls, die unsere Erkennung verpasst hat).
+    // Combine daily totals with their individual trips, calculate the difference
+    // as "Other" (untracked km, e.g. short trips between two 5-minute polls
+    // that our detection missed).
     const days = useMemo(() => {
         const result = dailyKm.map((d) => {
             const trips = (tripsByDay[d.date] || []).slice().sort((a, b) => a.startTime.localeCompare(b.startTime));
@@ -77,29 +78,29 @@ export default function TripsTab({ base, states }) {
 
     return (
         <Box sx={{ p: 2 }}>
-            {/* Übersicht oben */}
+            {/* Overview at the top */}
             <Card sx={{ mb: 2, bgcolor: '#0d1520', border: '1px solid #1e2d45' }}>
                 <CardContent>
-                    <SectionLabel>FAHRTEN-ÜBERSICHT</SectionLabel>
+                    <SectionLabel>{I18n.t('TRIP OVERVIEW')}</SectionLabel>
                     <Box sx={{ display: 'flex', gap: 2 }}>
                         <Box sx={{ flex: 1, textAlign: 'center' }}>
                             <Typography sx={{ fontSize: '1.6rem', fontWeight: 800, color: '#00d4ff' }}>
                                 {todayKm} km
                             </Typography>
-                            <Typography variant="caption" sx={{ color: '#5a7090' }}>Heute</Typography>
+                            <Typography variant="caption" sx={{ color: '#5a7090' }}>{I18n.t('Today')}</Typography>
                         </Box>
                         <Divider orientation="vertical" flexItem sx={{ borderColor: '#1e2d45' }} />
                         <Box sx={{ flex: 1, textAlign: 'center' }}>
                             <Typography sx={{ fontSize: '1.6rem', fontWeight: 800, color: '#00ff88' }}>
                                 {weekTotal} km
                             </Typography>
-                            <Typography variant="caption" sx={{ color: '#5a7090' }}>Letzte 7 Tage</Typography>
+                            <Typography variant="caption" sx={{ color: '#5a7090' }}>{I18n.t('Last 7 days')}</Typography>
                         </Box>
                     </Box>
                     {currentTripActive && (
                         <Chip
                             icon={<DirectionsCarIcon sx={{ fontSize: 16 }} />}
-                            label="Fahrt läuft gerade"
+                            label={I18n.t('Trip in progress')}
                             size="small"
                             sx={{ mt: 1.5, bgcolor: '#00d4ff22', color: '#00d4ff', border: '1px solid #00d4ff55' }}
                         />
@@ -107,10 +108,10 @@ export default function TripsTab({ base, states }) {
                 </CardContent>
             </Card>
 
-            {/* Tagesliste */}
+            {/* Daily list */}
             {days.length === 0 ? (
                 <Typography sx={{ color: '#5a7090', textAlign: 'center', mt: 4 }}>
-                    Noch keine Fahrtdaten aufgezeichnet.
+                    {I18n.t('No trip data recorded yet.')}
                 </Typography>
             ) : (
                 days.map((day) => {
@@ -127,7 +128,7 @@ export default function TripsTab({ base, states }) {
                                             {fmtDateLong(day.date)}
                                         </Typography>
                                         <Typography variant="caption" sx={{ color: '#5a7090' }}>
-                                            {day.trips.length} {day.trips.length === 1 ? 'Fahrt' : 'Fahrten'} erkannt
+                                            {day.trips.length} {day.trips.length === 1 ? I18n.t('trip detected') : I18n.t('trips detected')}
                                         </Typography>
                                     </Box>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -167,7 +168,7 @@ export default function TripsTab({ base, states }) {
                                                         </Typography>
                                                         {trip.socUsed != null && (
                                                             <Typography variant="caption" sx={{ color: '#ff9900' }}>
-                                                                -{trip.socUsed}% Akku
+                                                                -{trip.socUsed}% {I18n.t('battery')}
                                                             </Typography>
                                                         )}
                                                         <Typography variant="caption" sx={{ color: '#00ff88', fontWeight: 700 }}>
@@ -188,7 +189,7 @@ export default function TripsTab({ base, states }) {
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                                     <HelpOutlineIcon sx={{ fontSize: 16, color: '#5a7090' }} />
                                                     <Typography variant="caption" sx={{ color: '#5a7090' }}>
-                                                        Sonstige (nicht erfasste Fahrten)
+                                                        {I18n.t('Other (untracked trips)')}
                                                     </Typography>
                                                 </Box>
                                                 <Typography variant="caption" sx={{ color: '#5a7090', fontWeight: 700 }}>
@@ -205,8 +206,7 @@ export default function TripsTab({ base, states }) {
             )}
 
             <Typography variant="caption" sx={{ color: '#5a7090', display: 'block', textAlign: 'center', mt: 2 }}>
-                Fahrten werden alle 5 Minuten anhand der Geschwindigkeit erkannt. Sehr kurze Fahrten zwischen zwei
-                Abfragen können als "Sonstige" erscheinen, statt als eigene Fahrt erfasst zu werden.
+                {I18n.t('Trips are detected every 5 minutes based on speed. Very short trips between two polls may show up as "Other" instead of being recorded as an individual trip.')}
             </Typography>
         </Box>
     );

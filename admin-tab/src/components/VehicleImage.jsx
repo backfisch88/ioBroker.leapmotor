@@ -9,9 +9,9 @@ const layerStyle = {
     position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'contain',
 };
 
-// Erzeugt die @keyframes-Regeln für einen einzelnen Animationsframe.
-// Identisches Timing wie in der frueheren composite_html-Animation:
-// 15 Frames, je 0.12s, nacheinander kurz eingeblendet ("Stromfluss"-Effekt).
+// Generates the @keyframes rules for a single animation frame.
+// Identical timing to the earlier composite_html animation:
+// 15 frames, 0.12s each, briefly fading in one after another ("current flow" effect).
 function chargeFrameStyle(index, total) {
     const dur = 0.12;
     const totalDur = (total * dur).toFixed(2);
@@ -53,7 +53,7 @@ export default function VehicleImage({ base, states }) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [states, base, anyOpen, charging, plugged]);
 
-    // Animierte Lade-Frames (Strom-"Puls" Animation), nur sichtbar während echtem Laden
+    // Animated charging frames (current "pulse" animation), only visible while actually charging
     const chargeFrames = useMemo(() => {
         if (!charging) return [];
         const frames = [];

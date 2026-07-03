@@ -2,7 +2,9 @@ import React, { useState, useEffect, useMemo } from 'react';
 import {
     ThemeProvider, createTheme, CssBaseline, Box, Tabs, Tab,
     AppBar, Toolbar, Typography, CircularProgress, Alert,
+    Select, MenuItem,
 } from '@mui/material';
+import { I18n } from '@iobroker/adapter-react-v5';
 import DashboardIcon from '@mui/icons-material/DirectionsCar';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import BarChartIcon from '@mui/icons-material/BarChart';
@@ -49,7 +51,7 @@ export default function App() {
                 const m = id.match(new RegExp(`^${ADAPTER}\\.([A-Z0-9]+)\\.info\\.vin$`));
                 if (m) found.add(m[1]);
             });
-            const list = Array.from(found);
+            const list = Array.from(found).sort();
             setVins(list);
             if (list.length && !selectedVin) setSelectedVin(list[0]);
             getStates(`${ADAPTER}.*`, () => setLoading(false));
@@ -59,7 +61,9 @@ export default function App() {
 
     const base = selectedVin ? `${ADAPTER}.${selectedVin}` : null;
 
-    const vehicleName = useMemo(() => {
+    const vehicleName = (vin) => states[`${ADAPTER}.${vin}.info.name`]?.val || vin;
+
+    const currentVehicleName = useMemo(() => {
         if (!base) return '';
         return states[`${base}.info.name`]?.val || selectedVin || '';
     }, [states, base, selectedVin]);
@@ -70,7 +74,7 @@ export default function App() {
                 <CssBaseline />
                 <Box sx={{ p: 3 }}>
                     <Alert severity={error ? 'error' : 'info'} sx={{ mb: 2 }}>
-                        {error || 'Verbinde...'}
+                        {error || I18n.t('Connecting...')}
                     </Alert>
                     <Typography variant="caption" sx={{ display: 'block', color: '#5a7090', fontFamily: 'monospace' }}>
                         Debug: {debugInfo}
@@ -89,10 +93,27 @@ export default function App() {
             <CssBaseline />
             <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
                 <AppBar position="static" elevation={0} sx={{ bgcolor: 'background.paper', borderBottom: '1px solid #1e2d45' }}>
-                    <Toolbar>
+                    <Toolbar sx={{ gap: 1.5, flexWrap: 'wrap' }}>
                         <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 800, letterSpacing: '0.05em' }}>
-                            🚗 LEAPMOTOR {vehicleName ? `— ${vehicleName}` : ''}
+                            🚗 LEAPMOTOR {vins.length <= 1 && currentVehicleName ? `— ${currentVehicleName}` : ''}
                         </Typography>
+                        {vins.length > 1 && (
+                            <Select
+                                size="small"
+                                value={selectedVin || ''}
+                                onChange={(e) => setSelectedVin(e.target.value)}
+                                sx={{
+                                    minWidth: 140,
+                                    color: '#c8ddf0',
+                                    '& .MuiOutlinedInput-notchedOutline': { borderColor: '#1e2d45' },
+                                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#00d4ff' },
+                                }}
+                            >
+                                {vins.map((vin) => (
+                                    <MenuItem key={vin} value={vin}>{vehicleName(vin)}</MenuItem>
+                                ))}
+                            </Select>
+                        )}
                         <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: connected ? '#00ff88' : '#ff4444' }} />
                     </Toolbar>
                     <Tabs
@@ -104,16 +125,16 @@ export default function App() {
                         scrollButtons="auto"
                         allowScrollButtonsMobile
                     >
-                        <Tab icon={<DashboardIcon />} label="Dashboard" />
-                        <Tab icon={<BarChartIcon />} label="Verbrauch" />
-                        <Tab icon={<MapIcon />} label="Fahrten" />
-                        <Tab icon={<ListAltIcon />} label="Datenpunkte" />
-                        <Tab icon={<BuildIcon />} label="Diagnose" />
+                        <Tab icon={<DashboardIcon />} label={I18n.t('Dashboard')} />
+                        <Tab icon={<BarChartIcon />} label={I18n.t('Consumption')} />
+                        <Tab icon={<MapIcon />} label={I18n.t('Trips')} />
+                        <Tab icon={<ListAltIcon />} label={I18n.t('Datapoints')} />
+                        <Tab icon={<BuildIcon />} label={I18n.t('Diagnostics')} />
                     </Tabs>
                 </AppBar>
 
                 <Box sx={{ p: 2 }}>
-                    {!base && <Typography color="text.secondary">Kein Fahrzeug gefunden. Ist der Adapter gestartet?</Typography>}
+                    {!base && <Typography color="text.secondary">{I18n.t('No vehicle found. Is the adapter running?')}</Typography>}
                     {base && tab === 0 && <DashboardTab base={base} states={states} setState={setState} />}
                     {base && tab === 1 && <ConsumptionTab base={base} states={states} />}
                     {base && tab === 2 && <TripsTab base={base} states={states} />}
