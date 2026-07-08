@@ -92,7 +92,8 @@ class LeapmotorAdapter extends utils.Adapter{
             const pollTime=new Date().toLocaleString('de-DE',{timeZone:'Europe/Berlin'});
             await this.setStateAsync(`${vehicle.vin}.status.last_poll_time`,{val:pollTime,ack:true});
             try{await this.updateDailyMileage(vehicle.vin,s.totalMileage)}catch(e){this.log.debug(`Daily mileage error: ${e}`)}
-            try{await this.updateTripDetection(vehicle.vin,s.totalMileage,s.speed,s.soc)}catch(e){this.log.debug(`Trip detection error: ${e}`)}
+            try{await this.updateTripDetection(vehicle,s.totalMileage,s.speed,s.soc)}catch(e){this.log.debug(`Trip detection error: ${e}`)}
+            try{await this.resolvePendingTripEnergy(vehicle)}catch(e){this.log.debug(`Pending trip energy error: ${e}`)}
             try{await this.updateChargingCost(vehicle.vin,s.soc,s.chargeState)}catch(e){this.log.debug(`Charging cost error: ${e}`)}
             this.log.debug(`${vehicle.vin}: SOC=${s.soc}% Range=${s.expectedMileage}km Temp=${s.outdoorTemp}°C Locked=${s.driverDoorLockStatus} AC=${s.acSwitch}`);
             await this.buildCompositeHtml(vehicle.vin,s,vehicle.name);
@@ -131,7 +132,8 @@ class LeapmotorAdapter extends utils.Adapter{
         await this.setStateAsync(`${vin}.trips.today_km`,{val:todayEntry.km,ack:true});
     }
 
-    async updateTripDetection(vin,totalMileage,speed,soc){
+    async updateTripDetection(vehicle,totalMileage,speed,soc){
+        const vin=vehicle.vin;
         if(totalMileage==null)return;
         const isDriving=speed!=null&&speed>0;
         if(!this._tripStates)this._tripStates={};
@@ -170,14 +172,35 @@ class LeapmotorAdapter extends utils.Adapter{
             const durationMin=Math.round((Date.now()-(prev.startTime??Date.now()))/60000);
             const socUsed=prev.startSoc!=null&&soc!=null?Math.max(0,prev.startSoc-soc):null;
             if(km>=0.5){
+                const startTimeMs=prev.startTime??Date.now();
+                const endTimeMs=Date.now();
                 const trip={
-                    date:new Date(prev.startTime).toISOString().slice(0,10),
-                    startTime:new Date(prev.startTime).toLocaleString('de-DE',{timeZone:'Europe/Berlin'}),
-                    endTime:new Date().toLocaleString('de-DE',{timeZone:'Europe/Berlin'}),
+                    date:new Date(startTimeMs).toISOString().slice(0,10),
+                    startTime:new Date(startTimeMs).toLocaleString('de-DE',{timeZone:'Europe/Berlin'}),
+                    endTime:new Date(endTimeMs).toLocaleString('de-DE',{timeZone:'Europe/Berlin'}),
                     km:Math.round(km*10)/10,
                     durationMin,
                     socUsed,
                 };
+                // Try to get the cloud's OFFICIAL driving/AC/other energy split for this
+                // trip's exact time window. The cloud sometimes needs a while to finish
+                // aggregating a just-completed trip, so this can legitimately come back
+                // empty right away - in that case we mark the trip as pending and retry
+                // a few times on later poll cycles (see resolvePendingTripEnergy()).
+                try{
+                    const breakdown=await this.client.getEnergyBreakdown(vehicle,Math.floor(startTimeMs/1000),Math.floor(endTimeMs/1000));
+                    if(breakdown){
+                        trip.energyDrivingKwh=Math.round(breakdown.driving*100)/100;
+                        trip.energyAcKwh=Math.round(breakdown.ac*100)/100;
+                        trip.energyOtherKwh=Math.round(breakdown.other*100)/100;
+                        trip.energyOfficial=true;
+                    }else{
+                        trip.energyPending=true;
+                    }
+                }catch(e){
+                    this.log.debug(`Energy breakdown fetch failed for trip: ${e}`);
+                    trip.energyPending=true;
+                }
                 const stateId=`${vin}.trips.history_json`;
                 const cur=await this.getStateAsync(stateId);
                 let history=[];
@@ -186,11 +209,54 @@ class LeapmotorAdapter extends utils.Adapter{
                 history=history.slice(-50);
                 await this.setStateAsync(stateId,{val:JSON.stringify(history),ack:true});
                 this.log.debug(`Trip ended: ${trip.km}km in ${durationMin}min`);
+                if(trip.energyPending){
+                    if(!this._pendingEnergyTrips)this._pendingEnergyTrips={};
+                    if(!this._pendingEnergyTrips[vin])this._pendingEnergyTrips[vin]=[];
+                    this._pendingEnergyTrips[vin].push({startTimeMs,endTimeMs,date:trip.date,startTime:trip.startTime,attempts:0});
+                }
             }
             this._tripStates[vin]={wasActive:false,startMileage:null,startTime:null,startSoc:null};
             await this.setStateAsync(`${vin}.trips.current_trip_active`,{val:false,ack:true});
         }
         this._lastKnownMileage[vin]={mileage:totalMileage,ts:Date.now()};
+    }
+
+    // Retries fetching the official energy breakdown for trips whose cloud data
+    // wasn't ready yet when they first ended. Runs once per poll cycle; each
+    // pending trip is retried up to 12 times (~1 hour at the default 5-minute
+    // polling interval) before being given up on permanently.
+    async resolvePendingTripEnergy(vehicle){
+        const vin=vehicle.vin;
+        const pending=this._pendingEnergyTrips?.[vin];
+        if(!pending||pending.length===0)return;
+        const stateId=`${vin}.trips.history_json`;
+        const cur=await this.getStateAsync(stateId);
+        let history=[];
+        try{history=JSON.parse(cur?.val||'[]')}catch{history=[]}
+        let changed=false;
+        const stillPending=[];
+        for(const p of pending){
+            p.attempts=(p.attempts||0)+1;
+            let resolved=false;
+            try{
+                const breakdown=await this.client.getEnergyBreakdown(vehicle,Math.floor(p.startTimeMs/1000),Math.floor(p.endTimeMs/1000));
+                if(breakdown){
+                    const entry=history.find(t=>t.date===p.date&&t.startTime===p.startTime);
+                    if(entry){
+                        entry.energyDrivingKwh=Math.round(breakdown.driving*100)/100;
+                        entry.energyAcKwh=Math.round(breakdown.ac*100)/100;
+                        entry.energyOtherKwh=Math.round(breakdown.other*100)/100;
+                        entry.energyOfficial=true;
+                        delete entry.energyPending;
+                        changed=true;
+                    }
+                    resolved=true;
+                }
+            }catch(e){this.log.debug(`Pending energy breakdown retry failed: ${e}`)}
+            if(!resolved&&p.attempts<12)stillPending.push(p);
+        }
+        this._pendingEnergyTrips[vin]=stillPending;
+        if(changed)await this.setStateAsync(stateId,{val:JSON.stringify(history),ack:true});
     }
 
     async updateChargingCost(vin,soc,chargeState){
@@ -421,8 +487,8 @@ class LeapmotorAdapter extends utils.Adapter{
         }else{
             layers.push(pics['carpic_body']||'');
             layers.push(pics['carpic_hood_close']||'');
-            layers.push(s.lbcmDriverDoorStatus?(pics['carpic_leftfront_open']||''):(pics['carpic_leftfront_close']||''));
-            layers.push(s.lbcmLeftRearDoorStatus?(pics['carpic_leftbehind_open']||''):(pics['carpic_leftbehind_close']||''));
+            if(s.lbcmDriverDoorStatus)layers.push(pics['carpic_leftfront_open']||'');
+            if(s.lbcmLeftRearDoorStatus)layers.push(pics['carpic_leftbehind_open']||'');
             if(s.rbcmDriverDoorStatus)layers.push(pics['carpic_rightfront_open']||'');
             if(s.rbcmRightRearDoorStatus)layers.push(pics['carpic_rightbehind_open']||'');
             if(s.bbcmBackDoorStatus)layers.push(pics['carpic_tailgate_open']||'');

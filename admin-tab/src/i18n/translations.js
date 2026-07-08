@@ -107,6 +107,9 @@ const translations = {
         'Trips are detected every 5 minutes based on speed. Very short trips between two polls may show up as "Other" instead of being recorded as an individual trip.':
             'Fahrten werden alle 5 Minuten anhand der Geschwindigkeit erkannt. Sehr kurze Fahrten zwischen zwei Abfragen können als "Sonstige" erscheinen, statt als eigene Fahrt erfasst zu werden.',
 
+        'Official energy split': 'Offizielle Energie-Aufteilung',
+        'Official energy data not yet available from the cloud': 'Offizielle Energiedaten noch nicht von der Cloud verfügbar',
+
         'Battery': 'Batterie',
         'Range & Consumption': 'Reichweite & Verbrauch',
         'Charging': 'Laden',

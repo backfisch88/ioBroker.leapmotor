@@ -151,30 +151,53 @@ export default function TripsTab({ base, states }) {
                                                 <Box
                                                     key={i}
                                                     sx={{
-                                                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                                                         bgcolor: '#070d1a', borderRadius: 1.5, px: 1.5, py: 1,
                                                         border: '1px solid #1e2d4555',
+                                                        display: 'flex', flexDirection: 'column', gap: 0.5,
                                                     }}
                                                 >
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                        <DirectionsCarIcon sx={{ fontSize: 16, color: '#00d4ff' }} />
-                                                        <Typography variant="caption" sx={{ color: '#c8ddf0' }}>
-                                                            {startClock} – {endClock}
-                                                        </Typography>
-                                                    </Box>
-                                                    <Box sx={{ display: 'flex', gap: 1.5 }}>
-                                                        <Typography variant="caption" sx={{ color: '#5a7090' }}>
-                                                            {trip.durationMin} min
-                                                        </Typography>
-                                                        {trip.socUsed != null && (
-                                                            <Typography variant="caption" sx={{ color: '#ff9900' }}>
-                                                                -{trip.socUsed}% {I18n.t('battery')}
+                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                            <DirectionsCarIcon sx={{ fontSize: 16, color: '#00d4ff' }} />
+                                                            <Typography variant="caption" sx={{ color: '#c8ddf0' }}>
+                                                                {startClock} – {endClock}
                                                             </Typography>
-                                                        )}
-                                                        <Typography variant="caption" sx={{ color: '#00ff88', fontWeight: 700 }}>
-                                                            {trip.km} km
-                                                        </Typography>
+                                                        </Box>
+                                                        <Box sx={{ display: 'flex', gap: 1.5 }}>
+                                                            <Typography variant="caption" sx={{ color: '#5a7090' }}>
+                                                                {trip.durationMin} min
+                                                            </Typography>
+                                                            {trip.socUsed != null && (
+                                                                <Typography variant="caption" sx={{ color: '#ff9900' }}>
+                                                                    -{trip.socUsed}% {I18n.t('battery')}
+                                                                </Typography>
+                                                            )}
+                                                            <Typography variant="caption" sx={{ color: '#00ff88', fontWeight: 700 }}>
+                                                                {trip.km} km
+                                                            </Typography>
+                                                        </Box>
                                                     </Box>
+                                                    {trip.energyOfficial && (
+                                                        <Box sx={{ display: 'flex', gap: 1.5, pl: 3 }}>
+                                                            <Typography variant="caption" sx={{ color: '#3a5070', fontSize: '0.7rem' }}>
+                                                                🔋 {I18n.t('Official energy split')}:
+                                                            </Typography>
+                                                            <Typography variant="caption" sx={{ color: '#00d4ff', fontSize: '0.7rem' }}>
+                                                                {I18n.t('Driving')} {trip.energyDrivingKwh} kWh
+                                                            </Typography>
+                                                            <Typography variant="caption" sx={{ color: '#a090ff', fontSize: '0.7rem' }}>
+                                                                {I18n.t('Climate')} {trip.energyAcKwh} kWh
+                                                            </Typography>
+                                                            <Typography variant="caption" sx={{ color: '#5a7090', fontSize: '0.7rem' }}>
+                                                                {I18n.t('Other')} {trip.energyOtherKwh} kWh
+                                                            </Typography>
+                                                        </Box>
+                                                    )}
+                                                    {trip.energyPending && (
+                                                        <Typography variant="caption" sx={{ color: '#5a7090', fontSize: '0.7rem', pl: 3, fontStyle: 'italic' }}>
+                                                            ⏳ {I18n.t('Official energy data not yet available from the cloud')}
+                                                        </Typography>
+                                                    )}
                                                 </Box>
                                             );
                                         })}

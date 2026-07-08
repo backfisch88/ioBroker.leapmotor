@@ -42,8 +42,8 @@ export default function VehicleImage({ base, states }) {
         } else {
             result.push(pic('carpic_body'));
             result.push(pic('carpic_hood_close'));
-            result.push(doorDriver ? pic('carpic_leftfront_open') : pic('carpic_leftfront_close'));
-            result.push(doorRearLeft ? pic('carpic_leftbehind_open') : pic('carpic_leftbehind_close'));
+            if (doorDriver) result.push(pic('carpic_leftfront_open'));
+            if (doorRearLeft) result.push(pic('carpic_leftbehind_open'));
             if (doorFrontRight) result.push(pic('carpic_rightfront_open'));
             if (doorRearRight) result.push(pic('carpic_rightbehind_open'));
             if (doorTrunk) result.push(pic('carpic_tailgate_open'));
