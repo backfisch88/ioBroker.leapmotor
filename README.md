@@ -145,6 +145,9 @@ Which comfort commands actually appear depends on the detected vehicle model —
 `admin-tab/src/vehicleCapabilities.js` in the repository for the current capability matrix per model.
 
 ## Changelog
+### **WORK IN PROGRESS**
+- (placeholder for next release)
+
 ### 0.6.1 (2026-07-03)
 - Fix: repository checker findings - node: prefix for built-in modules, removed raw setTimeout fallback, included admin-tab i18n source in npm package, trimmed news list to 7 entries
 
