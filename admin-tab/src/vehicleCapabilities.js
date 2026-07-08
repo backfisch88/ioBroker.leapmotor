@@ -32,7 +32,14 @@ const CAPABILITIES = {
         windDirection: false, // demonstrably not controllable via cloud API (tested systematically multiple times)
         rearWindowHeating: false, // signal doesn't exist on the T03 (only on C10/B10)
     },
-    // B10, C10, C16: still UNTESTED. Other users can provide feedback via debug
+    // B10: partially confirmed via a real owner's status dumps (2026-07).
+    // Only what has actually been confirmed is listed here; everything else
+    // stays undocumented (optimistic default via hasCapability()).
+    B10: {
+        sunshade: true, // confirmed: B10 has an electric sunroof, unlike T03's fixed shade (signal 1724)
+        sunroof: true,
+    },
+    // C10, C16: still UNTESTED. Other users can provide feedback via debug
     // logs (e.g. "remote 301 failed: ..." or success without effect) on which
     // features actually work on their model. Until then, all features are
     // shown optimistically (see hasCapability() fallback).
