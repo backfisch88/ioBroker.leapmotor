@@ -145,8 +145,9 @@ Which comfort commands actually appear depends on the detected vehicle model —
 `admin-tab/src/vehicleCapabilities.js` in the repository for the current capability matrix per model.
 
 ## Changelog
-### **WORK IN PROGRESS**
-- (placeholder for next release)
+### 0.6.2 (2026-07-08)
+- Fix: B10 model now correctly uses the c10 cloud status endpoint (community-confirmed), resolving empty status/trips/charging datapoints
+- Fix: enabled full i18n for jsonConfig.json now that admin/i18n translation files cover all keys
 
 ### 0.6.1 (2026-07-03)
 - Fix: repository checker findings - node: prefix for built-in modules, removed raw setTimeout fallback, included admin-tab i18n source in npm package, trimmed news list to 7 entries
@@ -162,13 +163,6 @@ Which comfort commands actually appear depends on the detected vehicle model —
 
 ### 0.5.7 (2026-06-29)
 - Fix: avoid npm transparency log conflict from a previous failed publish attempt (no functional changes vs. 0.5.5)
-
-### 0.5.6 (2026-06-29)
-- New: Trips tab showing daily kilometers with individual detected trips and an "Other" entry for any unaccounted distance
-- Fix: trip detection now backfills kilometers driven before the trip was first detected (closes the gap caused by the 5-minute polling interval)
-- Fix: critical bug where `adminTab.link` used a relative path, causing a 404 error when opening the tab for all users — now uses an absolute path
-- Fix: admin tab files (`index_m.html`, `tab.html`, `tab.js`, `tab_m.html`) were missing from the published package; they are now included
-- Fix: `index_m.html` contained leftover placeholder content instead of the real mobile tab loader
 
 Older changes can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

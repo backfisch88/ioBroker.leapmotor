@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "leapmotor",
-    "version": "0.6.1",
+    "version": "0.6.2",
     "news": {
+      "0.6.2": {
+        "en": "Fix: B10 model now correctly uses the c10 cloud status endpoint (community-confirmed), resolving empty status/trips/charging datapoints. Fix: enabled full i18n for jsonConfig.json now that admin/i18n translation files cover all keys.",
+        "de": "Fix: B10-Modell nutzt jetzt korrekt den c10-Cloud-Statusendpunkt (community-bestaetigt), behebt leere status/trips/charging-Datenpunkte. Fix: vollstaendiges i18n fuer jsonConfig.json aktiviert, da admin/i18n-Uebersetzungsdateien jetzt alle Schluessel abdecken.",
+        "ru": "Исправление: модель B10 теперь корректно использует облачную конечную точку статуса c10 (подтверждено сообществом), что устраняет пустые точки данных status/trips/charging. Исправление: включена полная локализация i18n для jsonConfig.json, так как файлы перевода admin/i18n теперь охватывают все ключи.",
+        "pt": "Correção: o modelo B10 agora usa corretamente o endpoint de status c10 na nuvem (confirmado pela comunidade), resolvendo os pontos de dados vazios de status/trips/charging. Correção: i18n completo habilitado para jsonConfig.json, já que os arquivos de tradução admin/i18n agora cobrem todas as chaves.",
+        "nl": "Fix: B10-model gebruikt nu correct het c10-cloud statusendpoint (door de community bevestigd), waardoor lege status/trips/charging-datapunten worden opgelost. Fix: volledige i18n ingeschakeld voor jsonConfig.json, aangezien admin/i18n-vertaalbestanden nu alle sleutels dekken.",
+        "fr": "Correction : le modèle B10 utilise désormais correctement le point de terminaison de statut cloud c10 (confirmé par la communauté), résolvant les points de données status/trips/charging vides. Correction : i18n complet activé pour jsonConfig.json, les fichiers de traduction admin/i18n couvrant désormais toutes les clés.",
+        "it": "Correzione: il modello B10 ora utilizza correttamente l'endpoint di stato cloud c10 (confermato dalla community), risolvendo i datapoint status/trips/charging vuoti. Correzione: i18n completo abilitato per jsonConfig.json, poiché i file di traduzione admin/i18n ora coprono tutte le chiavi.",
+        "es": "Corrección: el modelo B10 ahora usa correctamente el endpoint de estado en la nube c10 (confirmado por la comunidad), resolviendo los puntos de datos vacíos de status/trips/charging. Corrección: se habilitó i18n completo para jsonConfig.json, ya que los archivos de traducción admin/i18n ahora cubren todas las claves.",
+        "pl": "Poprawka: model B10 poprawnie korzysta teraz z chmurowego punktu końcowego statusu c10 (potwierdzone przez społeczność), co rozwiązuje puste punkty danych status/trips/charging. Poprawka: włączono pełne i18n dla jsonConfig.json, ponieważ pliki tłumaczeń admin/i18n obejmują teraz wszystkie klucze.",
+        "uk": "Виправлення: модель B10 тепер коректно використовує хмарну кінцеву точку статусу c10 (підтверджено спільнотою), що вирішує проблему порожніх точок даних status/trips/charging. Виправлення: увімкнено повну локалізацію i18n для jsonConfig.json, оскільки файли перекладу admin/i18n тепер охоплюють усі ключі.",
+        "zh-cn": "修复：B10 车型现在正确使用 c10 云状态端点（已由社区确认），解决了 status/trips/charging 数据点为空的问题。修复：由于 admin/i18n 翻译文件现已覆盖所有键，为 jsonConfig.json 启用了完整的 i18n 支持。"
+      },
       "0.6.1": {
         "en": "Fix: repository checker findings - use node: prefix for built-in modules, remove raw setTimeout fallback, include admin-tab i18n source in npm package, trim news list to 7 entries.",
         "de": "Fix: Repository-Checker-Befunde behoben - node:-Praefix fuer eingebaute Module verwendet, rohen setTimeout-Fallback entfernt, admin-tab-i18n-Quellcode ins npm-Paket aufgenommen, News-Liste auf 7 Eintraege gekuerzt.",

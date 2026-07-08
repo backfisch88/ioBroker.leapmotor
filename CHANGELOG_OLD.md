@@ -1,4 +1,11 @@
 # Older Changelog
+## 0.5.6 (2026-06-29)
+- New: Trips tab showing daily kilometers with individual detected trips and an "Other" entry for any unaccounted distance
+- Fix: trip detection now backfills kilometers driven before the trip was first detected (closes the gap caused by the 5-minute polling interval)
+- Fix: critical bug where `adminTab.link` used a relative path, causing a 404 error when opening the tab for all users — now uses an absolute path
+- Fix: admin tab files (`index_m.html`, `tab.html`, `tab.js`, `tab_m.html`) were missing from the published package; they are now included
+- Fix: `index_m.html` contained leftover placeholder content instead of the real mobile tab loader
+
 ## 0.5.5 (2026-06-26)
 - Maintenance: dependency cleanup and repository checker compliance fixes
 
