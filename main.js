@@ -640,10 +640,19 @@ class LeapmotorAdapter extends utils.Adapter{
         await set('status.battery_soc',s.soc);
         await set('status.battery_current',s.batteryCurrent);
         await set('status.battery_voltage',s.batteryVoltage);
-        await set('status.battery_energy_kwh',s.dumpEnergy!=null?Math.round(s.dumpEnergy/100)/10:null);
+        let batteryEnergyKwh=s.dumpEnergy!=null?Math.round(s.dumpEnergy/100)/10:null;
+        if(batteryEnergyKwh===null&&s.soc!=null){
+            // No direct signal for remaining energy on this model (e.g. C10/B10) -
+            // estimate it from SOC and the configured/default battery capacity instead.
+            const capState=await this.getStateAsync(`${vin}.config.battery_capacity_kwh`);
+            const vehicleForCapacity=this.vehicles.find(v=>v.vin===vin);
+            const capacity=Number(capState?.val)||getDefaultBatteryCapacity(vehicleForCapacity?.carType);
+            batteryEnergyKwh=Math.round((s.soc/100)*capacity*10)/10;
+        }
+        await set('status.battery_energy_kwh',batteryEnergyKwh);
         // Range
         await set('status.range_km',s.expectedMileage);
-        await set('status.range_miles',s.expectedMileageMile!=null?parseFloat(s.expectedMileageMile):null);
+        await set('status.range_miles',s.expectedMileageMile!=null?parseFloat(s.expectedMileageMile):(s.expectedMileage!=null?Math.round(s.expectedMileage*0.621371*10)/10:null));
         await set('status.mileage_total',s.totalMileage);
         // Temperature
         await set('status.temp_outdoor',s.outdoorTemp);
