@@ -69,3 +69,44 @@ export function hasCapability(carType, feature) {
 }
 
 export { ALL_FEATURES };
+
+// Status datapoints that are confirmed to genuinely NOT exist in the cloud's
+// response for a given model family - not a bug, not "not yet loaded", but a
+// real limitation of the vehicle's data endpoint. Confirmed 2026-07 via a
+// real B10 owner's before/after tests (toggling each feature and checking
+// whether ANY signal ID changed) plus cross-referencing two independent
+// community reverse-engineering projects (leapmotor-api, leapmotor-ha), which
+// both only ever read these fields from the T03-style named-field response,
+// never from a C10/B10-style numeric signal ID.
+//
+// Model families share the same underlying cloud status endpoint (see
+// STATUS_ENDPOINT_OVERRIDES in lib/leapmotor-client.js), so this list applies
+// to any model routed through that endpoint, not just B10 specifically.
+const SIGNAL_FAMILY_UNAVAILABLE_STATUS_FIELDS = [
+    'ac_cooling_heating',
+    'ac_fan_speed_setting',
+    'bluetooth_on',
+    'hotspot_on',
+    'door_ctrl_allow',
+    'ptc_state',
+    'temp_outdoor',
+];
+
+// carType -> list of status.* key suffixes confirmed unavailable for that
+// specific model. Currently only B10 has been tested; models sharing its
+// endpoint (see above) are assumed to have the same limitation until an
+// owner confirms otherwise.
+const UNAVAILABLE_STATUS_FIELDS = {
+    B10: SIGNAL_FAMILY_UNAVAILABLE_STATUS_FIELDS,
+};
+
+/**
+ * Returns true if a given status.* datapoint (by its key suffix, e.g.
+ * "temp_outdoor") is confirmed to never be available for this vehicle model,
+ * so the UI can show a clear "not supported on this model" indicator instead
+ * of looking like a stuck/broken value.
+ */
+export function isKnownUnavailable(carType, statusKey) {
+    const list = UNAVAILABLE_STATUS_FIELDS[carType];
+    return Array.isArray(list) && list.includes(statusKey);
+}

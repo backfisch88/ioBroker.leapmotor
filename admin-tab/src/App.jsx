@@ -31,7 +31,14 @@ const theme = createTheme({
 const ADAPTER = (window.adapterInstance || 'leapmotor.0').replace(/^system\.adapter\./, '');
 
 export default function App() {
-    const { connected, error, states, getStates, getObjects, setState } = useConnection(ADAPTER);
+    const { connected, error, states, getStates, getObjects, setState, systemLanguage } = useConnection(ADAPTER);
+    // Sprache SYNCHRON während des Renderns setzen (nicht in einem useEffect,
+    // da Effects erst NACH dem Rendern laufen - das würde bedeuten, dass genau
+    // der erste Render-Durchlauf mit bekannter Sprache noch die alte/Default-
+    // Sprache für alle I18n.t()-Aufrufe verwendet).
+    if (systemLanguage && I18n.getLanguage() !== systemLanguage) {
+        I18n.setLanguage(systemLanguage);
+    }
     const [tab, setTab] = useState(0);
     const [vins, setVins] = useState([]);
     const [selectedVin, setSelectedVin] = useState(null);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { I18n } from '@iobroker/adapter-react-v5';
-import { hasCapability } from '../vehicleCapabilities';
+import { hasCapability, isKnownUnavailable } from '../vehicleCapabilities';
 import {
     Grid, Card, CardContent, Typography, Box, Button,
     Slider, IconButton, Chip, LinearProgress,
@@ -219,6 +219,13 @@ export default function DashboardTab({ base, states, setState }) {
     const isCool = acModeLocal !== null ? acModeLocal === 'cool' : (acOn && acMode === 1);
     const isVent = acModeLocal !== null ? acModeLocal === 'vent' : (acOn && acMode === 0);
     const isOff = acModeLocal !== null ? acModeLocal === 'off' : !acOn;
+    // On models where ac_cooling_heating is confirmed unavailable (e.g. B10),
+    // acMode is always null, so once the brief optimistic highlight after a
+    // click expires, none of the 4 buttons would show as active even though
+    // the climate is demonstrably running (acOn works fine on these models).
+    // Show a plain "Climate is ON/OFF" hint instead of falsely highlighting
+    // (or leaving unhighlighted) a specific mode we can't actually detect.
+    const acModeUnknown = acModeLocal===null && isKnownUnavailable(carType,'ac_cooling_heating');
 
     const sendClimate = (mode, cmd) => {
         setAcModeLocal(mode);
@@ -312,6 +319,11 @@ export default function DashboardTab({ base, states, setState }) {
                         <ToggleButton active={isVent} color="#a090ff" icon={<AirIcon />} label={I18n.t('Vent')} onClick={() => sendClimate('vent', 'ac_vent')} />
                         <ToggleButton active={isOff} color="#ff4444" icon={<PowerOffIcon />} label={I18n.t('Off')} onClick={() => sendClimate('off', 'ac_off')} />
                     </Box>
+                    {acModeUnknown && (
+                        <Typography variant="caption" sx={{ display: 'block', mt: -1, mb: 2, color: acOn ? '#00ff88' : '#5a7090' }}>
+                            ℹ️ {acOn ? I18n.t('Climate is currently ON (exact mode not reported by this vehicle model)') : I18n.t('Climate is currently OFF')}
+                        </Typography>
+                    )}
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                         <IconButton size="small" onClick={() => onTempCommit(Math.max(16, acTemp - 1))} sx={{ border: '1px solid #1e2d45' }}><RemoveIcon /></IconButton>
                         <Typography sx={{ minWidth: 60, textAlign: 'center', fontWeight: 800, color: '#00d4ff', fontSize: '1.3rem' }}>{acTemp}°C</Typography>

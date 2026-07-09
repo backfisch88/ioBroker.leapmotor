@@ -5,6 +5,7 @@
 // always the guaranteed baseline even if a language is missing or incomplete.
 const translations = {
     en: {},
+    ru: {}, // required so extendTranslations() detects the {lang: {key: val}} format correctly
     de: {
         'Connecting...': 'Verbinde...',
         'Dashboard': 'Dashboard',
@@ -45,6 +46,9 @@ const translations = {
         'Closed': 'Zu',
         'Locked': 'Zu',
         'Unlocked': 'Offen',
+
+        'Climate is currently ON (exact mode not reported by this vehicle model)': 'Klimaanlage ist aktuell AN (genauer Modus wird von diesem Fahrzeugmodell nicht gemeldet)',
+        'Climate is currently OFF': 'Klimaanlage ist aktuell AUS',
 
         'CLIMATE CONTROL': 'KLIMAANLAGE',
         'Heat': 'Heizen',
@@ -109,6 +113,8 @@ const translations = {
 
         'Official energy split': 'Offizielle Energie-Aufteilung',
         'Official energy data not yet available from the cloud': 'Offizielle Energiedaten noch nicht von der Cloud verfügbar',
+
+        'n/a (not supported on this model)': 'n/a (bei diesem Modell nicht verfügbar)',
 
         'Battery': 'Batterie',
         'Range & Consumption': 'Reichweite & Verbrauch',

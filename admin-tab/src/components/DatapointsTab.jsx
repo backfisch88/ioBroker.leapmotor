@@ -5,6 +5,7 @@ import {
 } from '@mui/material';
 import { I18n } from '@iobroker/adapter-react-v5';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { isKnownUnavailable } from '../vehicleCapabilities';
 
 const GROUPS = {
     'Battery': ['battery_soc', 'battery_current', 'battery_voltage', 'battery_energy_kwh', 'temp_battery_min'],
@@ -28,6 +29,7 @@ function formatVal(v) {
 
 export default function DatapointsTab({ base, states }) {
     const [expanded, setExpanded] = useState('Battery');
+    const carType = states[`${base}.info.model`]?.val;
 
     return (
         <Box>
@@ -48,11 +50,16 @@ export default function DatapointsTab({ base, states }) {
                                 {keys.map(k => {
                                     const id = `${base}.status.${k}`;
                                     const v = states[id]?.val;
+                                    const unavailable = (v === null || v === undefined) && isKnownUnavailable(carType, k);
                                     return (
                                         <TableRow key={k}>
                                             <TableCell sx={{ color: '#5a7090', borderColor: '#1e2d45' }}>{k}</TableCell>
-                                            <TableCell sx={{ color: '#c8ddf0', borderColor: '#1e2d45', fontFamily: 'monospace' }}>
-                                                {formatVal(v)}
+                                            <TableCell sx={{
+                                                color: unavailable ? '#5a7090' : '#c8ddf0',
+                                                borderColor: '#1e2d45', fontFamily: 'monospace',
+                                                fontStyle: unavailable ? 'italic' : 'normal',
+                                            }}>
+                                                {unavailable ? I18n.t('n/a (not supported on this model)') : formatVal(v)}
                                             </TableCell>
                                         </TableRow>
                                     );

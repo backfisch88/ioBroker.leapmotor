@@ -24,6 +24,8 @@ export function useConnection(adapterInstance) {
     const [connected, setConnected] = useState(false);
     const [error, setError] = useState(null);
     const [states, setStates] = useState({});
+    const [systemLanguage, setSystemLanguage] = useState(null);
+    const [langError, setLangError] = useState(null);
     const connRef = useRef(null);
 
     useEffect(() => {
@@ -44,6 +46,18 @@ export function useConnection(adapterInstance) {
                     conn.subscribeState(`${adapterInstance}.*`, (id, state) => {
                         setStates(prev => ({ ...prev, [id]: state }));
                     });
+                    // Echte ioBroker-Systemsprache holen (statt Browser-Sprache zu
+                    // raten), damit die Oberfläche der Admin-Spracheinstellung folgt.
+                    conn.getObject('system.config')
+                        .then((obj) => {
+                            if (!cancelled) setSystemLanguage(obj?.common?.language || 'en');
+                        })
+                        .catch((err) => {
+                            if (!cancelled) {
+                                setLangError(String(err?.message || err));
+                                setSystemLanguage('en');
+                            }
+                        });
                 },
                 onError: (err) => {
                     if (!cancelled) setError('Connection error: ' + (err?.message || JSON.stringify(err)));
@@ -104,5 +118,5 @@ export function useConnection(adapterInstance) {
             .catch((err) => cb?.(err));
     }, []);
 
-    return { connected, error, states, getStates, setState, getObjects };
+    return { connected, error, states, getStates, setState, getObjects, systemLanguage, langError };
 }
