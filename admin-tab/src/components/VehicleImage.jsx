@@ -15,7 +15,10 @@ const layerStyle = {
 function chargeFrameStyle(index, total) {
     const dur = 0.12;
     const totalDur = (total * dur).toFixed(2);
-    const delay = (index * dur).toFixed(2);
+    // Reversed: frame `total-1-index` fires first instead of `index`, since the
+    // animation appeared to flow plug->car instead of car->plug (current should
+    // flow INTO the car while charging).
+    const delay = ((total - 1 - index) * dur).toFixed(2);
     const pOn = (1 / total * 100).toFixed(1);
     const pOff = (2 / total * 100).toFixed(1);
     const animName = `chf${index}`;
@@ -42,8 +45,8 @@ export default function VehicleImage({ base, states }) {
         } else {
             result.push(pic('carpic_body'));
             result.push(pic('carpic_hood_close'));
-            if (doorDriver) result.push(pic('carpic_leftfront_open'));
-            if (doorRearLeft) result.push(pic('carpic_leftbehind_open'));
+            result.push(doorRearLeft ? pic('carpic_leftbehind_open') : pic('carpic_leftbehind_close'));
+            result.push(doorDriver ? pic('carpic_leftfront_open') : pic('carpic_leftfront_close'));
             if (doorFrontRight) result.push(pic('carpic_rightfront_open'));
             if (doorRearRight) result.push(pic('carpic_rightbehind_open'));
             if (doorTrunk) result.push(pic('carpic_tailgate_open'));

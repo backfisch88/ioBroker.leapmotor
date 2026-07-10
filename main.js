@@ -487,8 +487,8 @@ class LeapmotorAdapter extends utils.Adapter{
         }else{
             layers.push(pics['carpic_body']||'');
             layers.push(pics['carpic_hood_close']||'');
-            if(s.lbcmDriverDoorStatus)layers.push(pics['carpic_leftfront_open']||'');
-            if(s.lbcmLeftRearDoorStatus)layers.push(pics['carpic_leftbehind_open']||'');
+            layers.push(s.lbcmLeftRearDoorStatus?(pics['carpic_leftbehind_open']||''):(pics['carpic_leftbehind_close']||''));
+            layers.push(s.lbcmDriverDoorStatus?(pics['carpic_leftfront_open']||''):(pics['carpic_leftfront_close']||''));
             if(s.rbcmDriverDoorStatus)layers.push(pics['carpic_rightfront_open']||'');
             if(s.rbcmRightRearDoorStatus)layers.push(pics['carpic_rightbehind_open']||'');
             if(s.bbcmBackDoorStatus)layers.push(pics['carpic_tailgate_open']||'');
@@ -501,7 +501,7 @@ class LeapmotorAdapter extends utils.Adapter{
             let css='',fImgs='';
             for(let i=0;i<n;i++){
                 const src=pics[`carpic_charge${i+1}`]||'';if(!src)continue;
-                const a=`chf${i}`,d=(i*dur).toFixed(2);
+                const a=`chf${i}`,d=((n-1-i)*dur).toFixed(2);
                 css+=`@keyframes ${a}{0%{opacity:0}${pOn}%{opacity:1}${pOff}%{opacity:0}100%{opacity:0}}`;
                 fImgs+=`<img src="${src}" style="${lay}opacity:0;animation:${a} ${total}s ${d}s infinite;">`;
             }
