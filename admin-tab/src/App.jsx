@@ -143,7 +143,7 @@ export default function App() {
                 <Box sx={{ p: 2 }}>
                     {!base && <Typography color="text.secondary">{I18n.t('No vehicle found. Is the adapter running?')}</Typography>}
                     {base && tab === 0 && <DashboardTab base={base} states={states} setState={setState} />}
-                    {base && tab === 1 && <ConsumptionTab base={base} states={states} />}
+                    {base && tab === 1 && <ConsumptionTab base={base} states={states} adapter={ADAPTER} />}
                     {base && tab === 2 && <TripsTab base={base} states={states} />}
                     {base && tab === 3 && <DatapointsTab base={base} states={states} />}
                     {base && tab === 4 && <DiagnosticsTab base={base} states={states} setState={setState} adapter={ADAPTER} />}

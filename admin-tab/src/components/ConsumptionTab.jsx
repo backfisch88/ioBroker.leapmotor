@@ -24,7 +24,7 @@ function StatBox({ label, value, sub, color }) {
     );
 }
 
-export default function ConsumptionTab({ base, states }) {
+export default function ConsumptionTab({ base, states, adapter }) {
     const avgKwh = val(states, `${base}.consumption.kwh_100km`, null);
     const rank = val(states, `${base}.consumption.rank`, null);
     const totalKm = val(states, `${base}.consumption.mileage_total_km`, null);
@@ -41,7 +41,7 @@ export default function ConsumptionTab({ base, states }) {
         return `${d}.${m}`;
     };
 
-    const energyPrice = val(states, `${base}.config.energy_price_eur_kwh`, 0.30);
+    const energyPrice = val(states, `${adapter}.config.energy_price_eur_kwh`, 0.30);
 
     const weeklyData = useMemo(() => {
         const data = [];
