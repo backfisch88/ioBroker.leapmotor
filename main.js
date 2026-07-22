@@ -489,7 +489,17 @@ class LeapmotorAdapter extends utils.Adapter{
             layers.push(pics['carpic_body']||'');
             layers.push(pics['carpic_hood_close']||'');
             layers.push(s.lbcmLeftRearDoorStatus?(pics['carpic_leftbehind_open']||''):(pics['carpic_leftbehind_close']||''));
+            // Window-closed overlay only makes sense when the door itself is
+            // closed (window sits within the door frame). Only left-side
+            // window-closed images exist in the asset set; no right-side or
+            // "window open" counterparts are available.
+            if(!s.lbcmLeftRearDoorStatus&&(s.leftRearWindowPercent===0||s.leftRearWindowStatus===false)){
+                layers.push(pics['carpic_leftbehind_window_close']||'');
+            }
             layers.push(s.lbcmDriverDoorStatus?(pics['carpic_leftfront_open']||''):(pics['carpic_leftfront_close']||''));
+            if(!s.lbcmDriverDoorStatus&&(s.leftFrontWindowPercent===0||s.driverWindowStatus===false)){
+                layers.push(pics['carpic_leftfront_window_close']||'');
+            }
             if(s.rbcmDriverDoorStatus)layers.push(pics['carpic_rightfront_open']||'');
             if(s.rbcmRightRearDoorStatus)layers.push(pics['carpic_rightbehind_open']||'');
             if(s.bbcmBackDoorStatus)layers.push(pics['carpic_tailgate_open']||'');
