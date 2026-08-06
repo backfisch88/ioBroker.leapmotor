@@ -170,6 +170,8 @@ Which comfort commands actually appear depends on the detected vehicle model —
 
 Older changes can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 
+[Older changelogs can be found there](CHANGELOG_OLD.md)
+
 ## License
 
 MIT License
