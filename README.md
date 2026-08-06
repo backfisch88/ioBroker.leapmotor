@@ -145,6 +145,10 @@ Which comfort commands actually appear depends on the detected vehicle model —
 `admin-tab/src/vehicleCapabilities.js` in the repository for the current capability matrix per model.
 
 ## Changelog
+
+### **WORK IN PROGRESS**
+- (ioBroker-Bot) Adapter requires admin >= 7.8.23 now.
+
 ### 0.6.2 (2026-07-08)
 - Fix: B10 model now correctly uses the c10 cloud status endpoint (community-confirmed), resolving empty status/trips/charging datapoints
 - Fix: enabled full i18n for jsonConfig.json now that admin/i18n translation files cover all keys
