@@ -489,19 +489,14 @@ class LeapmotorAdapter extends utils.Adapter{
             layers.push(pics['carpic_body']||'');
             layers.push(pics['carpic_hood_close']||'');
             layers.push(s.lbcmLeftRearDoorStatus?(pics['carpic_leftbehind_open']||''):(pics['carpic_leftbehind_close']||''));
-            // Window-closed overlay only makes sense when the door itself is
-            // closed (window sits within the door frame). Only left-side
-            // window-closed images exist in the asset set; no right-side or
-            // "window open" counterparts are available.
-            if(!s.lbcmLeftRearDoorStatus&&(s.leftRearWindowPercent===0||s.leftRearWindowStatus===false)){
-                layers.push(pics['carpic_leftbehind_window_close']||'');
-            }
             layers.push(s.lbcmDriverDoorStatus?(pics['carpic_leftfront_open']||''):(pics['carpic_leftfront_close']||''));
-            if(!s.lbcmDriverDoorStatus&&(s.leftFrontWindowPercent===0||s.driverWindowStatus===false)){
-                layers.push(pics['carpic_leftfront_window_close']||'');
-            }
-            if(s.rbcmDriverDoorStatus)layers.push(pics['carpic_rightfront_open']||'');
+            // Window-closed overlays: only meaningful when the corresponding door is
+            // itself shown closed AND the window is fully up, otherwise the composite
+            // looks like the windows are permanently rolled down even when they aren't.
+            if(!s.lbcmLeftRearDoorStatus&&(s.leftRearWindowPercent??0)===0)layers.push(pics['carpic_leftbehind_window_close']||'');
+            if(!s.lbcmDriverDoorStatus&&(s.leftFrontWindowPercent??0)===0)layers.push(pics['carpic_leftfront_window_close']||'');
             if(s.rbcmRightRearDoorStatus)layers.push(pics['carpic_rightbehind_open']||'');
+            if(s.rbcmDriverDoorStatus)layers.push(pics['carpic_rightfront_open']||'');
             if(s.bbcmBackDoorStatus)layers.push(pics['carpic_tailgate_open']||'');
             if(plugged||charging)layers.push(pics['carpic_charge_open']||'');
         }
@@ -907,7 +902,25 @@ class LeapmotorAdapter extends utils.Adapter{
         if(cmd==='charge_limit_set'){
             await this.setStateAsync(id,{val:state.val,ack:true});
             try{
-                const content=JSON.stringify({chargeEnable:0,chargesoc:Number(state.val),circulation:0,cycles:'1,2,3,4,5,6,7',endtime:'08:00',recharge:0,starttime:'00:00'});
+                // Preserve the vehicle's existing charge schedule (enabled state,
+                // recurrence, start/end time) and only change the SOC target.
+                // Previously this always sent chargeEnable:0 + fixed default
+                // times, silently disabling any active schedule on every limit
+                // change - the vehicle then appears to ignore the SOC value
+                // entirely and just charges to 100% (confirmed against the
+                // reference leapmotor-api project's set_charge_limit(), which
+                // fixed this exact issue under its own "issue #18").
+                let existing=null;
+                try{existing=await this.client.getAppointment(vehicle,'190');}catch(e){this.log.debug(`charge_limit_set: could not read existing schedule, using defaults: ${e}`)}
+                const content=JSON.stringify({
+                    chargeEnable:existing?.chargeEnable??0,
+                    chargesoc:Number(state.val),
+                    circulation:existing?.circulation??0,
+                    cycles:existing?.cycles||'1,2,3,4,5,6,7',
+                    endtime:existing?.endtime||'08:00',
+                    recharge:existing?.recharge??0,
+                    starttime:existing?.starttime||'00:00',
+                });
                 try{
                     await this.client.sendCommandWithPin(vehicle,'190',content);
                 }catch(e){

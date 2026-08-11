@@ -33,10 +33,8 @@ export default function VehicleImage({ base, states }) {
     const doorFrontRight = val(states, `${base}.status.door_front_right`, false);
     const doorRearRight = val(states, `${base}.status.door_rear_right`, false);
     const doorTrunk = val(states, `${base}.status.door_trunk`, false);
-    const windowFlPct = val(states, `${base}.status.window_fl_pct`, null);
-    const windowRlPct = val(states, `${base}.status.window_rl_pct`, null);
-    const windowDriverOpen = val(states, `${base}.status.window_driver_open`, null);
-    const windowRlOpen = val(states, `${base}.status.window_rl_open`, null);
+    const windowFrontLeftPct = val(states, `${base}.status.window_fl_pct`, 0);
+    const windowRearLeftPct = val(states, `${base}.status.window_rl_pct`, 0);
     const plugged = val(states, `${base}.status.charging_plugged`, false);
     const charging = val(states, `${base}.status.charging_active`, false);
 
@@ -50,19 +48,14 @@ export default function VehicleImage({ base, states }) {
             result.push(pic('carpic_body'));
             result.push(pic('carpic_hood_close'));
             result.push(doorRearLeft ? pic('carpic_leftbehind_open') : pic('carpic_leftbehind_close'));
-            // Window-closed overlay only makes sense when the door itself is
-            // closed (window sits within the door frame). Only left-side
-            // window-closed images exist in the asset set; no right-side or
-            // "window open" counterparts are available.
-            if (!doorRearLeft && (windowRlPct === 0 || windowRlOpen === false)) {
-                result.push(pic('carpic_leftbehind_window_close'));
-            }
             result.push(doorDriver ? pic('carpic_leftfront_open') : pic('carpic_leftfront_close'));
-            if (!doorDriver && (windowFlPct === 0 || windowDriverOpen === false)) {
-                result.push(pic('carpic_leftfront_window_close'));
-            }
-            if (doorFrontRight) result.push(pic('carpic_rightfront_open'));
+            // Window-closed overlays: only shown when the corresponding door is closed
+            // and the window is fully up, otherwise the composite looks like the
+            // windows are permanently rolled down even when they aren't.
+            if (!doorRearLeft && (windowRearLeftPct ?? 0) === 0) result.push(pic('carpic_leftbehind_window_close'));
+            if (!doorDriver && (windowFrontLeftPct ?? 0) === 0) result.push(pic('carpic_leftfront_window_close'));
             if (doorRearRight) result.push(pic('carpic_rightbehind_open'));
+            if (doorFrontRight) result.push(pic('carpic_rightfront_open'));
             if (doorTrunk) result.push(pic('carpic_tailgate_open'));
             if (plugged || charging) result.push(pic('carpic_charge_open'));
         }
