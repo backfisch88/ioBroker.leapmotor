@@ -1,10 +1,11 @@
 {
-  "Leapmotor E-Mail": "Leapmotor E-Mail",
-  "Use a dedicated second account (see README)": "Use a dedicated second account (see README)",
-  "Password": "Password",
-  "Vehicle PIN": "Vehicle PIN",
   "4-digit PIN required for all remote commands": "4-digit PIN required for all remote commands",
-  "Polling interval (minutes)": "Polling interval (minutes)",
+  "Affects Leapmotor cloud API text only (e.g. schedule day names). Does not change the Admin Tab UI language, which follows your ioBroker Admin language setting.": "Affects Leapmotor cloud API text only (e.g. schedule day names). Does not change the Admin Tab UI language, which follows your ioBroker Admin language setting.",
+  "Cloud API Language": "Cloud API Language",
   "How often to fetch vehicle status (1-60)": "How often to fetch vehicle status (1-60)",
-  "Language": "Language"
+  "Leapmotor E-Mail": "Leapmotor E-Mail",
+  "Password": "Password",
+  "Polling interval (minutes)": "Polling interval (minutes)",
+  "Use a dedicated second account (see README)": "Use a dedicated second account (see README)",
+  "Vehicle PIN": "Vehicle PIN"
 }

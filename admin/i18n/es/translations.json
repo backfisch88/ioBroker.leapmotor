@@ -1,7 +1,8 @@
 {
   "4-digit PIN required for all remote commands": "Se requiere PIN de 4 dígitos para todos los comandos remotos",
+  "Affects Leapmotor cloud API text only (e.g. schedule day names). Does not change the Admin Tab UI language, which follows your ioBroker Admin language setting.": "Afecta solo al texto de la API en la nube de Leapmotor (p. ej. nombres de días en el programa). No cambia el idioma de la interfaz del panel Admin, que sigue la configuración de idioma de ioBroker Admin.",
+  "Cloud API Language": "Idioma de la API en la nube",
   "How often to fetch vehicle status (1-60)": "Con qué frecuencia recuperar el estado del vehículo (1-60)",
-  "Language": "Idioma",
   "Leapmotor E-Mail": "Correo electrónico de Leapmotor",
   "Password": "Contraseña",
   "Polling interval (minutes)": "Intervalo de sondeo (minutos)",

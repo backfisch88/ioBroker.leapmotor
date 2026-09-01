@@ -1,7 +1,8 @@
 {
   "4-digit PIN required for all remote commands": "所有远程命令都需要 4 位 PIN",
+  "Affects Leapmotor cloud API text only (e.g. schedule day names). Does not change the Admin Tab UI language, which follows your ioBroker Admin language setting.": "仅影响零跑云 API 的文本（例如计划中的星期名称）。不会更改管理标签界面的语言，该语言遵循 ioBroker 管理语言设置。",
+  "Cloud API Language": "云 API 语言",
   "How often to fetch vehicle status (1-60)": "获取车辆状态的频率 (1-60)",
-  "Language": "语言",
   "Leapmotor E-Mail": "零跑电子邮箱",
   "Password": "密码",
   "Polling interval (minutes)": "轮询间隔（分钟）",

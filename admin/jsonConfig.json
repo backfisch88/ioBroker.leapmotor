@@ -33,7 +33,8 @@
     },
     "language": {
       "type": "select",
-      "label": "Language",
+      "label": "Cloud API Language",
+      "help": "Affects Leapmotor cloud API text only (e.g. schedule day names). Does not change the Admin Tab UI language, which follows your ioBroker Admin language setting.",
       "options": [
         {"label": "English", "value": "en-GB"},
         {"label": "Deutsch", "value": "de"},
