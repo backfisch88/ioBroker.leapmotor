@@ -77,10 +77,10 @@ export default function TripsTab({ base, states }) {
     }, [days]);
 
     return (
-        <Box sx={{ p: 2 }}>
+        <Box>
             {/* Overview at the top */}
             <Card sx={{ mb: 2, bgcolor: '#0d1520', border: '1px solid #1e2d45' }}>
-                <CardContent>
+                <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
                     <SectionLabel>{I18n.t('TRIP OVERVIEW')}</SectionLabel>
                     <Box sx={{ display: 'flex', gap: 2 }}>
                         <Box sx={{ flex: 1, textAlign: 'center' }}>

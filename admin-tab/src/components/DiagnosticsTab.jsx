@@ -22,7 +22,7 @@ export default function DiagnosticsTab({ base, states, setState, adapter }) {
     return (
         <Box>
             <Card sx={{ mb: 2, bgcolor: '#0d1520', border: '1px solid #1e2d45' }}>
-                <CardContent>
+                <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                         {connection ? <WifiIcon sx={{ color: '#00ff88' }} /> : <WifiOffIcon sx={{ color: '#ff4444' }} />}
                         <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
@@ -49,7 +49,7 @@ export default function DiagnosticsTab({ base, states, setState, adapter }) {
             </Card>
 
             <Card sx={{ bgcolor: '#0d1520', border: '1px solid #1e2d45' }}>
-                <CardContent>
+                <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1.5 }}>
                         {I18n.t('Vehicle Information')}
                     </Typography>
