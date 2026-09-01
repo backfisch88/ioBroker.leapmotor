@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, Card, CardContent, Typography, Chip, Button, Grid, Divider } from '@mui/material';
+import { Box, Card, CardContent, Typography, Chip, Button, Divider } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import { I18n } from '@iobroker/adapter-react-v5';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import WifiIcon from '@mui/icons-material/Wifi';

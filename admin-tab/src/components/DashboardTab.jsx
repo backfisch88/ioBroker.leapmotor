@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { I18n } from '@iobroker/adapter-react-v5';
 import { hasCapability, isKnownUnavailable } from '../vehicleCapabilities';
 import {
-    Grid, Card, CardContent, Typography, Box, Button,
+    Card, CardContent, Typography, Box, Button,
     Slider, IconButton, Chip, LinearProgress,
 } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import BatteryFullIcon from '@mui/icons-material/BatteryFull';
 import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';

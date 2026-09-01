@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-import { Box, Card, CardContent, Typography, Grid, Divider } from '@mui/material';
+import { Box, Card, CardContent, Typography, Divider } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import { I18n } from '@iobroker/adapter-react-v5';
 import {
     ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList, ReferenceLine,
