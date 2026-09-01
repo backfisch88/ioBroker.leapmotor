@@ -61,7 +61,7 @@ export default function DiagnosticsTab({ base, states, setState, adapter }) {
                             [I18n.t('Steering'), rudder],
                             [I18n.t('Allocation Code'), allocationCode],
                         ].map(([label, value]) => (
-                            <Grid item xs={6} key={label}>
+                            <Grid size={6} key={label}>
                                 <Typography variant="caption" sx={{ color: '#3a5070' }}>{label}</Typography>
                                 <Typography sx={{ fontFamily: 'monospace', color: '#c8ddf0' }}>{value}</Typography>
                             </Grid>

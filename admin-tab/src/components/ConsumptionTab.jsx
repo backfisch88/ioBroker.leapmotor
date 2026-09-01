@@ -83,26 +83,26 @@ export default function ConsumptionTab({ base, states, adapter }) {
     return (
         <Box>
             <Grid container spacing={1.5} sx={{ mb: 2 }}>
-                <Grid item xs={4}>
+                <Grid size={4}>
                     <StatBox label={I18n.t('AVG CONSUMPTION')} value={avgKwh !== null ? `${avgKwh}` : '—'} sub={avgKwh !== null ? `kWh/100km · ≈${(avgKwh * energyPrice).toFixed(2)}€` : 'kWh/100km (Cloud)'} color="#00d4ff" />
                 </Grid>
-                <Grid item xs={4}>
+                <Grid size={4}>
                     <StatBox label={I18n.t('RANKING')} value={rank ?? '—'} />
                 </Grid>
-                <Grid item xs={4}>
+                <Grid size={4}>
                     <StatBox label={I18n.t('TOTAL')} value={totalKm !== null ? `${totalKm}` : '—'} sub={totalMiles ? `km · ${totalMiles} mi` : 'km'} />
                 </Grid>
             </Grid>
 
             {stats && (
                 <Grid container spacing={1.5} sx={{ mb: 2 }}>
-                    <Grid item xs={4}>
+                    <Grid size={4}>
                         <StatBox label={I18n.t('BEST WEEK')} value={`${stats.min}`} sub={stats.best?.week} color="#00ff88" />
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid size={4}>
                         <StatBox label={I18n.t('WORST WEEK')} value={`${stats.max}`} sub={stats.worst?.week} color="#ff6644" />
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid size={4}>
                         <StatBox
                             label={I18n.t('TREND')}
                             value={`${stats.trend > 0 ? '+' : ''}${stats.trend.toFixed(1)}`}
@@ -153,7 +153,7 @@ export default function ConsumptionTab({ base, states, adapter }) {
                             <Divider sx={{ borderColor: '#1e2d45', my: 2 }} />
                             <Grid container spacing={1}>
                                 {weeklyData.map((w, i) => (
-                                    <Grid item xs={6} key={i}>
+                                    <Grid size={6} key={i}>
                                         <Box sx={{ bgcolor: '#070d1a', border: '1px solid #1e2d45', borderRadius: 1.5, px: 1.5, py: 1 }}>
                                             <Typography variant="caption" sx={{ color: '#5a7090', display: 'block', fontSize: '0.7rem' }}>{w.fullRange || w.week}</Typography>
                                             <Typography sx={{

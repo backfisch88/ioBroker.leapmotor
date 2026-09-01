@@ -293,18 +293,18 @@ export default function DashboardTab({ base, states, setState }) {
             </Card>
 
             <Grid container spacing={1.5} sx={{ mb: 2 }}>
-                <Grid item xs={4}><StatTile label={I18n.t('OUTSIDE')} value={`${outdoor}°C`} /></Grid>
-                <Grid item xs={4}><StatTile label={I18n.t('RANGE')} value={`${range} km`} color="#00d4ff" /></Grid>
-                <Grid item xs={4}>
+                <Grid size={4}><StatTile label={I18n.t('OUTSIDE')} value={`${outdoor}°C`} /></Grid>
+                <Grid size={4}><StatTile label={I18n.t('RANGE')} value={`${range} km`} color="#00d4ff" /></Grid>
+                <Grid size={4}>
                     <StatTile label={I18n.t('STATUS')} value={parked ? '🅿 Parked' : `▶ ${speed} km/h`} color={parked ? '#00ff88' : '#ffcc00'} />
                 </Grid>
-                <Grid item xs={4}>
+                <Grid size={4}>
                     <StatTile label={I18n.t('CHARGING')} value={charging ? `⚡ ${remainMin} min` : '— —'} color={charging ? '#00ff88' : undefined} />
                 </Grid>
-                <Grid item xs={4}>
+                <Grid size={4}>
                     <StatTile label={I18n.t('DOORS')} value={doorOpen ? `🚪 ${I18n.t('Open')}` : `✓ ${I18n.t('Closed')}`} color={doorOpen ? '#ff4444' : '#00ff88'} />
                 </Grid>
-                <Grid item xs={4}>
+                <Grid size={4}>
                     <StatTile label={I18n.t('LOCK')} value={locked ? `🔒 ${I18n.t('Locked')}` : `🔓 ${I18n.t('Unlocked')}`} color={locked ? '#00d4ff' : '#ff4444'} />
                 </Grid>
             </Grid>
@@ -512,26 +512,26 @@ export default function DashboardTab({ base, states, setState }) {
                 <CardContent>
                     <SectionLabel>{I18n.t('LOCKS & OPENINGS')}</SectionLabel>
                     <Grid container spacing={1}>
-                        <Grid item xs={6} sm={4}>
+                        <Grid size={{ xs: 6, sm: 4 }}>
                             <Button fullWidth startIcon={<LockIcon />} onClick={() => { triggerLocked(true); send('lock'); }}
                                 sx={{ color: locked ? '#070d1a' : '#00d4ff', bgcolor: locked ? '#00d4ff' : 'transparent', border: '1px solid #1e2d45', transition: 'background-color 0.15s' }}>
                                 {I18n.t('Lock')}
                             </Button>
                         </Grid>
-                        <Grid item xs={6} sm={4}>
+                        <Grid size={{ xs: 6, sm: 4 }}>
                             <Button fullWidth startIcon={<LockOpenIcon />} onClick={() => { triggerLocked(false); send('unlock'); }}
                                 sx={{ color: !locked ? '#070d1a' : '#ff9900', bgcolor: !locked ? '#ff9900' : 'transparent', border: '1px solid #1e2d45', transition: 'background-color 0.15s' }}>
                                 {I18n.t('Unlock')}
                             </Button>
                         </Grid>
-                        <Grid item xs={6} sm={4}>
+                        <Grid size={{ xs: 6, sm: 4 }}>
                             <Button fullWidth startIcon={<DirectionsCarIcon />}
                                 onClick={() => { triggerDoorTrunk(!doorTrunk); send(doorTrunk ? 'trunk_close' : 'trunk_open'); }}
                                 sx={{ border: '1px solid #1e2d45' }}>
                                 {I18n.t('Trunk')} {doorTrunk ? I18n.t('Close') : I18n.t('Open')}
                             </Button>
                         </Grid>
-                        <Grid item xs={6} sm={4}>
+                        <Grid size={{ xs: 6, sm: 4 }}>
                             <Button fullWidth startIcon={<LocationSearchingIcon />} onClick={() => send('find')} sx={{ border: '1px solid #1e2d45' }}>
                                 {I18n.t('Locate Vehicle')}
                             </Button>
