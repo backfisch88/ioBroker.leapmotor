@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "leapmotor",
-    "version": "0.6.2",
+    "version": "0.6.3",
     "news": {
+      "0.6.3": {
+        "en": "Fix: preserve the existing charge schedule (enabled state, recurrence, start/end time) when changing the charge limit, instead of resetting it every time. Fix: corrected door z-order and window-closed overlay logic on both vehicle sides. Fix: clarified that the 'Language' setting only affects Leapmotor cloud API text, not the Admin Tab UI (renamed to 'Cloud API Language'). Chore: bumped axios to 1.19.0. Adapter is now available in the ioBroker stable repository.",
+        "de": "Fix: Bestehenden Ladeplan (Aktivierung, Wiederholung, Start-/Endzeit) beim Aendern des Ladelimits erhalten, statt ihn jedes Mal zurueckzusetzen. Fix: Tuer-Ebenenreihenfolge und Fenster-geschlossen-Overlay-Logik auf beiden Fahrzeugseiten korrigiert. Fix: klargestellt, dass die Einstellung 'Language' nur Texte der Leapmotor-Cloud-API betrifft, nicht die Admin-Tab-Oberflaeche (umbenannt in 'Cloud API Language'). Chore: axios auf 1.19.0 angehoben. Adapter ist jetzt im ioBroker-Stable-Repository verfuegbar.",
+        "ru": "Исправление: сохранение существующего графика зарядки (включение, повторение, время начала/окончания) при изменении лимита заряда вместо его сброса каждый раз. Исправление: исправлен порядок слоёв дверей и логика оверлея закрытого окна с обеих сторон автомобиля. Исправление: уточнено, что настройка 'Language' влияет только на текст облачного API Leapmotor, а не на интерфейс вкладки Admin (переименовано в 'Cloud API Language'). Прочее: обновлён axios до 1.19.0. Адаптер теперь доступен в стабильном репозитории ioBroker.",
+        "pt": "Correção: preservação do agendamento de carregamento existente (ativação, recorrência, hora de início/fim) ao alterar o limite de carga, em vez de redefini-lo sempre. Correção: corrigida a ordem das camadas das portas e a lógica de sobreposição de janela fechada em ambos os lados do veículo. Correção: esclarecido que a configuração 'Language' afeta apenas o texto da API na nuvem da Leapmotor, não a interface da aba Admin (renomeada para 'Cloud API Language'). Manutenção: axios atualizado para 1.19.0. O adaptador agora está disponível no repositório stable do ioBroker.",
+        "nl": "Fix: bestaand laadschema (ingeschakeld, herhaling, start-/eindtijd) behouden bij het wijzigen van de laadlimiet, in plaats van dit steeds te resetten. Fix: deurlaagvolgorde en venster-gesloten-overlaylogica aan beide zijden van het voertuig gecorrigeerd. Fix: verduidelijkt dat de instelling 'Language' alleen tekst van de Leapmotor-cloud-API beïnvloedt, niet de Admin-tab-interface (hernoemd naar 'Cloud API Language'). Chore: axios bijgewerkt naar 1.19.0. Adapter is nu beschikbaar in de ioBroker stable-repository.",
+        "fr": "Correction : conservation du planning de charge existant (activation, récurrence, heure de début/fin) lors de la modification de la limite de charge, au lieu de le réinitialiser à chaque fois. Correction : ordre des calques des portières et logique de superposition fenêtre-fermée corrigés des deux côtés du véhicule. Correction : clarification que le paramètre 'Language' n'affecte que le texte de l'API cloud Leapmotor, pas l'interface de l'onglet Admin (renommé en 'Cloud API Language'). Divers : axios mis à jour vers 1.19.0. L'adaptateur est désormais disponible dans le dépôt stable d'ioBroker.",
+        "it": "Correzione: mantenuta la pianificazione di ricarica esistente (attivazione, ricorrenza, ora di inizio/fine) quando si modifica il limite di ricarica, invece di reimpostarla ogni volta. Correzione: corretto l'ordine degli strati delle portiere e la logica di overlay finestra-chiusa su entrambi i lati del veicolo. Correzione: chiarito che l'impostazione 'Language' riguarda solo il testo dell'API cloud Leapmotor, non l'interfaccia della scheda Admin (rinominata in 'Cloud API Language'). Varie: aggiornato axios a 1.19.0. L'adattatore è ora disponibile nel repository stable di ioBroker.",
+        "es": "Corrección: se preserva el horario de carga existente (activación, recurrencia, hora de inicio/fin) al cambiar el límite de carga, en lugar de restablecerlo cada vez. Corrección: se corrigió el orden de las capas de las puertas y la lógica de superposición de ventana cerrada en ambos lados del vehículo. Corrección: se aclaró que la configuración 'Language' solo afecta al texto de la API en la nube de Leapmotor, no a la interfaz de la pestaña Admin (renombrada a 'Cloud API Language'). Varios: axios actualizado a 1.19.0. El adaptador ya está disponible en el repositorio stable de ioBroker.",
+        "pl": "Poprawka: zachowanie istniejącego harmonogramu ładowania (włączenie, powtarzanie, czas rozpoczęcia/zakończenia) przy zmianie limitu ładowania, zamiast resetowania go za każdym razem. Poprawka: poprawiono kolejność warstw drzwi i logikę nakładki zamkniętego okna po obu stronach pojazdu. Poprawka: doprecyzowano, że ustawienie 'Language' dotyczy wyłącznie tekstu API chmury Leapmotor, a nie interfejsu karty Admin (zmieniono nazwę na 'Cloud API Language'). Inne: zaktualizowano axios do 1.19.0. Adapter jest teraz dostępny w repozytorium stable ioBroker.",
+        "uk": "Виправлення: збереження наявного графіка заряджання (увімкнення, повторення, час початку/завершення) під час зміни ліміту заряду, замість скидання щоразу. Виправлення: виправлено порядок шарів дверей і логіку накладання закритого вікна з обох боків автомобіля. Виправлення: уточнено, що налаштування 'Language' впливає лише на текст хмарного API Leapmotor, а не на інтерфейс вкладки Admin (перейменовано на 'Cloud API Language'). Інше: оновлено axios до 1.19.0. Адаптер тепер доступний у стабільному репозиторії ioBroker.",
+        "zh-cn": "修复：更改充电限制时保留现有充电计划（启用状态、重复周期、开始/结束时间），而不是每次都重置。修复：修正了车辆两侧车门层级顺序和车窗关闭叠加逻辑。修复：明确 'Language' 设置仅影响零跑云 API 的文本，不影响管理标签界面（已重命名为 'Cloud API Language'）。杂项：axios 更新至 1.19.0。适配器现已加入 ioBroker 稳定版仓库。"
+      },
       "0.6.2": {
         "en": "Fix: B10 model now correctly uses the c10 cloud status endpoint (community-confirmed), resolving empty status/trips/charging datapoints. Fix: enabled full i18n for jsonConfig.json now that admin/i18n translation files cover all keys.",
         "de": "Fix: B10-Modell nutzt jetzt korrekt den c10-Cloud-Statusendpunkt (community-bestaetigt), behebt leere status/trips/charging-Datenpunkte. Fix: vollstaendiges i18n fuer jsonConfig.json aktiviert, da admin/i18n-Uebersetzungsdateien jetzt alle Schluessel abdecken.",
@@ -80,19 +93,6 @@
         "pl": "Poprawka: dodano wcześniej brakujące pliki karty administratora do opublikowanego pakietu",
         "uk": "Виправлення: додано раніше відсутні файли вкладки адміністратора до опублікованого пакета",
         "zh-cn": "修复：在已发布的包中包含之前缺失的管理标签文件"
-      },
-      "0.5.3": {
-        "en": "New: standard package.test.js test suite using @iobroker/testing for repository compliance",
-        "de": "Neu: Standard-Test-Suite (package.test.js) mit @iobroker/testing für Repository-Konformität",
-        "ru": "Новое: стандартный набор тестов package.test.js с использованием @iobroker/testing",
-        "pt": "Novo: conjunto de testes padrão package.test.js usando @iobroker/testing",
-        "nl": "Nieuw: standaard testsuite package.test.js met @iobroker/testing",
-        "fr": "Nouveau : suite de tests standard package.test.js utilisant @iobroker/testing",
-        "it": "Nuovo: suite di test standard package.test.js con @iobroker/testing",
-        "es": "Nuevo: conjunto de pruebas estándar package.test.js usando @iobroker/testing",
-        "pl": "Nowość: standardowy zestaw testów package.test.js z @iobroker/testing",
-        "uk": "Нове: стандартний набір тестів package.test.js з використанням @iobroker/testing",
-        "zh-cn": "新增：使用 @iobroker/testing 的标准测试套件 package.test.js"
       }
     },
     "titleLang": {

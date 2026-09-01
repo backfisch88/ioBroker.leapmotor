@@ -147,6 +147,13 @@ Which comfort commands actually appear depends on the detected vehicle model —
 ## Changelog
 
 ### **WORK IN PROGRESS**
+
+### 0.6.3 (2026-09-01)
+- Fix: preserve the existing charge schedule (enabled state, recurrence, start/end time) when changing the charge limit, instead of resetting it every time
+- Fix: corrected door z-order and window-closed overlay logic on both vehicle sides
+- Fix: clarified that the "Language" setting only affects Leapmotor cloud API text, not the Admin Tab UI (renamed to "Cloud API Language")
+- Chore: bumped axios to 1.19.0
+- Adapter is now available in the ioBroker stable repository
 - (ioBroker-Bot) Adapter requires admin >= 7.8.23 now.
 
 ### 0.6.2 (2026-07-08)
