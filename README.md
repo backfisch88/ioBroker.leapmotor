@@ -2,7 +2,7 @@
 
 # ioBroker.leapmotor
 
-[![Version](https://img.shields.io/badge/version-0.6.0-blue.svg)](https://github.com/backfisch88/ioBroker.leapmotor)
+[![NPM version](https://img.shields.io/npm/v/iobroker.leapmotor.svg)](https://www.npmjs.com/package/iobroker.leapmotor)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Unofficial [Leapmotor](https://www.leapmotor.com/) electric vehicle integration for ioBroker. Tested on T03.
