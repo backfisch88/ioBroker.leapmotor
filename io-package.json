@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "leapmotor",
-    "version": "0.6.3",
+    "version": "0.6.4",
     "news": {
+      "0.6.4": {
+        "en": "Chore: migrated Admin Tab to adapter-react-v5 8.x and MUI v6 (React stays on 18, no breaking change for users). Fix: corrected Grid layout usage after the MUI v6 update, which had caused overlapping text on the Diagnostics tab. Fix: unified card spacing/padding across all Admin Tab pages for a consistent look. Fix: pinned react-dom to 18.3.1 to avoid a dependency resolution conflict. Chore: minor CI workflow fix.",
+        "de": "Chore: Admin-Tab auf adapter-react-v5 8.x und MUI v6 migriert (React bleibt bei 18, kein Breaking Change fuer Nutzer). Fix: Grid-Layout nach dem MUI-v6-Update korrigiert, das zu ueberlappendem Text im Diagnose-Tab gefuehrt hatte. Fix: Kartenabstaende auf allen Admin-Tab-Seiten fuer ein einheitliches Erscheinungsbild vereinheitlicht. Fix: react-dom auf 18.3.1 festgelegt, um einen Abhaengigkeitskonflikt zu vermeiden. Chore: kleiner CI-Workflow-Fix.",
+        "ru": "Прочее: интерфейс Admin Tab перенесён на adapter-react-v5 8.x и MUI v6 (React остаётся версии 18, без критических изменений для пользователей). Исправление: исправлена вёрстка Grid после обновления MUI v6, из-за которой текст на вкладке Diagnostics накладывался друг на друга. Исправление: унифицированы отступы карточек на всех страницах Admin Tab для единообразного вида. Исправление: зафиксирована версия react-dom на 18.3.1 во избежание конфликта зависимостей. Прочее: небольшое исправление CI-workflow.",
+        "pt": "Manutenção: aba Admin migrada para adapter-react-v5 8.x e MUI v6 (React permanece na versão 18, sem alterações significativas para os usuários). Correção: corrigido o layout de Grid após a atualização do MUI v6, que causava sobreposição de texto na aba Diagnostics. Correção: unificado o espaçamento dos cartões em todas as páginas da aba Admin para uma aparência consistente. Correção: react-dom fixado em 18.3.1 para evitar um conflito de dependências. Manutenção: pequena correção no workflow de CI.",
+        "nl": "Chore: Admin-tab gemigreerd naar adapter-react-v5 8.x en MUI v6 (React blijft op 18, geen breaking change voor gebruikers). Fix: Grid-layout gecorrigeerd na de MUI v6-update, die overlappende tekst op de Diagnostics-tab veroorzaakte. Fix: kaartafstanden op alle Admin-tab-pagina's geüniformeerd voor een consistente look. Fix: react-dom vastgezet op 18.3.1 om een afhankelijkheidsconflict te voorkomen. Chore: kleine CI-workflowfix.",
+        "fr": "Divers : onglet Admin migré vers adapter-react-v5 8.x et MUI v6 (React reste en version 18, aucun changement majeur pour les utilisateurs). Correction : mise en page Grid corrigée après la mise à jour MUI v6, qui provoquait un chevauchement de texte sur l'onglet Diagnostics. Correction : espacement des cartes harmonisé sur toutes les pages de l'onglet Admin pour un rendu cohérent. Correction : react-dom fixé à 18.3.1 pour éviter un conflit de dépendances. Divers : petite correction du workflow CI.",
+        "it": "Varie: scheda Admin migrata a adapter-react-v5 8.x e MUI v6 (React resta alla versione 18, nessuna modifica sostanziale per gli utenti). Correzione: corretto il layout Grid dopo l'aggiornamento a MUI v6, che causava sovrapposizione di testo nella scheda Diagnostics. Correzione: uniformata la spaziatura delle card su tutte le pagine della scheda Admin per un aspetto coerente. Correzione: react-dom fissato alla versione 18.3.1 per evitare un conflitto di dipendenze. Varie: piccola correzione al workflow CI.",
+        "es": "Varios: pestaña Admin migrada a adapter-react-v5 8.x y MUI v6 (React se mantiene en la versión 18, sin cambios importantes para los usuarios). Corrección: corregido el diseño de Grid tras la actualización a MUI v6, que causaba superposición de texto en la pestaña Diagnostics. Corrección: unificado el espaciado de las tarjetas en todas las páginas de la pestaña Admin para un aspecto coherente. Corrección: react-dom fijado en 18.3.1 para evitar un conflicto de dependencias. Varios: pequeña corrección en el workflow de CI.",
+        "pl": "Inne: zakładka Admin przeniesiona na adapter-react-v5 8.x i MUI v6 (React pozostaje w wersji 18, brak istotnych zmian dla użytkowników). Poprawka: poprawiono układ Grid po aktualizacji MUI v6, który powodował nakładanie się tekstu na zakładce Diagnostics. Poprawka: ujednolicono odstępy kart na wszystkich stronach zakładki Admin dla spójnego wyglądu. Poprawka: przypięto react-dom do wersji 18.3.1, aby uniknąć konfliktu zależności. Inne: drobna poprawka workflow CI.",
+        "uk": "Інше: вкладку Admin перенесено на adapter-react-v5 8.x і MUI v6 (React залишається версії 18, без критичних змін для користувачів). Виправлення: виправлено верстку Grid після оновлення MUI v6, через яке текст на вкладці Diagnostics накладався один на одного. Виправлення: уніфіковано відступи карток на всіх сторінках вкладки Admin для єдиного вигляду. Виправлення: зафіксовано react-dom на версії 18.3.1, щоб уникнути конфлікту залежностей. Інше: невелике виправлення CI-workflow.",
+        "zh-cn": "杂项：管理标签已迁移至 adapter-react-v5 8.x 和 MUI v6（React 保持 18 版本，用户无重大变化）。修复：修正了 MUI v6 更新后导致诊断标签文本重叠的 Grid 布局问题。修复：统一了所有管理标签页面的卡片间距，视觉更加一致。修复：将 react-dom 锁定为 18.3.1 以避免依赖冲突。杂项：小幅修复 CI 工作流。"
+      },
       "0.6.3": {
         "en": "Fix: preserve the existing charge schedule (enabled state, recurrence, start/end time) when changing the charge limit, instead of resetting it every time. Fix: corrected door z-order and window-closed overlay logic on both vehicle sides. Fix: clarified that the 'Language' setting only affects Leapmotor cloud API text, not the Admin Tab UI (renamed to 'Cloud API Language'). Chore: bumped axios to 1.19.0. Adapter is now available in the ioBroker stable repository.",
         "de": "Fix: Bestehenden Ladeplan (Aktivierung, Wiederholung, Start-/Endzeit) beim Aendern des Ladelimits erhalten, statt ihn jedes Mal zurueckzusetzen. Fix: Tuer-Ebenenreihenfolge und Fenster-geschlossen-Overlay-Logik auf beiden Fahrzeugseiten korrigiert. Fix: klargestellt, dass die Einstellung 'Language' nur Texte der Leapmotor-Cloud-API betrifft, nicht die Admin-Tab-Oberflaeche (umbenannt in 'Cloud API Language'). Chore: axios auf 1.19.0 angehoben. Adapter ist jetzt im ioBroker-Stable-Repository verfuegbar.",
@@ -80,19 +93,6 @@
         "pl": "Krytyczna poprawka: adminTab.link używał względnej ścieżki powodującej błędy 404 podczas otwierania karty. Teraz używa ścieżki absolutnej.",
         "uk": "Критичне виправлення: adminTab.link використовував відносний шлях, що викликало помилки 404 під час відкриття вкладки. Тепер використовується абсолютний шлях.",
         "zh-cn": "重要修复：adminTab.link 使用相对路径导致所有用户打开标签时出现404错误。现在使用绝对路径。"
-      },
-      "0.5.4": {
-        "en": "Fix: include previously missing admin tab files (index_m.html, tab.html, tab.js, tab_m.html) in the published package",
-        "de": "Fix: zuvor fehlende Admin-Tab-Dateien (index_m.html, tab.html, tab.js, tab_m.html) im veröffentlichten Paket ergänzt",
-        "ru": "Исправление: добавлены ранее отсутствующие файлы вкладки администратора в опубликованный пакет",
-        "pt": "Correção: incluídos arquivos da aba admin anteriormente ausentes no pacote publicado",
-        "nl": "Fix: voorheen ontbrekende admin-tab bestanden toegevoegd aan het gepubliceerde pakket",
-        "fr": "Correction : ajout des fichiers de l'onglet admin précédemment manquants dans le package publié",
-        "it": "Correzione: aggiunti i file della scheda admin precedentemente mancanti nel pacchetto pubblicato",
-        "es": "Corrección: se incluyeron los archivos de la pestaña admin que faltaban en el paquete publicado",
-        "pl": "Poprawka: dodano wcześniej brakujące pliki karty administratora do opublikowanego pakietu",
-        "uk": "Виправлення: додано раніше відсутні файли вкладки адміністратора до опублікованого пакета",
-        "zh-cn": "修复：在已发布的包中包含之前缺失的管理标签文件"
       }
     },
     "titleLang": {

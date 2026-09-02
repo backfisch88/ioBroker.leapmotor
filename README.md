@@ -148,6 +148,13 @@ Which comfort commands actually appear depends on the detected vehicle model —
 
 ### **WORK IN PROGRESS**
 
+### 0.6.4 (2026-09-02)
+- Chore: migrated Admin Tab to adapter-react-v5 8.x and MUI v6 (React stays on 18, no breaking change for users)
+- Fix: corrected Grid layout usage after the MUI v6 update, which had caused overlapping text on the Diagnostics tab
+- Fix: unified card spacing/padding across all Admin Tab pages for a consistent look
+- Fix: pinned react-dom to 18.3.1 to avoid a dependency resolution conflict
+- Chore: minor CI workflow fix
+
 ### 0.6.3 (2026-09-01)
 - Fix: preserve the existing charge schedule (enabled state, recurrence, start/end time) when changing the charge limit, instead of resetting it every time
 - Fix: corrected door z-order and window-closed overlay logic on both vehicle sides
