@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "leapmotor",
-    "version": "0.6.4",
+    "version": "0.6.5",
     "news": {
+      "0.6.5": {
+        "en": "New: on adapter start, the raw (pre-parsing) status response from the Leapmotor cloud is logged once per vehicle at debug level, to help diagnose unsupported or under-tested vehicle models (e.g. B05). New: status request errors now also include the requested URL and the server's response body (if any), making endpoint-related issues easier to pinpoint.",
+        "de": "Neu: Beim Adapterstart wird die rohe (noch nicht verarbeitete) Status-Antwort der Leapmotor-Cloud einmal pro Fahrzeug auf Debug-Level geloggt, um die Diagnose bei nicht unterstuetzten oder wenig getesteten Fahrzeugmodellen (z.B. B05) zu erleichtern. Neu: Fehler beim Status-Abruf enthalten jetzt zusaetzlich die angefragte URL sowie den Antwort-Body des Servers (falls vorhanden), wodurch Endpoint-bezogene Probleme leichter einzugrenzen sind.",
+        "ru": "Новое: при запуске адаптера необработанный (сырой) ответ статуса от облака Leapmotor логируется один раз для каждого автомобиля на уровне отладки, чтобы упростить диагностику неподдерживаемых или малопротестированных моделей (например, B05). Новое: ошибки запроса статуса теперь также включают запрошенный URL и тело ответа сервера (если есть), что упрощает выявление проблем, связанных с эндпоинтами.",
+        "pt": "Novo: ao iniciar o adaptador, a resposta de status bruta (antes do processamento) da nuvem Leapmotor é registrada uma vez por veículo no nível de depuração, para ajudar a diagnosticar modelos de veículos não suportados ou pouco testados (por exemplo, B05). Novo: erros de solicitação de status agora também incluem a URL solicitada e o corpo da resposta do servidor (se houver), facilitando a identificação de problemas relacionados ao endpoint.",
+        "nl": "Nieuw: bij het starten van de adapter wordt het ruwe (nog niet verwerkte) statusantwoord van de Leapmotor-cloud eenmaal per voertuig op debug-niveau gelogd, om te helpen bij het diagnosticeren van niet-ondersteunde of weinig geteste voertuigmodellen (bijv. B05). Nieuw: fouten bij statusaanvragen bevatten nu ook de opgevraagde URL en de response body van de server (indien aanwezig), waardoor endpoint-gerelateerde problemen gemakkelijker te achterhalen zijn.",
+        "fr": "Nouveau : au démarrage de l'adaptateur, la réponse de statut brute (avant traitement) du cloud Leapmotor est journalisée une fois par véhicule au niveau debug, pour faciliter le diagnostic des modèles de véhicules non pris en charge ou peu testés (par ex. B05). Nouveau : les erreurs de requête de statut incluent désormais aussi l'URL demandée et le corps de la réponse du serveur (le cas échéant), facilitant l'identification des problèmes liés aux endpoints.",
+        "it": "Novità: all'avvio dell'adattatore, la risposta di stato grezza (non ancora elaborata) del cloud Leapmotor viene registrata una volta per veicolo a livello di debug, per aiutare a diagnosticare modelli di veicoli non supportati o poco testati (ad es. B05). Novità: gli errori di richiesta di stato ora includono anche l'URL richiesto e il corpo della risposta del server (se presente), rendendo più facile individuare i problemi relativi agli endpoint.",
+        "es": "Novedad: al iniciar el adaptador, la respuesta de estado sin procesar (antes del análisis) de la nube de Leapmotor se registra una vez por vehículo en el nivel de depuración, para ayudar a diagnosticar modelos de vehículos no compatibles o poco probados (p. ej. B05). Novedad: los errores de solicitud de estado ahora también incluyen la URL solicitada y el cuerpo de la respuesta del servidor (si lo hay), facilitando identificar problemas relacionados con el endpoint.",
+        "pl": "Nowość: przy starcie adaptera surowa (jeszcze nieprzetworzona) odpowiedź statusu z chmury Leapmotor jest logowana raz na pojazd na poziomie debug, aby ułatwić diagnozowanie nieobsługiwanych lub słabo przetestowanych modeli pojazdów (np. B05). Nowość: błędy żądania statusu zawierają teraz również żądany adres URL oraz treść odpowiedzi serwera (jeśli występuje), co ułatwia identyfikację problemów związanych z punktem końcowym.",
+        "uk": "Нове: під час запуску адаптера необроблена (сира) відповідь статусу з хмари Leapmotor логується один раз для кожного автомобіля на рівні debug, щоб полегшити діагностику непідтримуваних або малотестованих моделей (наприклад, B05). Нове: помилки запиту статусу тепер також містять запитану URL-адресу та тіло відповіді сервера (якщо є), що полегшує виявлення проблем, пов'язаних з ендпоінтом.",
+        "zh-cn": "新增：适配器启动时，每辆车会在调试级别记录一次来自零跑云端的原始（未解析）状态响应，以帮助诊断不受支持或测试较少的车型（例如 B05）。新增：状态请求错误现在还包含请求的 URL 和服务器的响应内容（如果有），使与端点相关的问题更容易定位。"
+      },
       "0.6.4": {
         "en": "Chore: migrated Admin Tab to adapter-react-v5 8.x and MUI v6 (React stays on 18, no breaking change for users). Fix: corrected Grid layout usage after the MUI v6 update, which had caused overlapping text on the Diagnostics tab. Fix: unified card spacing/padding across all Admin Tab pages for a consistent look. Fix: pinned react-dom to 18.3.1 to avoid a dependency resolution conflict. Chore: minor CI workflow fix.",
         "de": "Chore: Admin-Tab auf adapter-react-v5 8.x und MUI v6 migriert (React bleibt bei 18, kein Breaking Change fuer Nutzer). Fix: Grid-Layout nach dem MUI-v6-Update korrigiert, das zu ueberlappendem Text im Diagnose-Tab gefuehrt hatte. Fix: Kartenabstaende auf allen Admin-Tab-Seiten fuer ein einheitliches Erscheinungsbild vereinheitlicht. Fix: react-dom auf 18.3.1 festgelegt, um einen Abhaengigkeitskonflikt zu vermeiden. Chore: kleiner CI-Workflow-Fix.",
@@ -80,19 +93,6 @@
         "pl": "Nowość: karta Podróże pokazująca dzienne kilometry z wykrytymi pojedynczymi podróżami. Poprawka: wykrywanie podróży uzupełnia teraz kilometry przejechane przed pierwszym wykryciem.",
         "uk": "Нове: вкладка Поїздки з щоденним пробігом та виявленими окремими поїздками. Виправлення: виявлення поїздок тепер враховує кілометри, пройдені до першого виявлення.",
         "zh-cn": "新增：行程标签显示每日公里数和检测到的单独行程。修复：行程检测现在会补充首次检测前行驶的公里数。"
-      },
-      "0.5.5": {
-        "en": "Critical fix: adminTab.link used a relative path causing 404 errors when opening the tab for all users. Now uses an absolute path to the React app.",
-        "de": "Kritischer Fix: adminTab.link nutzte einen relativen Pfad, der beim Öffnen des Tabs zu 404-Fehlern bei allen Nutzern führte. Jetzt wird ein absoluter Pfad zur React-App verwendet.",
-        "ru": "Критическое исправление: adminTab.link использовал относительный путь, вызывающий ошибки 404 при открытии вкладки. Теперь используется абсолютный путь.",
-        "pt": "Correção crítica: adminTab.link usava um caminho relativo causando erros 404 ao abrir a aba. Agora usa um caminho absoluto.",
-        "nl": "Kritieke fix: adminTab.link gebruikte een relatief pad wat 404-fouten veroorzaakte bij het openen van het tabblad. Gebruikt nu een absoluut pad.",
-        "fr": "Correction critique : adminTab.link utilisait un chemin relatif causant des erreurs 404 à l'ouverture de l'onglet. Utilise maintenant un chemin absolu.",
-        "it": "Correzione critica: adminTab.link utilizzava un percorso relativo causando errori 404 all'apertura della scheda. Ora utilizza un percorso assoluto.",
-        "es": "Corrección crítica: adminTab.link usaba una ruta relativa que causaba errores 404 al abrir la pestaña. Ahora usa una ruta absoluta.",
-        "pl": "Krytyczna poprawka: adminTab.link używał względnej ścieżki powodującej błędy 404 podczas otwierania karty. Teraz używa ścieżki absolutnej.",
-        "uk": "Критичне виправлення: adminTab.link використовував відносний шлях, що викликало помилки 404 під час відкриття вкладки. Тепер використовується абсолютний шлях.",
-        "zh-cn": "重要修复：adminTab.link 使用相对路径导致所有用户打开标签时出现404错误。现在使用绝对路径。"
       }
     },
     "titleLang": {

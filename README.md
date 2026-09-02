@@ -148,6 +148,10 @@ Which comfort commands actually appear depends on the detected vehicle model —
 
 ### **WORK IN PROGRESS**
 
+### 0.6.5 (2026-09-02)
+- New: on adapter start, the raw (pre-parsing) status response is logged once per vehicle at debug level, to help diagnose unsupported or under-tested vehicle models (e.g. B05)
+- New: status request errors now also include the requested URL and the server's response body (if any)
+
 ### 0.6.4 (2026-09-02)
 - Chore: migrated Admin Tab to adapter-react-v5 8.x and MUI v6 (React stays on 18, no breaking change for users)
 - Fix: corrected Grid layout usage after the MUI v6 update, which had caused overlapping text on the Diagnostics tab
