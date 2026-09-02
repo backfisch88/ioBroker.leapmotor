@@ -89,11 +89,16 @@ class LeapmotorAdapter extends utils.Adapter{
         if(!this.client)return;
         try{
             const s=await this.client.getVehicleStatus(vehicle);
-            // Full raw status dump for diagnosing unsupported/under-tested models
-            // (e.g. B05). Only emitted at debug level - enable via instance log
-            // level to capture field names for a GitHub issue. Remember to
-            // redact the VIN before pasting into a public issue.
-            this.log.debug(`${vehicle.vin}: raw status dump: ${JSON.stringify(s)}`);
+            // Full parsed status dump for diagnosing unsupported/under-tested
+            // models (e.g. B05). Only emitted once per VIN per adapter start,
+            // at debug level - enable via instance log level to capture field
+            // names for a GitHub issue. Remember to redact the VIN before
+            // pasting into a public issue.
+            if(!this._statusDumped)this._statusDumped=new Set();
+            if(!this._statusDumped.has(vehicle.vin)){
+                this._statusDumped.add(vehicle.vin);
+                this.log.debug(`${vehicle.vin}: raw status dump: ${JSON.stringify(s)}`);
+            }
             await this.writeStatusStates(vehicle.vin,s);
             const pollTime=new Date().toLocaleString('de-DE',{timeZone:'Europe/Berlin'});
             await this.setStateAsync(`${vehicle.vin}.status.last_poll_time`,{val:pollTime,ack:true});
@@ -106,7 +111,13 @@ class LeapmotorAdapter extends utils.Adapter{
         }catch(e){
             const msg=String(e);
             if(msg.includes('ungültig')||msg.includes('Token')||msg.includes('401')){throw e;}
-            this.log.warn('Status error '+vehicle.vin+': '+e);
+            // Include the raw server response body (if any) - this is the only
+            // diagnostic info available when the request itself fails (e.g. a
+            // wrong endpoint name for an unsupported model like B05), since in
+            // that case getVehicleStatus() never reaches its own raw-data dump.
+            const respBody=e?.response?.data?JSON.stringify(e.response.data):null;
+            const reqUrl=e?.config?.url||null;
+            this.log.warn('Status error '+vehicle.vin+': '+e+(reqUrl?` | requested URL: ${reqUrl}`:'')+(respBody?` | response body: ${respBody}`:''));
         }
         try{await this.updateConsumption(vehicle)}catch(e){this.log.warn(`Consumption error: ${e}`)}
         const lastScheduleCheck=this._lastScheduleCheck||0;
