@@ -89,6 +89,11 @@ class LeapmotorAdapter extends utils.Adapter{
         if(!this.client)return;
         try{
             const s=await this.client.getVehicleStatus(vehicle);
+            // Full raw status dump for diagnosing unsupported/under-tested models
+            // (e.g. B05). Only emitted at debug level - enable via instance log
+            // level to capture field names for a GitHub issue. Remember to
+            // redact the VIN before pasting into a public issue.
+            this.log.debug(`${vehicle.vin}: raw status dump: ${JSON.stringify(s)}`);
             await this.writeStatusStates(vehicle.vin,s);
             const pollTime=new Date().toLocaleString('de-DE',{timeZone:'Europe/Berlin'});
             await this.setStateAsync(`${vehicle.vin}.status.last_poll_time`,{val:pollTime,ack:true});
