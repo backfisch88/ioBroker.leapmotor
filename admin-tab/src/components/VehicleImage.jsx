@@ -45,6 +45,12 @@ export default function VehicleImage({ base, states }) {
         if (!anyOpen && !charging && !plugged) {
             result.push(pic('carpic_for_tripsum'));
         } else {
+            // Right-side doors are the far side from this camera angle, so
+            // their open-door overlays must sit underneath the body/hood
+            // layers - otherwise they render on top and look like they're
+            // floating in front of the car instead of behind it.
+            if (doorRearRight) result.push(pic('carpic_rightbehind_open'));
+            if (doorFrontRight) result.push(pic('carpic_rightfront_open'));
             result.push(pic('carpic_body'));
             result.push(pic('carpic_hood_close'));
             result.push(doorRearLeft ? pic('carpic_leftbehind_open') : pic('carpic_leftbehind_close'));
@@ -54,8 +60,6 @@ export default function VehicleImage({ base, states }) {
             // windows are permanently rolled down even when they aren't.
             if (!doorRearLeft && (windowRearLeftPct ?? 0) === 0) result.push(pic('carpic_leftbehind_window_close'));
             if (!doorDriver && (windowFrontLeftPct ?? 0) === 0) result.push(pic('carpic_leftfront_window_close'));
-            if (doorRearRight) result.push(pic('carpic_rightbehind_open'));
-            if (doorFrontRight) result.push(pic('carpic_rightfront_open'));
             if (doorTrunk) result.push(pic('carpic_tailgate_open'));
             if (plugged || charging) result.push(pic('carpic_charge_open'));
         }

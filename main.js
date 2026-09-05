@@ -502,6 +502,12 @@ class LeapmotorAdapter extends utils.Adapter{
         if(!anyOpen&&!charging&&!plugged){
             layers.push(pics['carpic_for_tripsum']||'');
         }else{
+            // Right-side doors are the far side from this camera angle, so
+            // their open-door overlays must sit underneath the body/hood
+            // layers - otherwise they render on top and look like they're
+            // floating in front of the car instead of behind it.
+            if(s.rbcmRightRearDoorStatus)layers.push(pics['carpic_rightbehind_open']||'');
+            if(s.rbcmDriverDoorStatus)layers.push(pics['carpic_rightfront_open']||'');
             layers.push(pics['carpic_body']||'');
             layers.push(pics['carpic_hood_close']||'');
             layers.push(s.lbcmLeftRearDoorStatus?(pics['carpic_leftbehind_open']||''):(pics['carpic_leftbehind_close']||''));
@@ -511,8 +517,6 @@ class LeapmotorAdapter extends utils.Adapter{
             // looks like the windows are permanently rolled down even when they aren't.
             if(!s.lbcmLeftRearDoorStatus&&(s.leftRearWindowPercent??0)===0)layers.push(pics['carpic_leftbehind_window_close']||'');
             if(!s.lbcmDriverDoorStatus&&(s.leftFrontWindowPercent??0)===0)layers.push(pics['carpic_leftfront_window_close']||'');
-            if(s.rbcmRightRearDoorStatus)layers.push(pics['carpic_rightbehind_open']||'');
-            if(s.rbcmDriverDoorStatus)layers.push(pics['carpic_rightfront_open']||'');
             if(s.bbcmBackDoorStatus)layers.push(pics['carpic_tailgate_open']||'');
             if(plugged||charging)layers.push(pics['carpic_charge_open']||'');
         }
