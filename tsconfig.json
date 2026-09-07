@@ -1,0 +1,10 @@
+{
+    "extends": "@tsconfig/node22/tsconfig.json",
+    "compilerOptions": {
+        "checkJs": false,
+        "noEmit": true,
+        "allowJs": true
+    },
+    "include": ["main.js", "lib/**/*.js"],
+    "exclude": ["node_modules", "admin", "admin-tab", "test"]
+}
