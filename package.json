@@ -41,7 +41,7 @@
     "@iobroker/testing": "^5.2.2",
     "@tsconfig/node22": "^22.0.6",
     "@types/node": ">=22",
-    "eslint": "^10.10.0"
+    "eslint": "^9.39.5"
   },
   "main": "main.js",
   "files": [
