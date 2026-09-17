@@ -198,6 +198,11 @@ export default function TripsTab({ base, states }) {
                                                             ⏳ {I18n.t('Official energy data not yet available from the cloud')}
                                                         </Typography>
                                                     )}
+                                                    {trip.energyUnavailable && (
+                                                        <Typography variant="caption" sx={{ color: '#5a7090', fontSize: '0.7rem', pl: 3, fontStyle: 'italic' }}>
+                                                            ⚠️ {I18n.t('Official energy data unavailable for this trip')}
+                                                        </Typography>
+                                                    )}
                                                 </Box>
                                             );
                                         })}

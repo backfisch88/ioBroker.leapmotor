@@ -195,6 +195,8 @@ class LeapmotorAdapter extends utils.Adapter{
                     date:new Date(startTimeMs).toISOString().slice(0,10),
                     startTime:new Date(startTimeMs).toLocaleString('de-DE',{timeZone:'Europe/Berlin'}),
                     endTime:new Date(endTimeMs).toLocaleString('de-DE',{timeZone:'Europe/Berlin'}),
+                    startTimeMs,
+                    endTimeMs,
                     km:Math.round(km*10)/10,
                     durationMin,
                     socUsed,
@@ -242,14 +244,41 @@ class LeapmotorAdapter extends utils.Adapter{
     // wasn't ready yet when they first ended. Runs once per poll cycle; each
     // pending trip is retried up to 12 times (~1 hour at the default 5-minute
     // polling interval) before being given up on permanently.
+    //
+    // The retry queue (_pendingEnergyTrips) lives only in memory and is lost
+    // on every adapter restart. Without reconciliation, a trip that was still
+    // pending at restart time would be orphaned forever: still marked
+    // energyPending in the stored history, but no longer tracked anywhere to
+    // be retried or given up on. So on every call we first re-discover any
+    // energyPending trips in the stored history that aren't currently in the
+    // queue and re-add them (fresh attempt budget), before processing.
     async resolvePendingTripEnergy(vehicle){
         const vin=vehicle.vin;
-        const pending=this._pendingEnergyTrips?.[vin];
-        if(!pending||pending.length===0)return;
         const stateId=`${vin}.trips.history_json`;
         const cur=await this.getStateAsync(stateId);
         let history=[];
         try{history=JSON.parse(cur?.val||'[]')}catch{history=[]}
+
+        if(!this._pendingEnergyTrips)this._pendingEnergyTrips={};
+        if(!this._pendingEnergyTrips[vin])this._pendingEnergyTrips[vin]=[];
+        const tracked=new Set(this._pendingEnergyTrips[vin].map(p=>`${p.date}|${p.startTime}`));
+        for(const t of history){
+            const key=`${t.date}|${t.startTime}`;
+            if(t.energyPending&&!tracked.has(key)){
+                // Older trip entries (created before this field was added)
+                // won't have raw epoch timestamps - fall back to "an hour
+                // ago" so the retry at least has a plausible-ish window
+                // rather than crashing; it will simply fail to find a
+                // breakdown and get marked unavailable after 12 attempts.
+                const startTimeMs=t.startTimeMs??(Date.now()-3600000);
+                const endTimeMs=t.endTimeMs??Date.now();
+                this._pendingEnergyTrips[vin].push({startTimeMs,endTimeMs,date:t.date,startTime:t.startTime,attempts:0});
+                tracked.add(key);
+            }
+        }
+
+        const pending=this._pendingEnergyTrips?.[vin];
+        if(!pending||pending.length===0)return;
         let changed=false;
         const stillPending=[];
         for(const p of pending){
@@ -270,6 +299,19 @@ class LeapmotorAdapter extends utils.Adapter{
                     resolved=true;
                 }
             }catch(e){this.log.debug(`Pending energy breakdown retry failed: ${e}`)}
+            if(!resolved&&p.attempts>=12){
+                // Retry budget exhausted - stop retrying, but also update the
+                // stored trip entry so the UI stops showing "not yet
+                // available" forever. Without this, a trip whose official
+                // breakdown never arrives (e.g. cloud aggregation failure)
+                // stays stuck on the "still loading" message indefinitely.
+                const entry=history.find(t=>t.date===p.date&&t.startTime===p.startTime);
+                if(entry){
+                    delete entry.energyPending;
+                    entry.energyUnavailable=true;
+                    changed=true;
+                }
+            }
             if(!resolved&&p.attempts<12)stillPending.push(p);
         }
         this._pendingEnergyTrips[vin]=stillPending;
