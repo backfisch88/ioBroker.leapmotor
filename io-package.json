@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "leapmotor",
-    "version": "0.6.5",
+    "version": "0.6.6",
     "news": {
+      "0.6.6": {
+        "en": "Fix: B05 vehicles now use the shared C10 status endpoint (community-confirmed), resolving the HTTP 404 status error. Fix: right-side door overlays now render correctly behind the vehicle body/hood for proper depth ordering. Chore: various repository/tooling improvements (ESLint config, tsconfig, VSCode schema hints, short-format i18n files, dependency updates, Node.js 26 test support).",
+        "de": "Fix: B05-Fahrzeuge nutzen jetzt den gemeinsamen C10-Status-Endpoint (community-bestaetigt), behebt den HTTP-404-Statusfehler. Fix: Tuer-Overlays auf der rechten Seite werden jetzt korrekt hinter Karosserie/Motorhaube gerendert. Chore: diverse Repository-/Tooling-Verbesserungen (ESLint-Config, tsconfig, VSCode-Schema-Hinweise, i18n-Kurzformat, Dependency-Updates, Node.js-26-Testunterstuetzung).",
+        "ru": "Исправление: автомобили B05 теперь используют общий статус-эндпоинт C10 (подтверждено сообществом), устраняя ошибку HTTP 404. Исправление: наложения правых дверей теперь корректно отображаются позади кузова/капота. Прочее: различные улучшения репозитория и инструментов (конфигурация ESLint, tsconfig, подсказки схем VSCode, короткий формат i18n, обновления зависимостей, поддержка тестирования Node.js 26).",
+        "pt": "Correção: veículos B05 agora usam o endpoint de status compartilhado C10 (confirmado pela comunidade), resolvendo o erro HTTP 404. Correção: sobreposições das portas do lado direito agora são renderizadas corretamente atrás da carroceria/capô. Manutenção: diversas melhorias de repositório/ferramentas (configuração ESLint, tsconfig, dicas de esquema do VSCode, i18n em formato curto, atualizações de dependências, suporte a testes Node.js 26).",
+        "nl": "Fix: B05-voertuigen gebruiken nu het gedeelde C10-statusendpoint (door de community bevestigd), waardoor de HTTP 404-statusfout is opgelost. Fix: overlays van de rechterportieren worden nu correct achter de carrosserie/motorkap weergegeven. Chore: diverse repository-/tooling-verbeteringen (ESLint-config, tsconfig, VSCode-schema-hints, i18n in kort formaat, dependency-updates, Node.js 26-testondersteuning).",
+        "fr": "Correction : les véhicules B05 utilisent désormais le point de terminaison de statut partagé C10 (confirmé par la communauté), résolvant l'erreur HTTP 404. Correction : les superpositions des portières droites s'affichent désormais correctement derrière la carrosserie/le capot. Divers : diverses améliorations du dépôt/outillage (config ESLint, tsconfig, indices de schéma VSCode, i18n au format court, mises à jour des dépendances, prise en charge des tests Node.js 26).",
+        "it": "Correzione: i veicoli B05 ora utilizzano l'endpoint di stato condiviso C10 (confermato dalla community), risolvendo l'errore HTTP 404. Correzione: le sovrapposizioni delle portiere destre ora vengono visualizzate correttamente dietro la carrozzeria/cofano. Varie: varie migliorie al repository/strumenti (configurazione ESLint, tsconfig, suggerimenti schema VSCode, i18n in formato breve, aggiornamenti delle dipendenze, supporto test Node.js 26).",
+        "es": "Corrección: los vehículos B05 ahora usan el endpoint de estado compartido C10 (confirmado por la comunidad), resolviendo el error HTTP 404. Corrección: las superposiciones de las puertas derechas ahora se muestran correctamente detrás de la carrocería/capó. Varios: varias mejoras de repositorio/herramientas (configuración ESLint, tsconfig, sugerencias de esquema de VSCode, i18n en formato corto, actualizaciones de dependencias, soporte de pruebas Node.js 26).",
+        "pl": "Poprawka: pojazdy B05 korzystają teraz ze wspólnego punktu końcowego statusu C10 (potwierdzone przez społeczność), co rozwiązuje błąd HTTP 404. Poprawka: nakładki prawych drzwi są teraz poprawnie renderowane za nadwoziem/maską. Inne: różne usprawnienia repozytorium/narzędzi (konfiguracja ESLint, tsconfig, podpowiedzi schematu VSCode, krótki format i18n, aktualizacje zależności, wsparcie testów Node.js 26).",
+        "uk": "Виправлення: автомобілі B05 тепер використовують спільну кінцеву точку статусу C10 (підтверджено спільнотою), що усуває помилку HTTP 404. Виправлення: накладання правих дверей тепер коректно відображаються позаду кузова/капота. Інше: різні покращення репозиторію/інструментів (конфігурація ESLint, tsconfig, підказки схем VSCode, короткий формат i18n, оновлення залежностей, підтримка тестів Node.js 26).",
+        "zh-cn": "修复：B05 车型现在使用共享的 C10 状态端点（经社区确认），解决了 HTTP 404 状态错误。修复：右侧车门叠加层现在正确渲染在车身/引擎盖后方。杂项：多项仓库/工具改进（ESLint 配置、tsconfig、VSCode 模式提示、短格式 i18n、依赖更新、Node.js 26 测试支持）。"
+      },
       "0.6.5": {
         "en": "New: on adapter start, the raw (pre-parsing) status response from the Leapmotor cloud is logged once per vehicle at debug level, to help diagnose unsupported or under-tested vehicle models (e.g. B05). New: status request errors now also include the requested URL and the server's response body (if any), making endpoint-related issues easier to pinpoint.",
         "de": "Neu: Beim Adapterstart wird die rohe (noch nicht verarbeitete) Status-Antwort der Leapmotor-Cloud einmal pro Fahrzeug auf Debug-Level geloggt, um die Diagnose bei nicht unterstuetzten oder wenig getesteten Fahrzeugmodellen (z.B. B05) zu erleichtern. Neu: Fehler beim Status-Abruf enthalten jetzt zusaetzlich die angefragte URL sowie den Antwort-Body des Servers (falls vorhanden), wodurch Endpoint-bezogene Probleme leichter einzugrenzen sind.",
@@ -80,19 +93,6 @@
         "pl": "Poprawka: zgodność z weryfikatorem repozytorium - dodano brakującą strukturę obiektów pośrednich (kanały charging/consumption/pictures/trips), poprawiono nieprawidłowe role stanów, dodano rzeczywisty test integracyjny.",
         "uk": "Виправлення: відповідність перевірці репозиторію - додано відсутню проміжну структуру об'єктів (канали charging/consumption/pictures/trips), виправлено недійсні ролі станів, додано реальний інтеграційний тест.",
         "zh-cn": "修复：符合仓库检查器规范 - 添加了缺失的中间对象结构（charging/consumption/pictures/trips 通道），修正了无效的状态角色，添加了真实的集成测试。"
-      },
-      "0.5.7": {
-        "en": "New: Trips tab showing daily kilometers with individual detected trips. Fix: trip detection now backfills kilometers driven before the trip was first detected (5-minute polling gap).",
-        "de": "Neu: Fahrten-Tab mit Tageskilometern und erkannten Einzelfahrten. Fix: Fahrt-Erkennung berücksichtigt jetzt nachträglich Kilometer, die vor der ersten Erkennung gefahren wurden (5-Minuten-Polling-Lücke).",
-        "ru": "Новое: вкладка поездок с ежедневным пробегом и обнаруженными отдельными поездками. Исправление: обнаружение поездок теперь учитывает километры, пройденные до первого обнаружения.",
-        "pt": "Novo: aba de viagens mostrando quilômetros diários com viagens individuais detectadas. Correção: a detecção de viagens agora preenche os quilômetros percorridos antes da primeira detecção.",
-        "nl": "Nieuw: Ritten-tabblad met dagelijkse kilometers en gedetecteerde individuele ritten. Fix: rit-detectie vult nu kilometers aan die zijn gereden voor de eerste detectie.",
-        "fr": "Nouveau : onglet Trajets affichant les kilomètres quotidiens avec les trajets individuels détectés. Correction : la détection des trajets comble désormais les kilomètres parcourus avant la première détection.",
-        "it": "Nuovo: scheda Viaggi che mostra i chilometri giornalieri con i singoli viaggi rilevati. Correzione: il rilevamento dei viaggi ora recupera i chilometri percorsi prima del primo rilevamento.",
-        "es": "Nuevo: pestaña de viajes que muestra los kilómetros diarios con los viajes individuales detectados. Corrección: la detección de viajes ahora completa los kilómetros recorridos antes de la primera detección.",
-        "pl": "Nowość: karta Podróże pokazująca dzienne kilometry z wykrytymi pojedynczymi podróżami. Poprawka: wykrywanie podróży uzupełnia teraz kilometry przejechane przed pierwszym wykryciem.",
-        "uk": "Нове: вкладка Поїздки з щоденним пробігом та виявленими окремими поїздками. Виправлення: виявлення поїздок тепер враховує кілометри, пройдені до першого виявлення.",
-        "zh-cn": "新增：行程标签显示每日公里数和检测到的单独行程。修复：行程检测现在会补充首次检测前行驶的公里数。"
       }
     },
     "titleLang": {

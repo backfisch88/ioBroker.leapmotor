@@ -148,6 +148,11 @@ Which comfort commands actually appear depends on the detected vehicle model —
 
 ### **WORK IN PROGRESS**
 
+### 0.6.6 (2026-09-17)
+- Fix: B05 vehicles now use the shared C10 status endpoint (community-confirmed via leapmotor-ha), resolving the HTTP 404 status error (#38)
+- Fix: right-side door overlays now render correctly behind the vehicle body/hood for proper depth ordering
+- Chore: added ESLint config, tsconfig.json, VSCode JSON schema hints, converted i18n files to short format, bumped several dependencies, added Node.js 26 to the test matrix
+
 ### 0.6.5 (2026-09-02)
 - New: on adapter start, the raw (pre-parsing) status response is logged once per vehicle at debug level, to help diagnose unsupported or under-tested vehicle models (e.g. B05)
 - New: status request errors now also include the requested URL and the server's response body (if any)
