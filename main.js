@@ -159,9 +159,16 @@ class LeapmotorAdapter extends utils.Adapter{
         // continuous drive into several and mis-attributing part of it to
         // "Sonstige" (undetected) km once it resumes.
         const isDriving=(speed!=null&&speed>0)||keyPosition===true;
+        // Grace period before actually closing a trip once isDriving goes
+        // false: complements the ignition check above as a backstop for
+        // cases where key_position briefly misreports (or a model doesn't
+        // expose it reliably). A trip is only finalized once isDriving has
+        // stayed false for this long straight; if driving resumes before
+        // that, the trip simply continues uninterrupted.
+        const TRIP_END_GRACE_MS=600000; // 10 minutes
         if(!this._tripStates)this._tripStates={};
         if(!this._lastKnownMileage)this._lastKnownMileage={};
-        const prev=this._tripStates[vin]||{wasActive:false,startMileage:null,startTime:null,startSoc:null};
+        const prev=this._tripStates[vin]||{wasActive:false,startMileage:null,startTime:null,startSoc:null,pendingEndSince:null};
         const lastMileage=this._lastKnownMileage[vin];
 
         if(isDriving&&!prev.wasActive){
@@ -187,16 +194,32 @@ class LeapmotorAdapter extends utils.Adapter{
                     startTime=Date.now()-missedTimeMs;
                 }
             }
-            this._tripStates[vin]={wasActive:true,startMileage,startTime,startSoc:soc};
+            this._tripStates[vin]={wasActive:true,startMileage,startTime,startSoc:soc,pendingEndSince:null};
             await this.setStateAsync(`${vin}.trips.current_trip_active`,{val:true,ack:true});
             this.log.debug(`Trip started at ${startMileage}km (current: ${totalMileage}km)`);
+        }else if(isDriving&&prev.wasActive&&prev.pendingEndSince){
+            // False alarm: driving resumed before the grace period elapsed.
+            // Clear the pending-end marker so the trip continues uninterrupted.
+            this._tripStates[vin]={...prev,pendingEndSince:null};
         }else if(!isDriving&&prev.wasActive){
+            if(!prev.pendingEndSince){
+                // First poll where the car looks stopped: start the grace
+                // countdown instead of ending the trip immediately.
+                this._tripStates[vin]={...prev,pendingEndSince:Date.now()};
+                this._lastKnownMileage[vin]={mileage:totalMileage,ts:Date.now()};
+                return;
+            }
+            if(Date.now()-prev.pendingEndSince<TRIP_END_GRACE_MS){
+                // Still within the grace period - keep waiting, trip stays open.
+                this._lastKnownMileage[vin]={mileage:totalMileage,ts:Date.now()};
+                return;
+            }
             const km=Math.max(0,totalMileage-(prev.startMileage??totalMileage));
-            const durationMin=Math.round((Date.now()-(prev.startTime??Date.now()))/60000);
+            const durationMin=Math.round((prev.pendingEndSince-(prev.startTime??prev.pendingEndSince))/60000);
             const socUsed=prev.startSoc!=null&&soc!=null?Math.max(0,prev.startSoc-soc):null;
             if(km>=0.5){
-                const startTimeMs=prev.startTime??Date.now();
-                const endTimeMs=Date.now();
+                const startTimeMs=prev.startTime??prev.pendingEndSince;
+                const endTimeMs=prev.pendingEndSince;
                 const trip={
                     date:new Date(startTimeMs).toISOString().slice(0,10),
                     startTime:new Date(startTimeMs).toLocaleString('de-DE',{timeZone:'Europe/Berlin'}),
@@ -240,7 +263,7 @@ class LeapmotorAdapter extends utils.Adapter{
                     this._pendingEnergyTrips[vin].push({startTimeMs,endTimeMs,date:trip.date,startTime:trip.startTime,attempts:0});
                 }
             }
-            this._tripStates[vin]={wasActive:false,startMileage:null,startTime:null,startSoc:null};
+            this._tripStates[vin]={wasActive:false,startMileage:null,startTime:null,startSoc:null,pendingEndSince:null};
             await this.setStateAsync(`${vin}.trips.current_trip_active`,{val:false,ack:true});
         }
         this._lastKnownMileage[vin]={mileage:totalMileage,ts:Date.now()};
