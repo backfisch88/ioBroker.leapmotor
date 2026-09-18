@@ -77,7 +77,8 @@ class LeapmotorAdapter extends utils.Adapter{
         try{for(const v of this.vehicles)await this.updateVehicleStatus(v);}
         catch(e){
             const msg=String(e);
-            if(msg.includes('ungültig')||msg.includes('Token')||msg.includes('401')){
+            const msgLower=msg.toLowerCase();
+            if(msgLower.includes('ungültig')||msgLower.includes('token')||msg.includes('401')){
                 this.log.debug('Token expired – re-login...');
                 try{await this.client.login();this.log.debug('Re-login successful.');for(const v of this.vehicles)await this.updateVehicleStatus(v);}
                 catch(e2){this.log.error('Re-login failed: '+e2);}
@@ -110,7 +111,8 @@ class LeapmotorAdapter extends utils.Adapter{
             await this.buildCompositeHtml(vehicle.vin,s,vehicle.name);
         }catch(e){
             const msg=String(e);
-            if(msg.includes('ungültig')||msg.includes('Token')||msg.includes('401')){throw e;}
+            const msgLower=msg.toLowerCase();
+            if(msgLower.includes('ungültig')||msgLower.includes('token')||msg.includes('401')){throw e;}
             // Include the raw server response body (if any) - this is the only
             // diagnostic info available when the request itself fails (e.g. a
             // wrong endpoint name for an unsupported model like B05), since in
