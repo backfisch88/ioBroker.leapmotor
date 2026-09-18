@@ -148,6 +148,12 @@ Which comfort commands actually appear depends on the detected vehicle model —
 
 ### **WORK IN PROGRESS**
 
+### 0.6.7 (2026-09-18)
+- Fix: the automatic re-login on an expired session token was case-sensitive and never triggered for the cloud's "TOKEN_NOT_AVAILABLE" error, causing all polling to silently fail until a manual adapter restart
+- Fix: a trip now only ends once the ignition is actually off (not just when speed reaches 0), and only after a 10-minute confirmation grace period - a brief stop at a light or curb no longer splits one drive into several
+- Fix: the trip energy-breakdown retry queue now survives adapter restarts instead of leaving trips stuck showing "not yet available" forever; trips whose data never arrives are now clearly marked unavailable after the retry budget is exhausted
+- Chore: raw status/energy-breakdown debug logging improvements to aid future diagnosis
+
 ### 0.6.6 (2026-09-17)
 - Fix: B05 vehicles now use the shared C10 status endpoint (community-confirmed via leapmotor-ha), resolving the HTTP 404 status error (#38)
 - Fix: right-side door overlays now render correctly behind the vehicle body/hood for proper depth ordering
