@@ -103,7 +103,7 @@ class LeapmotorAdapter extends utils.Adapter{
             const pollTime=new Date().toLocaleString('de-DE',{timeZone:'Europe/Berlin'});
             await this.setStateAsync(`${vehicle.vin}.status.last_poll_time`,{val:pollTime,ack:true});
             try{await this.updateDailyMileage(vehicle.vin,s.totalMileage)}catch(e){this.log.debug(`Daily mileage error: ${e}`)}
-            try{await this.updateTripDetection(vehicle,s.totalMileage,s.speed,s.soc)}catch(e){this.log.debug(`Trip detection error: ${e}`)}
+            try{await this.updateTripDetection(vehicle,s.totalMileage,s.speed,s.soc,s.bcmKeyPositionOn1||s.bcmKeyPositionOn3)}catch(e){this.log.debug(`Trip detection error: ${e}`)}
             try{await this.resolvePendingTripEnergy(vehicle)}catch(e){this.log.debug(`Pending trip energy error: ${e}`)}
             try{await this.updateChargingCost(vehicle.vin,s.soc,s.chargeState)}catch(e){this.log.debug(`Charging cost error: ${e}`)}
             this.log.debug(`${vehicle.vin}: SOC=${s.soc}% Range=${s.expectedMileage}km Temp=${s.outdoorTemp}°C Locked=${s.driverDoorLockStatus} AC=${s.acSwitch}`);
@@ -149,10 +149,16 @@ class LeapmotorAdapter extends utils.Adapter{
         await this.setStateAsync(`${vin}.trips.today_km`,{val:todayEntry.km,ack:true});
     }
 
-    async updateTripDetection(vehicle,totalMileage,speed,soc){
+    async updateTripDetection(vehicle,totalMileage,speed,soc,keyPosition){
         const vin=vehicle.vin;
         if(totalMileage==null)return;
-        const isDriving=speed!=null&&speed>0;
+        // A trip stays active as long as EITHER the car is moving OR the
+        // ignition/key is still on - not just speed>0. Without the ignition
+        // check, a brief stop (traffic light, waiting at the curb) with the
+        // engine still running would end the trip right there, splitting one
+        // continuous drive into several and mis-attributing part of it to
+        // "Sonstige" (undetected) km once it resumes.
+        const isDriving=(speed!=null&&speed>0)||keyPosition===true;
         if(!this._tripStates)this._tripStates={};
         if(!this._lastKnownMileage)this._lastKnownMileage={};
         const prev=this._tripStates[vin]||{wasActive:false,startMileage:null,startTime:null,startSoc:null};
