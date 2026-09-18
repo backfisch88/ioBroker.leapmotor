@@ -205,6 +205,6 @@ Older changes can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 
 MIT License
 
-Copyright (c) 2026 Henrik Schönhofen (backfisch88)
+Copyright (c) 2026 Henrik Schönhofen (backfisch88) <henrik.schoenhofen@icloud.com>
 
 See [LICENSE](LICENSE) for the full license text.
