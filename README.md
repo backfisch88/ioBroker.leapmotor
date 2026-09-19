@@ -144,6 +144,16 @@ Comfort commands (only created/shown if the vehicle model supports the feature):
 Which comfort commands actually appear depends on the detected vehicle model — see
 `admin-tab/src/vehicleCapabilities.js` in the repository for the current capability matrix per model.
 
+Community-test commands (payload verified against community reverse-engineering sources, **not physically tested on any vehicle yet** - please open a GitHub issue with your model and result if you try one):
+
+| Command | Description | Tested on T03 |
+|---------|-------------|:---:|
+| cmd.charge_start / charge_stop | Start/stop charging directly (not just via schedule) | ❌ not tested |
+| cmd.unlock_charger | Unlock the charging connector remotely | ❌ not tested |
+| cmd.healthy_charging_on / off | Toggle battery-health charging mode | ❌ not tested |
+| cmd.fuel_heating_on / off | Fuel heater on/off - **REEV/range-extender models only** (e.g. C10 EREV); no effect expected on any pure-BEV model including this T03 | ❌ not applicable (T03 is BEV) |
+| cmd.destination_address / destination_latitude / destination_longitude / destination_send | Send a navigation destination to the vehicle's built-in nav (set the address or lat/lon, then trigger destination_send) | ❌ not tested |
+
 ## Changelog
 
 ### **WORK IN PROGRESS**
