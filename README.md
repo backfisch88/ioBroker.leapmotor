@@ -138,14 +138,16 @@ Value-based commands:
 
 Comfort commands (only created/shown if the vehicle model supports the feature):
 
-| Command | Description |
-|---------|-------------|
-| cmd.sentry_mode_on / off | Sentry mode |
-| cmd.seat_heat_driver / copilot | Seat heating |
-| cmd.seat_ventilation_driver / copilot | Seat ventilation |
-| cmd.steering_wheel_heat_on / off | Steering wheel heating |
-| cmd.mirror_heat_on / off | Mirror heating |
-| cmd.hotspot_on / off | Wi-Fi hotspot (no effect on T03) |
+| Command | Description | Confirmed on | Expected on (untested, reasoned guess) |
+|---------|-------------|--------------|------------------------------|
+| cmd.sentry_mode_on / off | Sentry mode | – | Confirmed **not** on T03 |
+| cmd.seat_heat_driver / copilot | Seat heating | – | B10, B11/C10 - trim-dependent, at least one C10 spec sheet had no heated seats standard. Confirmed **not** on T03 |
+| cmd.seat_ventilation_driver / copilot | Seat ventilation | – | Same as seat heating |
+| cmd.steering_wheel_heat_on / off | Steering wheel heating | – | Same as seat heating. Confirmed **not** on T03 |
+| cmd.mirror_heat_on / off | Mirror heating | – | B10, B11/C10, B05. Confirmed **not exposed via API/app at all** on this T03 |
+| cmd.hotspot_on / off | Wi-Fi hotspot | – | Unknown other models. Confirmed **not** on T03 |
+
+`sunroof`/`sunshade` are handled the same way — see `admin-tab/src/vehicleCapabilities.js` for the confirmed B10 vs T03 difference.
 
 Which comfort commands actually appear depends on the detected vehicle model — see
 `admin-tab/src/vehicleCapabilities.js` in the repository for the current capability matrix per model.

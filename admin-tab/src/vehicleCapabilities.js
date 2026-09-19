@@ -31,6 +31,12 @@ const CAPABILITIES = {
         steeringWheelHeat: false, // T03 has no steering wheel heating installed
         windDirection: false, // demonstrably not controllable via cloud API (tested systematically multiple times)
         rearWindowHeating: false, // signal doesn't exist on the T03 (only on C10/B10)
+        fuelHeating: false, // T03 is pure BEV, has no fuel heater (REEV-only feature)
+        // chargeStartStop/unlockCharger/healthyCharging intentionally left
+        // undocumented here (optimistic default): not yet tested, but they
+        // use the same charging subsystem as chargeLimit (confirmed true),
+        // so likely work. destinationSend also untested - unclear whether
+        // T03's built-in nav accepts cloud-pushed destinations at all.
     },
     // B10: partially confirmed via a real owner's status dumps (2026-07).
     // Only what has actually been confirmed is listed here; everything else
@@ -39,6 +45,25 @@ const CAPABILITIES = {
         sunshade: true, // confirmed: B10 has an electric sunroof, unlike T03's fixed shade (signal 1724)
         sunroof: true,
     },
+    // B05, C10 (also reported as "B11" - Leapmotor's internal platform code
+    // for the C10 chassis, see main.js/lib/leapmotor-client.js), C16: still
+    // UNTESTED for the comfort/charging/nav features below. Reasoned
+    // expectations only, NOT hard-coded here since these are guesses, not
+    // confirmations, and a wrong 'false' would incorrectly hide a working
+    // feature for someone with a higher trim - the optimistic default is
+    // safer than a fabricated flag:
+    // - seatHeat/seatVentilation/steeringWheelHeat/mirrorHeat/sunroof:
+    //   plausible on B10/C10/B11 (larger, higher-trim vehicles) but at least
+    //   one real ADAC spec sheet for a C10 "Pro Style" trim listed no heated
+    //   seats/steering wheel as standard - trim-dependent, can't assume yes
+    //   for a whole model line. B05 is a smaller/base-trim hatchback, same
+    //   uncertainty.
+    // - chargeStartStop/unlockCharger/healthyCharging: same charging
+    //   subsystem as chargeLimit, expected to work on every model.
+    // - fuelHeating: only meaningful on REEV/range-extender trims (e.g. a
+    //   C10 EREV); the cloud's carType alone doesn't distinguish BEV vs
+    //   EREV, so this can't be set per model at all, only per actual trim.
+    // - destinationSend: expected on nav-equipped models (C10/B10/B11).
     // C10, C16: still UNTESTED. Other users can provide feedback via debug
     // logs (e.g. "remote 301 failed: ..." or success without effect) on which
     // features actually work on their model. Until then, all features are
@@ -51,7 +76,8 @@ const ALL_FEATURES = [
     'quickClimate', 'climateSchedule', 'chargeLimit', 'chargeSchedule',
     'batteryPreheat', 'defrost', 'hotspot', 'mirrorHeat', 'sentryMode',
     'speedLimit', 'seatHeat', 'seatVentilation', 'steeringWheelHeat',
-    'windDirection', 'rearWindowHeating',
+    'windDirection', 'rearWindowHeating', 'chargeStartStop', 'unlockCharger',
+    'healthyCharging', 'fuelHeating', 'destinationSend',
 ];
 
 /**
