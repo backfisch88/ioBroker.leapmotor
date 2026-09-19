@@ -98,23 +98,28 @@ leapmotor.0.<VIN>.pictures.composite_html
 
 Simple on/off buttons under `cmd.*` (role `button`, set to `true` to trigger):
 
-| Command | Description | PIN required |
-|---------|-------------|:------------:|
-| cmd.ac_heat | Start heating | ✅ |
-| cmd.ac_cool | Start cooling | ✅ |
-| cmd.ac_vent | Start ventilation | ✅ |
-| cmd.ac_off | Stop climate | ✅ |
-| cmd.defrost | Windshield defrost | ✅ |
-| cmd.windows_open | Open windows | – |
-| cmd.windows_close | Close windows | – |
-| cmd.find | Find vehicle (horn/lights) | – |
-| cmd.battery_preheat | Battery preheat on | ✅ |
-| cmd.battery_preheat_off | Battery preheat off | ✅ |
-| cmd.lock | Lock vehicle | ✅ |
-| cmd.unlock | Unlock vehicle | ✅ |
-| cmd.trunk_open | Open trunk | ✅ |
-| cmd.trunk_close | Close trunk | ✅ |
-| cmd.refresh | Trigger immediate status update | – |
+| Command | Description | PIN required | Tested |
+|---------|-------------|:------------:|:------:|
+| cmd.ac_heat | Start heating | ✅ | ✅ |
+| cmd.ac_cool | Start cooling | ✅ | ✅ |
+| cmd.ac_vent | Start ventilation | ✅ | ✅ |
+| cmd.ac_off | Stop climate | ✅ | ✅ |
+| cmd.defrost | Windshield defrost | ✅ | ✅ |
+| cmd.windows_open | Open windows | – | ✅ |
+| cmd.windows_close | Close windows | – | ✅ |
+| cmd.find | Find vehicle (horn/lights) | – | ✅ |
+| cmd.battery_preheat | Battery preheat on | ✅ | ✅ |
+| cmd.battery_preheat_off | Battery preheat off | ✅ | ✅ |
+| cmd.lock | Lock vehicle | ✅ | ✅ |
+| cmd.unlock | Unlock vehicle | ✅ | ✅ |
+| cmd.trunk_open | Open trunk | ✅ | ✅ |
+| cmd.trunk_close | Close trunk | ✅ | ✅ |
+| cmd.refresh | Trigger immediate status update | – | ✅ |
+| cmd.charge_start / charge_stop | Start/stop charging directly (not just via schedule) | ✅ | ❌ community-test |
+| cmd.unlock_charger | Unlock the charging connector remotely | ✅ | ❌ community-test |
+| cmd.healthy_charging_on / off | Toggle battery-health charging mode | ✅ | ❌ community-test |
+| cmd.fuel_heating_on / off | Fuel heater on/off - **REEV/range-extender models only** (e.g. C10 EREV) | ✅ | ❌ not applicable on T03 (BEV) |
+| cmd.destination_send | Send the address/coordinates set below to the vehicle's built-in nav | – | ❌ community-test |
 
 Value-based commands:
 
@@ -129,6 +134,7 @@ Value-based commands:
 | cmd.charge_schedule_enable / start / end / apply | Charging schedule |
 | cmd.climate_schedule_enable / mode / time / days / apply / cancel | Recurring climate schedule |
 | cmd.speed_limit_set | Speed limit, if supported by the vehicle |
+| cmd.destination_address / destination_latitude / destination_longitude | Destination to send via cmd.destination_send (fill address, or lat/lon, then trigger) - community-test, not tested here |
 
 Comfort commands (only created/shown if the vehicle model supports the feature):
 
