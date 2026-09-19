@@ -1006,9 +1006,12 @@ class LeapmotorAdapter extends utils.Adapter{
         }
         if(cmd==='seat_heat_driver'||cmd==='seat_heat_copilot'){
             await this.setStateAsync(id,{val:state.val,ack:true});
-            const seatPos=cmd==='seat_heat_driver'?'3':'2';
+            const seatPos=cmd==='seat_heat_driver'?'driver':'copilot';
             try{
-                const content=JSON.stringify({value:`${seatPos},${state.val}`});
+                // Verified via leapmotor-ha's live app captures: separate
+                // position/level keys, not our previous comma-joined
+                // "3,2"-style single value string.
+                const content=JSON.stringify({position:seatPos,level:String(state.val)});
                 try{
                     await this.client.sendCommandWithPin(vehicle,'301',content);
                 }catch(e){
@@ -1023,9 +1026,9 @@ class LeapmotorAdapter extends utils.Adapter{
         }
         if(cmd==='seat_ventilation_driver'||cmd==='seat_ventilation_copilot'){
             await this.setStateAsync(id,{val:state.val,ack:true});
-            const seatPos=cmd==='seat_ventilation_driver'?'3':'2';
+            const seatPos=cmd==='seat_ventilation_driver'?'driver':'copilot';
             try{
-                const content=JSON.stringify({value:`${seatPos},${state.val}`});
+                const content=JSON.stringify({position:seatPos,level:String(state.val)});
                 try{
                     await this.client.sendCommandWithPin(vehicle,'370',content);
                 }catch(e){
@@ -1237,10 +1240,16 @@ class LeapmotorAdapter extends utils.Adapter{
             'defrost':             ['170','{"circle":"in","mode":"hot","operate":"manual","position":"all","temperature":"32","windlevel":"7","wshld":"1"}'],
             'sentry_mode_on':      ['220','{"value":"1"}'],
             'sentry_mode_off':     ['220','{"value":"0"}'],
-            'steering_wheel_heat_on':  ['320','{"value":"on"}'],
-            'steering_wheel_heat_off': ['320','{"value":"off"}'],
-            'mirror_heat_on':      ['440','{"value":"on"}'],
-            'mirror_heat_off':     ['440','{"value":"off"}'],
+            // Payloads below use numeric level/value codes (not "on"/"off"
+            // strings) - verified via leapmotor-ha's live captures of the
+            // international app's actual traffic. Our previous "on"/"off"
+            // string payloads were likely silently ignored by the server;
+            // this matches a real reported case of mirror heat having no
+            // effect when tested.
+            'steering_wheel_heat_on':  ['320','{"level":"2"}'],
+            'steering_wheel_heat_off': ['320','{"level":"1"}'],
+            'mirror_heat_on':      ['440','{"value":"2"}'],
+            'mirror_heat_off':     ['440','{"value":"1"}'],
             'quick_cool':          ['170','{"circle":"in","mode":"cold","operate":"manual","position":"all","temperature":"18","windlevel":"7","wshld":"0"}'],
             'quick_heat':          ['170','{"circle":"in","mode":"hot","operate":"manual","position":"all","temperature":"32","windlevel":"7","wshld":"0"}'],
             'battery_preheat':     ['160','{"value":"ptcon"}'],
