@@ -978,6 +978,7 @@ class LeapmotorAdapter extends utils.Adapter{
         if(cmd==='windows_set'){
             await this.setStateAsync(id,{val:state.val,ack:true});
             const nativeVal=toNativeWindowPosition(vehicle.carType,state.val);
+            this.log.debug(`Command: windows_set for ${vehicle.vin} (value=${state.val}%, native=${nativeVal})`);
             try{
                 try{
                     await this.client.sendCommandWithPin(vehicle,'230',JSON.stringify({value:String(nativeVal)}));
@@ -987,6 +988,7 @@ class LeapmotorAdapter extends utils.Adapter{
                         await this.client.sendCommandWithPin(vehicle,'230',JSON.stringify({value:String(nativeVal)}));
                     }else{throw e}
                 }
+                this.log.debug(`windows_set successful.`);
                 await this.setStateAsync(`${vin}.status.window_fl_pct`,{val:state.val,ack:true});
                 await this.setStateAsync(`${vin}.status.window_fr_pct`,{val:state.val,ack:true});
             }catch(e){this.log.error(`windows_set failed: ${e}`)}
@@ -994,6 +996,7 @@ class LeapmotorAdapter extends utils.Adapter{
         }
         if(cmd==='sunshade_set'){
             await this.setStateAsync(id,{val:state.val,ack:true});
+            this.log.debug(`Command: sunshade_set for ${vehicle.vin} (value=${state.val})`);
             try{
                 try{
                     await this.client.sendCommandWithPin(vehicle,'240',JSON.stringify({value:String(state.val)}));
@@ -1003,6 +1006,7 @@ class LeapmotorAdapter extends utils.Adapter{
                         await this.client.sendCommandWithPin(vehicle,'240',JSON.stringify({value:String(state.val)}));
                     }else{throw e}
                 }
+                this.log.debug(`sunshade_set successful.`);
                 await this.setStateAsync(`${vin}.status.sun_shade`,{val:state.val,ack:true});
             }catch(e){this.log.error(`sunshade_set failed: ${e}`)}
             return;
