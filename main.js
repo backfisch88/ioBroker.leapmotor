@@ -104,7 +104,7 @@ class LeapmotorAdapter extends utils.Adapter{
             const pollTime=new Date().toLocaleString('de-DE',{timeZone:'Europe/Berlin'});
             await this.setStateAsync(`${vehicle.vin}.status.last_poll_time`,{val:pollTime,ack:true});
             try{await this.updateDailyMileage(vehicle.vin,s.totalMileage)}catch(e){this.log.debug(`Daily mileage error: ${e}`)}
-            try{await this.updateTripDetection(vehicle,s.totalMileage,s.speed,s.soc,s.bcmKeyPositionOn1||s.bcmKeyPositionOn3)}catch(e){this.log.debug(`Trip detection error: ${e}`)}
+            try{await this.updateTripDetection(vehicle,s.totalMileage,s.speed,s.soc,s.bcmKeyPositionOn1||s.bcmKeyPositionOn3,s.collectTimeMs)}catch(e){this.log.debug(`Trip detection error: ${e}`)}
             try{await this.resolvePendingTripEnergy(vehicle)}catch(e){this.log.debug(`Pending trip energy error: ${e}`)}
             try{await this.updateChargingCost(vehicle.vin,s.soc,s.chargeState)}catch(e){this.log.debug(`Charging cost error: ${e}`)}
             this.log.debug(`${vehicle.vin}: SOC=${s.soc}% Range=${s.expectedMileage}km Temp=${s.outdoorTemp}°C Locked=${s.driverDoorLockStatus} AC=${s.acSwitch}`);
@@ -151,16 +151,30 @@ class LeapmotorAdapter extends utils.Adapter{
         await this.setStateAsync(`${vin}.trips.today_km`,{val:todayEntry.km,ack:true});
     }
 
-    async updateTripDetection(vehicle,totalMileage,speed,soc,keyPosition){
+    async updateTripDetection(vehicle,totalMileage,speed,soc,keyPosition,vehicleTimeMs){
         const vin=vehicle.vin;
         if(totalMileage==null)return;
-        // A trip stays active as long as EITHER the car is moving OR the
-        // ignition/key is still on - not just speed>0. Without the ignition
-        // check, a brief stop (traffic light, waiting at the curb) with the
-        // engine still running would end the trip right there, splitting one
-        // continuous drive into several and mis-attributing part of it to
-        // "Sonstige" (undetected) km once it resumes.
-        const isDriving=(speed!=null&&speed>0)||keyPosition===true;
+        // Note: the grace-period elapsed-time logic below deliberately uses
+        // our OWN poll wall-clock (Date.now()), not vehicleTimeMs. The
+        // vehicle's own reported timestamp can go long stretches (observed:
+        // hours) without updating once the car is parked/asleep, so gating
+        // the 10-minute countdown on it risked trips hanging open far longer
+        // than intended. vehicleTimeMs is only used for the trip's recorded
+        // end time (see below), for an accurate energy-breakdown query window.
+        // A trip is only ever STARTED by actual movement (speed>0), never by
+        // ignition alone - otherwise remote pre-conditioning (heating/cooling
+        // the car before getting in, which turns the ignition/key on without
+        // the car moving) gets misdetected as the trip beginning, inflating
+        // the recorded duration with pure preheat time.
+        const isMoving=speed!=null&&speed>0;
+        // Once a trip IS already active, it stays active as long as EITHER
+        // the car is moving OR the ignition/key is still on - not just
+        // speed>0. Without the ignition check, a brief stop (traffic light,
+        // waiting at the curb) with the engine still running would end the
+        // trip right there, splitting one continuous drive into several and
+        // mis-attributing part of it to "Sonstige" (undetected) km once it
+        // resumes.
+        const isDriving=isMoving||keyPosition===true;
         // Grace period before actually closing a trip once isDriving goes
         // false: complements the ignition check above as a backstop for
         // cases where key_position briefly misreports (or a model doesn't
@@ -173,7 +187,7 @@ class LeapmotorAdapter extends utils.Adapter{
         const prev=this._tripStates[vin]||{wasActive:false,startMileage:null,startTime:null,startSoc:null,pendingEndSince:null};
         const lastMileage=this._lastKnownMileage[vin];
 
-        if(isDriving&&!prev.wasActive){
+        if(isMoving&&!prev.wasActive){
             // Die Fahrt wird erst jetzt erkannt, aber der Kilometerstand kann sich
             // bereits seit dem letzten Poll (bis zu 5 Minuten zuvor) erhoeht haben,
             // ohne dass wir es als Fahrt erfasst hatten ("Sonstige" km im Dashboard).
@@ -206,8 +220,11 @@ class LeapmotorAdapter extends utils.Adapter{
         }else if(!isDriving&&prev.wasActive){
             if(!prev.pendingEndSince){
                 // First poll where the car looks stopped: start the grace
-                // countdown instead of ending the trip immediately.
-                this._tripStates[vin]={...prev,pendingEndSince:Date.now()};
+                // countdown instead of ending the trip immediately. Capture
+                // the vehicle's own reported time now (if available) - this
+                // is when the car actually stopped, and becomes the trip's
+                // recorded end time once the grace period elapses below.
+                this._tripStates[vin]={...prev,pendingEndSince:Date.now(),pendingEndVehicleTime:vehicleTimeMs||null};
                 this._lastKnownMileage[vin]={mileage:totalMileage,ts:Date.now()};
                 return;
             }
@@ -217,11 +234,12 @@ class LeapmotorAdapter extends utils.Adapter{
                 return;
             }
             const km=Math.max(0,totalMileage-(prev.startMileage??totalMileage));
-            const durationMin=Math.round((prev.pendingEndSince-(prev.startTime??prev.pendingEndSince))/60000);
+            const accurateEndTimeMs=prev.pendingEndVehicleTime||prev.pendingEndSince;
+            const durationMin=Math.round((accurateEndTimeMs-(prev.startTime??accurateEndTimeMs))/60000);
             const socUsed=prev.startSoc!=null&&soc!=null?Math.max(0,prev.startSoc-soc):null;
             if(km>=0.5){
-                const startTimeMs=prev.startTime??prev.pendingEndSince;
-                const endTimeMs=prev.pendingEndSince;
+                const startTimeMs=prev.startTime??accurateEndTimeMs;
+                const endTimeMs=accurateEndTimeMs;
                 const trip={
                     date:new Date(startTimeMs).toISOString().slice(0,10),
                     startTime:new Date(startTimeMs).toLocaleString('de-DE',{timeZone:'Europe/Berlin'}),
@@ -265,7 +283,7 @@ class LeapmotorAdapter extends utils.Adapter{
                     this._pendingEnergyTrips[vin].push({startTimeMs,endTimeMs,date:trip.date,startTime:trip.startTime,attempts:0});
                 }
             }
-            this._tripStates[vin]={wasActive:false,startMileage:null,startTime:null,startSoc:null,pendingEndSince:null};
+            this._tripStates[vin]={wasActive:false,startMileage:null,startTime:null,startSoc:null,pendingEndSince:null,pendingEndVehicleTime:null};
             await this.setStateAsync(`${vin}.trips.current_trip_active`,{val:false,ack:true});
         }
         this._lastKnownMileage[vin]={mileage:totalMileage,ts:Date.now()};
