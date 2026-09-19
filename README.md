@@ -115,11 +115,11 @@ Simple on/off buttons under `cmd.*` (role `button`, set to `true` to trigger):
 | cmd.trunk_open | Open trunk | ✅ | ✅ |
 | cmd.trunk_close | Close trunk | ✅ | ✅ |
 | cmd.refresh | Trigger immediate status update | – | ✅ |
-| cmd.charge_start / charge_stop | Start/stop charging directly (not just via schedule) | ✅ | ❌ community-test |
-| cmd.unlock_charger | Unlock the charging connector remotely | ✅ | ❌ community-test |
-| cmd.healthy_charging_on / off | Toggle battery-health charging mode | ✅ | ❌ community-test |
+| cmd.charge_start / charge_stop | Start/stop charging directly (not just via schedule) - same charging subsystem as cmd.charge_limit_set, expected to work on any model (T03, B05, B10, B11/C10, C16) | ✅ | ❌ community-test |
+| cmd.unlock_charger | Unlock the charging connector remotely - expected to work on any model, same charging subsystem | ✅ | ❌ community-test |
+| cmd.healthy_charging_on / off | Toggle battery-health charging mode - expected to work on any model, same charging subsystem | ✅ | ❌ community-test |
 | cmd.fuel_heating_on / off | Fuel heater on/off - **REEV/range-extender models only** (e.g. C10 EREV) | ✅ | ❌ not applicable on T03 (BEV) |
-| cmd.destination_send | Send the address/coordinates set below to the vehicle's built-in nav | – | ❌ community-test |
+| cmd.destination_send | Send the address/coordinates set below to the vehicle's built-in nav - expected on nav-equipped models (C10/B10/B11); unclear whether T03's built-in nav accepts cloud-pushed destinations at all | – | ❌ community-test |
 
 Value-based commands:
 
@@ -149,16 +149,6 @@ Comfort commands (only created/shown if the vehicle model supports the feature):
 
 Which comfort commands actually appear depends on the detected vehicle model — see
 `admin-tab/src/vehicleCapabilities.js` in the repository for the current capability matrix per model.
-
-Community-test commands (payload verified against community reverse-engineering sources, **not physically tested on any vehicle yet** - please open a GitHub issue with your model and result if you try one):
-
-| Command | Description | Tested on T03 |
-|---------|-------------|:---:|
-| cmd.charge_start / charge_stop | Start/stop charging directly (not just via schedule) | ❌ not tested |
-| cmd.unlock_charger | Unlock the charging connector remotely | ❌ not tested |
-| cmd.healthy_charging_on / off | Toggle battery-health charging mode | ❌ not tested |
-| cmd.fuel_heating_on / off | Fuel heater on/off - **REEV/range-extender models only** (e.g. C10 EREV); no effect expected on any pure-BEV model including this T03 | ❌ not applicable (T03 is BEV) |
-| cmd.destination_address / destination_latitude / destination_longitude / destination_send | Send a navigation destination to the vehicle's built-in nav (set the address or lat/lon, then trigger destination_send) | ❌ not tested |
 
 ## Changelog
 
