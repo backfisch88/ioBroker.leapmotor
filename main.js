@@ -23,6 +23,26 @@ const DEFAULT_BATTERY_CAPACITY_KWH={
 function getDefaultBatteryCapacity(carType){
     return DEFAULT_BATTERY_CAPACITY_KWH[String(carType||'').toUpperCase()]||36.0;
 }
+// Window remote-control commands use a 0-10 native scale on B05/B10/C10
+// instead of the 0-100 scale used natively on T03. Our own datapoints are
+// always exposed as 0-100 percent to the user; this converts to whatever
+// scale the specific vehicle's API actually expects. Community-confirmed
+// via leapmotor-ha (Home Assistant integration).
+const WINDOW_POSITION_SCALE={B05:10,B10:10,C10:10};
+function toNativeWindowPosition(carType,percent){
+    const fullOpenValue=WINDOW_POSITION_SCALE[String(carType||'').toUpperCase()]||100;
+    return Math.round((Number(percent)||0)/100*fullOpenValue);
+}
+// A chargeState of 1/2/3 normally means charging, but the cloud can
+// occasionally report a stale/phantom charging state while the vehicle is
+// actually being driven or is simply powered-on and ready - which is
+// physically impossible while genuinely charging. Community-confirmed via
+// leapmotor-ha: reject the charging flag in that case.
+function isActuallyCharging(chargeState,gearStatus,speed,vehicleReady){
+    if(chargeState==null||![1,2,3].includes(chargeState))return false;
+    const precludesCharging=[1,2,3].includes(gearStatus)||(speed!=null&&speed>0)||vehicleReady===true;
+    return !precludesCharging;
+}
 class LeapmotorAdapter extends utils.Adapter{
     constructor(options={}){
         super({...options,name:'leapmotor'});
@@ -106,7 +126,7 @@ class LeapmotorAdapter extends utils.Adapter{
             try{await this.updateDailyMileage(vehicle.vin,s.totalMileage)}catch(e){this.log.debug(`Daily mileage error: ${e}`)}
             try{await this.updateTripDetection(vehicle,s.totalMileage,s.speed,s.soc,s.bcmKeyPositionOn1||s.bcmKeyPositionOn3,s.collectTimeMs)}catch(e){this.log.debug(`Trip detection error: ${e}`)}
             try{await this.resolvePendingTripEnergy(vehicle)}catch(e){this.log.debug(`Pending trip energy error: ${e}`)}
-            try{await this.updateChargingCost(vehicle.vin,s.soc,s.chargeState)}catch(e){this.log.debug(`Charging cost error: ${e}`)}
+            try{await this.updateChargingCost(vehicle.vin,s.soc,s.chargeState,s.gearStatus,s.speed,s.bcmKeyPositionOn3)}catch(e){this.log.debug(`Charging cost error: ${e}`)}
             this.log.debug(`${vehicle.vin}: SOC=${s.soc}% Range=${s.expectedMileage}km Temp=${s.outdoorTemp}°C Locked=${s.driverDoorLockStatus} AC=${s.acSwitch}`);
             await this.buildCompositeHtml(vehicle.vin,s,vehicle.name);
         }catch(e){
@@ -367,8 +387,8 @@ class LeapmotorAdapter extends utils.Adapter{
         if(changed)await this.setStateAsync(stateId,{val:JSON.stringify(history),ack:true});
     }
 
-    async updateChargingCost(vin,soc,chargeState){
-        const charging=chargeState!=null&&[1,2,3].includes(chargeState);
+    async updateChargingCost(vin,soc,chargeState,gearStatus,speed,vehicleReady){
+        const charging=isActuallyCharging(chargeState,gearStatus,speed,vehicleReady);
         if(!this._chargingSessions)this._chargingSessions={};
         const prev=this._chargingSessions[vin]||{wasCharging:false,startSoc:null,accumulatedCost:0,accumulatedKwh:0,lastSoc:null};
 
@@ -586,7 +606,7 @@ class LeapmotorAdapter extends utils.Adapter{
         if(!pics['carpic_for_tripsum']&&!pics['carpic_body'])return;
         const anyDoor=s.lbcmDriverDoorStatus||s.rbcmDriverDoorStatus||s.lbcmLeftRearDoorStatus||s.rbcmRightRearDoorStatus;
         const anyOpen=anyDoor||s.bbcmBackDoorStatus;
-        const charging=s.chargeState!=null&&[1,2,3].includes(s.chargeState);
+        const charging=isActuallyCharging(s.chargeState,s.gearStatus,s.speed,s.bcmKeyPositionOn3);
         const plugged=s.chargeState>0;
         const lay='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;';
         const layers=[];
@@ -842,7 +862,7 @@ class LeapmotorAdapter extends utils.Adapter{
         await set('status.temp_outdoor',s.outdoorTemp);
         await set('status.temp_battery_min',s.minSingleTemp);
         // Charging
-        await set('status.charging_active',s.chargeState!=null?[1,2,3].includes(s.chargeState):null);
+        await set('status.charging_active',s.chargeState!=null?isActuallyCharging(s.chargeState,s.gearStatus,s.speed,s.bcmKeyPositionOn3):null);
         await set('status.charging_state',s.chargeState);
         await set('status.charging_soc_limit',s.chargesocSetting);
         await set('status.charging_remain_min',s.chargeRemainTime);
@@ -878,10 +898,17 @@ class LeapmotorAdapter extends utils.Adapter{
         await set('status.window_fr_pct',s.rightFrontWindowPercent);
         await set('status.window_rl_pct',s.leftRearWindowPercent);
         await set('status.window_rr_pct',s.rightRearWindowPercent);
-        await set('status.window_driver_open',s.driverWindowStatus);
-        await set('status.window_fr_open',s.rightFrontWindowStatus);
-        await set('status.window_rl_open',s.leftRearWindowStatus);
-        await set('status.window_rr_open',s.rightRearWindowStatus);
+        // On T03, the binary window-open flags can unreliably remain at 0
+        // even when the window is actually open - fall back to the live
+        // position percent in that case. Other models keep the flag-only
+        // behavior, matching leapmotor-ha's verified per-model handling.
+        const vehicleForWindows=this.vehicles.find(v=>v.vin===vin);
+        const isT03=String(vehicleForWindows?.carType||'').toUpperCase()==='T03';
+        const windowOpenState=(flag,percent)=>isT03?Boolean(flag||(percent>0)):flag;
+        await set('status.window_driver_open',windowOpenState(s.driverWindowStatus,s.leftFrontWindowPercent));
+        await set('status.window_fr_open',windowOpenState(s.rightFrontWindowStatus,s.rightFrontWindowPercent));
+        await set('status.window_rl_open',windowOpenState(s.leftRearWindowStatus,s.leftRearWindowPercent));
+        await set('status.window_rr_open',windowOpenState(s.rightRearWindowStatus,s.rightRearWindowPercent));
         await set('status.sun_shade',s.sunShade);
         // Tires
         await set('status.tire_fl',tire(s.leftFrontTirePressure));
@@ -931,13 +958,14 @@ class LeapmotorAdapter extends utils.Adapter{
         }
         if(cmd==='windows_set'){
             await this.setStateAsync(id,{val:state.val,ack:true});
+            const nativeVal=toNativeWindowPosition(vehicle.carType,state.val);
             try{
                 try{
-                    await this.client.sendCommandWithPin(vehicle,'230',JSON.stringify({value:String(state.val)}));
+                    await this.client.sendCommandWithPin(vehicle,'230',JSON.stringify({value:String(nativeVal)}));
                 }catch(e){
                     if(String(e).includes('ngültig')||String(e).includes('token')){
                         await this.client.login();
-                        await this.client.sendCommandWithPin(vehicle,'230',JSON.stringify({value:String(state.val)}));
+                        await this.client.sendCommandWithPin(vehicle,'230',JSON.stringify({value:String(nativeVal)}));
                     }else{throw e}
                 }
                 await this.setStateAsync(`${vin}.status.window_fl_pct`,{val:state.val,ack:true});
@@ -1196,7 +1224,7 @@ class LeapmotorAdapter extends utils.Adapter{
         const noPinCmds={};
         const pinCmds={
             'find':                ['120','{"value":"true"}'],
-            'windows_open':        ['230','{"value":"100"}'],
+            'windows_open':        ['230','{"value":"'+toNativeWindowPosition(vehicle.carType,100)+'"}'],
             'windows_close':       ['230','{"value":"0"}'],
             'sunshade_open':       ['240','{"value":"10"}'],
             'sunshade_close':      ['240','{"value":"0"}'],
