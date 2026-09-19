@@ -28,7 +28,7 @@ function getDefaultBatteryCapacity(carType){
 // always exposed as 0-100 percent to the user; this converts to whatever
 // scale the specific vehicle's API actually expects. Community-confirmed
 // via leapmotor-ha (Home Assistant integration).
-const WINDOW_POSITION_SCALE={B05:10,B10:10,C10:10};
+const WINDOW_POSITION_SCALE={B05:10,B10:10,B11:10,C10:10};
 function toNativeWindowPosition(carType,percent){
     const fullOpenValue=WINDOW_POSITION_SCALE[String(carType||'').toUpperCase()]||100;
     return Math.round((Number(percent)||0)/100*fullOpenValue);
