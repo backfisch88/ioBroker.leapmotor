@@ -809,6 +809,25 @@ class LeapmotorAdapter extends utils.Adapter{
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.steering_wheel_heat_off`,{type:'state',common:{name:'Steering Wheel Heat Off',type:'boolean',role:'button',read:false,write:true,def:false},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.mirror_heat_on`,{type:'state',common:{name:'Mirror/Rear Window Heat On',type:'boolean',role:'button',read:false,write:true,def:false},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.mirror_heat_off`,{type:'state',common:{name:'Mirror/Rear Window Heat Off',type:'boolean',role:'button',read:false,write:true,def:false},native:{}});
+        // Community-test additions (2026-09): verified against two independent
+        // community reverse-engineering projects, not against real hardware
+        // here - this T03 may not support all of these. Kept in for other
+        // models/regions; please report back via a GitHub issue whether these
+        // work (or don't) on your vehicle.
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.charge_start`,{type:'state',common:{name:'Start Charging',type:'boolean',role:'button',read:false,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.charge_stop`,{type:'state',common:{name:'Stop Charging',type:'boolean',role:'button',read:false,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.unlock_charger`,{type:'state',common:{name:'Unlock Charging Connector',type:'boolean',role:'button',read:false,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.healthy_charging_on`,{type:'state',common:{name:'Healthy Charging Mode On',type:'boolean',role:'button',read:false,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.healthy_charging_off`,{type:'state',common:{name:'Healthy Charging Mode Off',type:'boolean',role:'button',read:false,write:true,def:false},native:{}});
+        // Fuel-heater (REEV/range-extender variants only, e.g. C10 EREV) -
+        // no effect expected on pure-BEV models like this T03.
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.fuel_heating_on`,{type:'state',common:{name:'Fuel Heater On (REEV models only)',type:'boolean',role:'button',read:false,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.fuel_heating_off`,{type:'state',common:{name:'Fuel Heater Off (REEV models only)',type:'boolean',role:'button',read:false,write:true,def:false},native:{}});
+        // Send a navigation destination to the vehicle's built-in nav system.
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.destination_address`,{type:'state',common:{name:'Destination Address',type:'string',role:'text',read:true,write:true,def:''},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.destination_latitude`,{type:'state',common:{name:'Destination Latitude',type:'number',role:'value.gps.latitude',read:true,write:true,def:0},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.destination_longitude`,{type:'state',common:{name:'Destination Longitude',type:'number',role:'value.gps.longitude',read:true,write:true,def:0},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.destination_send`,{type:'state',common:{name:'Send Destination To Vehicle',type:'boolean',role:'button',read:false,write:true,def:false},native:{}});
         await this.setObjectNotExistsAsync(`messages`,{type:'channel',common:{name:'Vehicle Messages'},native:{}});
         await this.setObjectNotExistsAsync(`messages.unread_count`,{type:'state',common:{name:'Unread Messages',type:'number',role:'value',read:true,write:false,def:0},native:{}});
         await this.setObjectNotExistsAsync(`messages.latest_title`,{type:'state',common:{name:'Latest Message Title',type:'string',role:'text',read:true,write:false,def:''},native:{}});
@@ -1041,6 +1060,31 @@ class LeapmotorAdapter extends utils.Adapter{
             }catch(e){this.log.error(`${cmd} failed: ${e}`)}
             return;
         }
+        if(cmd==='destination_send'&&state.val===true){
+            await this.setStateAsync(id,{val:false,ack:true});
+            try{
+                const addrState=await this.getStateAsync(`${vehicle.vin}.cmd.destination_address`);
+                const latState=await this.getStateAsync(`${vehicle.vin}.cmd.destination_latitude`);
+                const lonState=await this.getStateAsync(`${vehicle.vin}.cmd.destination_longitude`);
+                const address=String(addrState?.val??'').trim();
+                const latitude=String(latState?.val??0);
+                const longitude=String(lonState?.val??0);
+                // Community-test addition (2026-09): payload format verified
+                // against two independent community reverse-engineering
+                // projects, not against real hardware here. requiresPin is
+                // false in both reference sources.
+                const content=JSON.stringify({address:address||`${latitude},${longitude}`,addressname:address||`${latitude},${longitude}`,latitude,longitude,linenum:'0'});
+                try{
+                    await this.client.sendCommandWithoutPin(vehicle,'180',content);
+                }catch(e){
+                    if(String(e).includes('ngültig')||String(e).includes('token')){
+                        await this.client.login();
+                        await this.client.sendCommandWithoutPin(vehicle,'180',content);
+                    }else{throw e}
+                }
+            }catch(e){this.log.error(`${cmd} failed: ${e}`)}
+            return;
+        }
         if(cmd==='charge_limit_set'){
             await this.setStateAsync(id,{val:state.val,ack:true});
             try{
@@ -1254,6 +1298,15 @@ class LeapmotorAdapter extends utils.Adapter{
             // vehicle. Left in for models/regions where it may work.
             'mirror_heat_on':      ['440','{"value":"2"}'],
             'mirror_heat_off':     ['440','{"value":"1"}'],
+            // Community-test additions (2026-09), same basis as the mirror/
+            // steering-wheel comment above.
+            'charge_start':        ['193','{"value":"start"}'],
+            'charge_stop':         ['193','{"value":"stop"}'],
+            'unlock_charger':      ['192','{"operation":"unlock"}'],
+            'healthy_charging_on': ['480','{"value":"1"}'],
+            'healthy_charging_off':['480','{"value":"0"}'],
+            'fuel_heating_on':     ['380','{"value":"1"}'],
+            'fuel_heating_off':    ['380','{"value":"0"}'],
             'quick_cool':          ['170','{"circle":"in","mode":"cold","operate":"manual","position":"all","temperature":"18","windlevel":"7","wshld":"0"}'],
             'quick_heat':          ['170','{"circle":"in","mode":"hot","operate":"manual","position":"all","temperature":"32","windlevel":"7","wshld":"0"}'],
             'battery_preheat':     ['160','{"value":"ptcon"}'],
