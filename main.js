@@ -1240,14 +1240,18 @@ class LeapmotorAdapter extends utils.Adapter{
             'defrost':             ['170','{"circle":"in","mode":"hot","operate":"manual","position":"all","temperature":"32","windlevel":"7","wshld":"1"}'],
             'sentry_mode_on':      ['220','{"value":"1"}'],
             'sentry_mode_off':     ['220','{"value":"0"}'],
-            // Payloads below use numeric level/value codes (not "on"/"off"
-            // strings) - verified via leapmotor-ha's live captures of the
-            // international app's actual traffic. Our previous "on"/"off"
-            // string payloads were likely silently ignored by the server;
-            // this matches a real reported case of mirror heat having no
-            // effect when tested.
+            // Payloads below verified against two independent community
+            // reverse-engineering projects, not against real hardware -
+            // this T03 has neither steering-wheel nor seat heat/
+            // ventilation, so live confirmation isn't possible here.
             'steering_wheel_heat_on':  ['320','{"level":"2"}'],
             'steering_wheel_heat_off': ['320','{"level":"1"}'],
+            // Payload confirmed correct against two independent community
+            // sources. Cloud accepts and acks the command, but nothing
+            // happens on the vehicle - confirmed also non-functional via
+            // the official Leapmotor app on this T03. Not an adapter bug:
+            // Leapmotor has not wired mirror heat to the API/app for this
+            // vehicle. Left in for models/regions where it may work.
             'mirror_heat_on':      ['440','{"value":"2"}'],
             'mirror_heat_off':     ['440','{"value":"1"}'],
             'quick_cool':          ['170','{"circle":"in","mode":"cold","operate":"manual","position":"all","temperature":"18","windlevel":"7","wshld":"0"}'],
