@@ -43,8 +43,9 @@ This way your main account stays logged in to the app at all times.
 
 ## Tested Vehicles
 
-- Leapmotor T03 ✅ (fully tested)
-- Leapmotor B10 / C10 / C16 – should work, comfort feature availability not yet verified
+- Leapmotor T03 ✅ (fully tested, including all remote commands)
+- Leapmotor B10 - status/data reporting extensively verified by a real owner (battery, range, mileage, speed, ignition, all doors, all windows, tire pressure, sunroof, GPS, charge plan, charge limit, AC vent direction); remote commands (lock, climate, etc.) not separately confirmed via the adapter's own buttons, but expected to work (same command subsystem as T03)
+- Leapmotor C10 / C16 - should work, not yet verified
 
 ## Installation
 
@@ -127,7 +128,7 @@ Value-based commands:
 |---------|-------------|----------|
 | cmd.ac_temp | Target temperature, 16–30 °C | All models (confirmed T03) |
 | cmd.ac_fan_speed | Fan speed, 1–7 | All models (confirmed T03) |
-| cmd.ac_position | Air position: all / up / down / front / rear | All models (confirmed T03) |
+| cmd.ac_position | Air position: all / up / down / front / rear | All models (confirmed T03). On B10, the vehicle's reported direction status was independently confirmed correct via a real owner's before/after tests (2026-09) - sending this specific command wasn't separately re-tested on B10 |
 | cmd.windows_set | Window position, 0–100 % | All models (confirmed T03; scale auto-adjusted per model, see WORK IN PROGRESS changelog) |
 | cmd.sunshade_set / sunshade_open / sunshade_close | Sunshade position (T03), 0–10 | T03 (confirmed); B10 has an electric sunroof instead (confirmed) |
 | cmd.charge_limit_set | Charge limit, 50–100 % | All models (confirmed T03) |
@@ -145,7 +146,7 @@ Comfort commands (only created/shown if the vehicle model supports the feature):
 | cmd.seat_ventilation_driver / copilot | Seat ventilation | Same as seat heating |
 | cmd.steering_wheel_heat_on / off | Steering wheel heating | Same as seat heating. Confirmed **not** on T03 |
 | cmd.mirror_heat_on / off | Mirror heating | Untested - plausible on B10, B11/C10, B05. Confirmed **not exposed via API/app at all** on this T03 |
-| cmd.hotspot_on / off | Wi-Fi hotspot | Confirmed **not** on T03; unknown on other models |
+| cmd.hotspot_on / off | Wi-Fi hotspot | Confirmed **not** on T03 or B10; unknown on other models |
 
 `sunroof`/`sunshade` are handled the same way — see `admin-tab/src/vehicleCapabilities.js` for the confirmed B10 vs T03 difference.
 
@@ -164,6 +165,7 @@ Which comfort commands actually appear depends on the detected vehicle model —
 - Chore: cross-checked the tire-pressure signal ID mapping (front-left/front-right/rear-left/rear-right) against leapmotor-ha's independently corrected mapping - confirmed correct, no code change
 - New: added B11 handling - not a separate model, it's Leapmotor's internal platform code for the C10 itself (confirmed via ADAC vehicle database); some cloud responses surface this code as carType instead of "C10", now mapped to the same endpoint and window scale.
 - New (untested, community feedback welcome): start/stop charging, unlock charging connector, healthy-charging-mode toggle, fuel-heater toggle (REEV/range-extender models only), and sending a navigation destination (address or coordinates) to the vehicle. Payloads verified against two independent community reverse-engineering projects, not against real hardware - none of this is testable on this T03 (no REEV fuel heater; the other commands need a vehicle where charging/nav can safely be tried). Please open a GitHub issue with your model and result if you test any of these.
+- Confirmed via a real B10 owner (extensive status field testing, 2026-07): battery/range/mileage/speed/ignition/doors/windows/tire pressure/sunroof/GPS/charge plan/charge limit status all report correctly; the hotspot status field doesn't exist on B10, same as T03. Also confirmed the vehicle's reported AC vent direction is decoded correctly (2026-09 dumps). Battery preheat was attempted but inconclusive (vehicle declined to activate in warm weather) - still untested.
 
 ### 0.6.8 (2026-09-19)
 - Fix: the 0.6.7 re-login fix correctly detected an expired session token, but retried login using the same device identity every time - which the cloud started rejecting after the first failure, leaving the adapter stuck until a manual restart. A fresh device identity is now generated on every login attempt.

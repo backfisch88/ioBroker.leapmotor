@@ -44,6 +44,12 @@ const CAPABILITIES = {
     B10: {
         sunshade: true, // confirmed: B10 has an electric sunroof, unlike T03's fixed shade (signal 1724)
         sunroof: true,
+        hotspot: false, // confirmed via a real owner (2026-07): the hotspot_on
+        // status field doesn't exist on B10 at all, same as T03
+        windDirection: true, // the vehicle's reported vent-direction status
+        // (signal 1944) was confirmed correct via a real owner's live
+        // before/after tests (2026-09); the write command itself wasn't
+        // separately re-tested on this model
     },
     // B05, C10 (also reported as "B11" - Leapmotor's internal platform code
     // for the C10 chassis, see main.js/lib/leapmotor-client.js), C16: still
