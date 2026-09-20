@@ -134,7 +134,7 @@ class LeapmotorAdapter extends utils.Adapter{
             const pollTime=new Date().toLocaleString('de-DE',{timeZone:'Europe/Berlin'});
             await this.setStateAsync(`${vehicle.vin}.status.last_poll_time`,{val:pollTime,ack:true});
             try{await this.updateDailyMileage(vehicle.vin,s.totalMileage)}catch(e){this.log.debug(`Daily mileage error: ${e}`)}
-            try{await this.updateTripDetection(vehicle,s.totalMileage,s.speed,s.soc,s.bcmKeyPositionOn1||s.bcmKeyPositionOn3,s.collectTimeMs)}catch(e){this.log.debug(`Trip detection error: ${e}`)}
+            try{await this.updateTripDetection(vehicle,s.totalMileage,s.speed,s.soc,s.bcmKeyPositionOn1||s.bcmKeyPositionOn3,s.collectTimeMs,s.driverDoorLockStatus)}catch(e){this.log.debug(`Trip detection error: ${e}`)}
             try{await this.resolvePendingTripEnergy(vehicle)}catch(e){this.log.debug(`Pending trip energy error: ${e}`)}
             try{await this.updateChargingCost(vehicle.vin,s.soc,s.chargeState,s.gearStatus,s.speed,s.bcmKeyPositionOn3)}catch(e){this.log.debug(`Charging cost error: ${e}`)}
             this.log.debug(`${vehicle.vin}: SOC=${s.soc}% Range=${s.expectedMileage}km Temp=${s.outdoorTemp}°C Locked=${s.driverDoorLockStatus} AC=${s.acSwitch}`);
@@ -181,7 +181,7 @@ class LeapmotorAdapter extends utils.Adapter{
         await this.setStateAsync(`${vin}.trips.today_km`,{val:todayEntry.km,ack:true});
     }
 
-    async updateTripDetection(vehicle,totalMileage,speed,soc,keyPosition,vehicleTimeMs){
+    async updateTripDetection(vehicle,totalMileage,speed,soc,keyPosition,vehicleTimeMs,locked){
         const vin=vehicle.vin;
         if(totalMileage==null)return;
         // Note: the grace-period elapsed-time logic below deliberately uses
@@ -212,6 +212,15 @@ class LeapmotorAdapter extends utils.Adapter{
         // stayed false for this long straight; if driving resumes before
         // that, the trip simply continues uninterrupted.
         const TRIP_END_GRACE_MS=600000; // 10 minutes
+        // Fast path: if the ignition is EXPLICITLY off (not just missing/
+        // undefined - a real false reading) AND the vehicle is locked, that's
+        // about as strong a "the trip is really over" signal as we can get -
+        // nobody drives off again from a locked, key-off state without
+        // unlocking first, which we'd see on the very next poll anyway. Skip
+        // the 10-minute wait entirely in that case so the trip closes on the
+        // same poll it's first detected as stopped, instead of up to 10
+        // minutes (2 poll cycles) later.
+        const definitelyStopped=keyPosition===false&&locked===true;
         if(!this._tripStates)this._tripStates={};
         if(!this._lastKnownMileage)this._lastKnownMileage={};
         const prev=this._tripStates[vin]||{wasActive:false,startMileage:null,startTime:null,startSoc:null,pendingEndSince:null};
@@ -250,21 +259,27 @@ class LeapmotorAdapter extends utils.Adapter{
         }else if(!isDriving&&prev.wasActive){
             if(!prev.pendingEndSince){
                 // First poll where the car looks stopped: start the grace
-                // countdown instead of ending the trip immediately. Capture
-                // the vehicle's own reported time now (if available) - this
-                // is when the car actually stopped, and becomes the trip's
-                // recorded end time once the grace period elapses below.
+                // countdown instead of ending the trip immediately - UNLESS
+                // it's already definitively stopped (locked + ignition off),
+                // in which case fall through to end it right away below.
+                if(!definitelyStopped){
+                    // Capture the vehicle's own reported time now (if
+                    // available) - this is when the car actually stopped,
+                    // and becomes the trip's recorded end time once the
+                    // grace period elapses below.
+                    this._tripStates[vin]={...prev,pendingEndSince:Date.now(),pendingEndVehicleTime:vehicleTimeMs||null};
+                    this._lastKnownMileage[vin]={mileage:totalMileage,ts:Date.now()};
+                    return;
+                }
                 this._tripStates[vin]={...prev,pendingEndSince:Date.now(),pendingEndVehicleTime:vehicleTimeMs||null};
-                this._lastKnownMileage[vin]={mileage:totalMileage,ts:Date.now()};
-                return;
             }
-            if(Date.now()-prev.pendingEndSince<TRIP_END_GRACE_MS){
+            if(!definitelyStopped&&Date.now()-(this._tripStates[vin].pendingEndSince)<TRIP_END_GRACE_MS){
                 // Still within the grace period - keep waiting, trip stays open.
                 this._lastKnownMileage[vin]={mileage:totalMileage,ts:Date.now()};
                 return;
             }
             const km=Math.max(0,totalMileage-(prev.startMileage??totalMileage));
-            const accurateEndTimeMs=prev.pendingEndVehicleTime||prev.pendingEndSince;
+            const accurateEndTimeMs=this._tripStates[vin].pendingEndVehicleTime||this._tripStates[vin].pendingEndSince;
             const durationMin=Math.round((accurateEndTimeMs-(prev.startTime??accurateEndTimeMs))/60000);
             const socUsed=prev.startSoc!=null&&soc!=null?Math.max(0,prev.startSoc-soc):null;
             if(km>=0.5){
