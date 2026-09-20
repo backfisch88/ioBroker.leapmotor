@@ -937,6 +937,14 @@ class LeapmotorAdapter extends utils.Adapter{
         await set('status.charging_active',s.chargeState!=null?isActuallyCharging(s.chargeState,s.gearStatus,s.speed,s.bcmKeyPositionOn3):null);
         await set('status.charging_state',s.chargeState);
         await set('status.charging_soc_limit',s.chargesocSetting);
+        // Keep the writable cmd.charge_limit_set control in sync with the
+        // vehicle's actual current limit. Without this, changing the limit
+        // via the official app (instead of this adapter's own control)
+        // leaves cmd.charge_limit_set frozen at its creation-time default
+        // (80) forever - which then gets silently sent back to the vehicle
+        // by charge_schedule_apply, overwriting a real, intentionally
+        // different limit (e.g. 100%) the next time that runs.
+        if(s.chargesocSetting!=null)await set('cmd.charge_limit_set',s.chargesocSetting);
         await set('status.charging_remain_min',s.chargeRemainTime);
         await set('status.charging_plugged',s.chargeState!=null?s.chargeState>0:null);
         await set('status.dc_fast_charge',s.dcInputFastCharge!=null?s.dcInputFastCharge===1:null);
@@ -1247,7 +1255,20 @@ class LeapmotorAdapter extends utils.Adapter{
                 const enabled=enState?.val?1:0;
                 const start=String(startState?.val??'00:00');
                 const end=String(endState?.val??'08:00');
-                const limit=Number(limitState?.val??80);
+                // Bug fix: this used to fall back to a hardcoded 80 whenever
+                // our own cmd.charge_limit_set object had never been touched
+                // (it defaults to 80 at creation, regardless of the
+                // vehicle's ACTUAL current limit) - silently overwriting a
+                // real 100% (or any other) limit set via the official app
+                // every time this ran. Now falls back to the vehicle's own
+                // currently active schedule value instead of a fixed number,
+                // and only uses 80 if genuinely nothing else is available.
+                // (cmd.charge_limit_set is now also kept in sync on every
+                // poll - see updateVehicleStatus - so this fallback should
+                // rarely even be needed going forward.)
+                let existing=null;
+                try{existing=await this.client.getAppointment(vehicle,'190');}catch(e){this.log.debug(`charge_schedule_apply: could not read existing schedule: ${e}`)}
+                const limit=Number(limitState?.val??existing?.chargesoc??80);
                 const content=JSON.stringify({chargeEnable:enabled,chargesoc:limit,circulation:0,cycles:'1,2,3,4,5,6,7',endtime:end,recharge:0,starttime:start});
                 try{
                     await this.client.sendCommandWithPin(vehicle,'190',content);
