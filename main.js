@@ -1025,6 +1025,10 @@ class LeapmotorAdapter extends utils.Adapter{
         const vehicle=this.vehicles.find(v=>v.vin===vin);if(!vehicle)return;
         if(cmd==='ac_temp'||cmd==='ac_fan_speed'||cmd==='ac_position'||cmd==='ac_recirculate'){
             await this.setStateAsync(id,{val:state.val,ack:true});
+            // These just stage a value for the NEXT climate command (ac_heat/
+            // ac_cool/etc. read them back) - nothing is sent to the vehicle
+            // yet, so this logs "stored", not "successful".
+            this.log.debug(`${cmd} stored for ${vehicle.vin} (value=${state.val}) - takes effect on the next climate command`);
             // Status-Datenpunkt synchron halten
             if(cmd==='ac_temp'){
                 await this.setStateAsync(`${vin}.status.ac_temp`,{val:state.val,ack:true});
@@ -1074,6 +1078,7 @@ class LeapmotorAdapter extends utils.Adapter{
         }
         if(cmd==='speed_limit_set'){
             await this.setStateAsync(id,{val:state.val,ack:true});
+            this.log.debug(`Command: speed_limit_set for ${vehicle.vin} (value=${state.val})`);
             try{
                 const content=JSON.stringify({value:String(state.val)});
                 try{
@@ -1085,12 +1090,14 @@ class LeapmotorAdapter extends utils.Adapter{
                         await this.client.sendCommandWithPin(vehicle,'510',content);
                     }else{throw e}
                 }
+                this.log.debug(`speed_limit_set successful.`);
             }catch(e){this.log.error(`speed_limit_set failed: ${e}`)}
             return;
         }
         if(cmd==='seat_heat_driver'||cmd==='seat_heat_copilot'){
             await this.setStateAsync(id,{val:state.val,ack:true});
             const seatPos=cmd==='seat_heat_driver'?'driver':'copilot';
+            this.log.debug(`Command: ${cmd} for ${vehicle.vin} (level=${state.val})`);
             try{
                 // Verified via leapmotor-ha's live app captures: separate
                 // position/level keys, not our previous comma-joined
@@ -1105,12 +1112,14 @@ class LeapmotorAdapter extends utils.Adapter{
                         await this.client.sendCommandWithPin(vehicle,'301',content);
                     }else{throw e}
                 }
+                this.log.debug(`${cmd} successful.`);
             }catch(e){this.log.error(`${cmd} failed: ${e}`)}
             return;
         }
         if(cmd==='seat_ventilation_driver'||cmd==='seat_ventilation_copilot'){
             await this.setStateAsync(id,{val:state.val,ack:true});
             const seatPos=cmd==='seat_ventilation_driver'?'driver':'copilot';
+            this.log.debug(`Command: ${cmd} for ${vehicle.vin} (level=${state.val})`);
             try{
                 const content=JSON.stringify({position:seatPos,level:String(state.val)});
                 try{
@@ -1122,6 +1131,7 @@ class LeapmotorAdapter extends utils.Adapter{
                         await this.client.sendCommandWithPin(vehicle,'370',content);
                     }else{throw e}
                 }
+                this.log.debug(`${cmd} successful.`);
             }catch(e){this.log.error(`${cmd} failed: ${e}`)}
             return;
         }
@@ -1139,6 +1149,7 @@ class LeapmotorAdapter extends utils.Adapter{
                 // projects, not against real hardware here. requiresPin is
                 // false in both reference sources.
                 const content=JSON.stringify({address:address||`${latitude},${longitude}`,addressname:address||`${latitude},${longitude}`,latitude,longitude,linenum:'0'});
+                this.log.debug(`Command: destination_send for ${vehicle.vin} (address=${address||'(none)'}, lat=${latitude}, lon=${longitude})`);
                 try{
                     await this.client.sendCommandWithoutPin(vehicle,'180',content);
                 }catch(e){
@@ -1147,6 +1158,7 @@ class LeapmotorAdapter extends utils.Adapter{
                         await this.client.sendCommandWithoutPin(vehicle,'180',content);
                     }else{throw e}
                 }
+                this.log.debug(`destination_send successful.`);
             }catch(e){this.log.error(`${cmd} failed: ${e}`)}
             return;
         }
@@ -1172,6 +1184,7 @@ class LeapmotorAdapter extends utils.Adapter{
                     recharge:existing?.recharge??0,
                     starttime:existing?.starttime||'00:00',
                 });
+                this.log.debug(`Command: charge_limit_set for ${vehicle.vin} (limit=${state.val}%)`);
                 try{
                     await this.client.sendCommandWithPin(vehicle,'190',content);
                 }catch(e){
@@ -1181,12 +1194,14 @@ class LeapmotorAdapter extends utils.Adapter{
                         await this.client.sendCommandWithPin(vehicle,'190',content);
                     }else{throw e}
                 }
+                this.log.debug(`charge_limit_set successful.`);
                 await this.setStateAsync(`${vin}.status.charging_soc_limit`,{val:state.val,ack:true});
             }catch(e){this.log.error(`charge_limit_set failed: ${e}`)}
             return;
         }
         if(cmd==='climate_schedule_enable'||cmd==='climate_schedule_time'||cmd==='climate_schedule_mode'||cmd==='climate_schedule_days'){
             await this.setStateAsync(id,{val:state.val,ack:true});
+            this.log.debug(`${cmd} stored for ${vehicle.vin} (value=${state.val}) - takes effect on climate_schedule_apply`);
             return;
         }
         if(cmd==='climate_schedule_cancel'&&state.val===true){
@@ -1194,6 +1209,7 @@ class LeapmotorAdapter extends utils.Adapter{
             await this.setStateAsync(`${vin}.cmd.climate_schedule_enable`,{val:false,ack:true});
             try{
                 const content=JSON.stringify({controls:[]});
+                this.log.debug(`Command: climate_schedule_cancel for ${vehicle.vin}`);
                 try{
                     await this.client.sendCommandWithPin(vehicle,'171',content);
                 }catch(e){
@@ -1243,6 +1259,7 @@ class LeapmotorAdapter extends utils.Adapter{
         }
         if(cmd==='charge_schedule_enable'||cmd==='charge_schedule_start'||cmd==='charge_schedule_end'){
             await this.setStateAsync(id,{val:state.val,ack:true});
+            this.log.debug(`${cmd} stored for ${vehicle.vin} (value=${state.val}) - takes effect on charge_schedule_apply`);
             return;
         }
         if(cmd==='charge_schedule_apply'&&state.val===true){
@@ -1270,6 +1287,7 @@ class LeapmotorAdapter extends utils.Adapter{
                 try{existing=await this.client.getAppointment(vehicle,'190');}catch(e){this.log.debug(`charge_schedule_apply: could not read existing schedule: ${e}`)}
                 const limit=Number(limitState?.val??existing?.chargesoc??80);
                 const content=JSON.stringify({chargeEnable:enabled,chargesoc:limit,circulation:0,cycles:'1,2,3,4,5,6,7',endtime:end,recharge:0,starttime:start});
+                this.log.debug(`Command: charge_schedule_apply for ${vehicle.vin} (enabled=${enabled}, start=${start}, end=${end}, limit=${limit}%)`);
                 try{
                     await this.client.sendCommandWithPin(vehicle,'190',content);
                 }catch(e){
@@ -1279,12 +1297,13 @@ class LeapmotorAdapter extends utils.Adapter{
                         await this.client.sendCommandWithPin(vehicle,'190',content);
                     }else{throw e}
                 }
-                this.log.debug(`charge_schedule_apply: enabled=${enabled} start=${start} end=${end} limit=${limit}`);
+                this.log.debug(`charge_schedule_apply successful (enabled=${enabled} start=${start} end=${end} limit=${limit}).`);
             }catch(e){this.log.error(`charge_schedule_apply failed: ${e}`)}
             return;
         }
         if(cmd==='defrost_level'){
             await this.setStateAsync(id,{val:state.val,ack:true});
+            this.log.debug(`defrost_level stored for ${vehicle.vin} (value=${state.val}) - takes effect on defrost_cycle`);
             return;
         }
         if(cmd==='defrost_cycle'&&state.val===true){
@@ -1321,20 +1340,24 @@ class LeapmotorAdapter extends utils.Adapter{
                 };
                 const wshldVal=next===1?'1':'0';
                 const operate2=acOn2?'manual':'off';
+                this.log.debug(`Command: defrost_cycle for ${vehicle.vin} (stage ${cur} -> ${next}, wshld=${wshldVal}, mode=${mode2})`);
                 await sendDefrost(JSON.stringify({circle:circle2,mode:mode2,operate:operate2,position:pos2,temperature:temp2,windlevel:fan2,wshld:wshldVal}));
-                this.log.debug(`defrost_cycle: stage ${cur} -> ${next} (wshld=${wshldVal}, mode=${mode2})`);
+                this.log.debug(`defrost_cycle successful (stage ${cur} -> ${next}).`);
             }catch(e){this.log.error(`defrost_cycle failed: ${e}`)}
             return;
         }
         if(cmd==='refresh'&&state.val===true){this._lastScheduleCheck=0;
+            this.log.debug(`Command: refresh for ${vehicle.vin}`);
             try{
                 await this.updateVehicleStatus(vehicle);
+                this.log.debug(`refresh successful.`);
             }catch(e){
                 const msg=String(e).toLowerCase();
                 if(msg.includes('ungültig')||msg.includes('token')||msg.includes('401')){
                     try{
                         await this.client.login();
                         await this.updateVehicleStatus(vehicle);
+                        this.log.debug(`refresh successful (after re-login).`);
                     }catch(e2){this.log.error(`refresh failed after re-login: ${e2}`)}
                 }else{
                     this.log.error(`refresh failed: ${e}`);
