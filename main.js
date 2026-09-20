@@ -1306,7 +1306,19 @@ class LeapmotorAdapter extends utils.Adapter{
             return;
         }
         if(cmd==='refresh'&&state.val===true){this._lastScheduleCheck=0;
-            await this.updateVehicleStatus(vehicle);
+            try{
+                await this.updateVehicleStatus(vehicle);
+            }catch(e){
+                const msg=String(e).toLowerCase();
+                if(msg.includes('ungültig')||msg.includes('token')||msg.includes('401')){
+                    try{
+                        await this.client.login();
+                        await this.updateVehicleStatus(vehicle);
+                    }catch(e2){this.log.error(`refresh failed after re-login: ${e2}`)}
+                }else{
+                    this.log.error(`refresh failed: ${e}`);
+                }
+            }
             await this.setStateAsync(id,{val:false,ack:true});return;
         }
         if(state.val===true){await this.executeCommand(vehicle,cmd);await this.setStateAsync(id,{val:false,ack:true})}
@@ -1419,8 +1431,24 @@ class LeapmotorAdapter extends utils.Adapter{
             if('status.door_trunk' in optState)fakeS.bbcmBackDoorStatus=optState['status.door_trunk'];
             if('status.window_fl_pct' in optState){fakeS.leftFrontWindowPercent=optState['status.window_fl_pct'];fakeS.rightFrontWindowPercent=optState['status.window_fr_pct'];}
             await this.buildCompositeHtml(vehicle.vin,fakeS,vehicle.name);
-            // Fetch real status in the background after 10s
-            this.setTimeout(()=>this.updateVehicleStatus(vehicle),10000);
+            // Fetch real status in the background after 10s. Wrapped in its
+            // own try/catch: this runs detached from the outer try/catch
+            // (it fires later, via setTimeout), so an unhandled rejection
+            // here - e.g. the token expiring in exactly that 10s window -
+            // would otherwise crash the whole adapter process.
+            this.setTimeout(async()=>{
+                try{
+                    await this.updateVehicleStatus(vehicle);
+                }catch(e){
+                    const msg=String(e).toLowerCase();
+                    if(msg.includes('ungültig')||msg.includes('token')||msg.includes('401')){
+                        try{await this.client.login();await this.updateVehicleStatus(vehicle);}
+                        catch(e2){this.log.error(`Delayed refresh failed after re-login: ${e2}`)}
+                    }else{
+                        this.log.error(`Delayed refresh failed: ${e}`);
+                    }
+                }
+            },10000);
         }catch(e){this.log.error(`Command ${cmd} failed: ${e}`)}
     }
 
