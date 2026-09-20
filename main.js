@@ -104,6 +104,20 @@ class LeapmotorAdapter extends utils.Adapter{
                 
                 if(v.rudder)await this.setStateAsync(`${v.vin}.info.rudder`,{val:v.rudder,ack:true});
                 if(v.allocationCode)await this.setStateAsync(`${v.vin}.info.allocation_code`,{val:v.allocationCode,ack:true});
+                // Trip tracking lives entirely in memory (this._tripStates),
+                // which is empty right after a restart - but the persisted
+                // trips.current_trip_active state keeps whatever value it
+                // last had. If a trip was active when the adapter stopped,
+                // that flag would otherwise stay stuck on "active" forever,
+                // since nothing in the normal poll logic re-evaluates it
+                // without a matching in-memory entry. The original trip's
+                // exact end time/mileage is unrecoverable at this point, so
+                // just clear the stale flag rather than leave it hanging.
+                const activeState=await this.getStateAsync(`${v.vin}.trips.current_trip_active`);
+                if(activeState?.val===true){
+                    await this.setStateAsync(`${v.vin}.trips.current_trip_active`,{val:false,ack:true});
+                    this.log.info(`${v.vin}: cleared a stale "trip in progress" flag left over from before the last restart.`);
+                }
             }
         }catch(e){this.log.error(`Vehicle list failed: ${e}`);return}
         await this.pollAll();
