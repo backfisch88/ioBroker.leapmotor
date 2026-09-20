@@ -70,6 +70,16 @@ class LeapmotorAdapter extends utils.Adapter{
             this.log.info(`Found ${this.vehicles.length} vehicle(s).`);
             for(const v of this.vehicles){
                 this.log.info(`  → ${v.name} (${v.carType}) VIN: ${v.vin}`);
+                // Diagnostic for intermittent-permission issues (e.g. sunshade):
+                // the cloud grants a subset of remote-command rights per
+                // vehicle/account/sharing-level in "rightList" (community
+                // reverse-engineered, see leapmotor-api's VehicleRight enum).
+                // 161=SUNSHADE, 230=WINDOWS, 240=SKYLIGHT, 110=LOCK, 130=TRUNK.
+                // We don't enforce this - just logging it to see whether it's
+                // actually static or changes between successful/failed attempts.
+                if(v.raw?.rightList!==undefined){
+                    this.log.debug(`  ${v.vin} rightList: ${v.raw.rightList}`);
+                }
                 await this.createVehicleObjects(v);
                 await this.subscribeStatesAsync(`${v.vin}.cmd.*`);
                 await this.subscribeStatesAsync(`${v.vin}.config.*`);
