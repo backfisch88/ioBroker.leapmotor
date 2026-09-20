@@ -91,6 +91,11 @@ class LeapmotorAdapter extends utils.Adapter{
                 // actually static or changes between successful/failed attempts.
                 if(v.raw?.rightList!==undefined){
                     this.log.debug(`  ${v.vin} rightList: ${v.raw.rightList}`);
+                }else{
+                    // rightList not present under that name for this account/
+                    // region - log every field name actually present instead,
+                    // once, so we can spot an equivalent under a different key.
+                    this.log.debug(`  ${v.vin} rightList not found; raw vehicle-list fields: ${Object.keys(v.raw||{}).join(', ')}`);
                 }
                 await this.createVehicleObjects(v);
                 await this.subscribeStatesAsync(`${v.vin}.cmd.*`);
