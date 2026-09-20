@@ -111,6 +111,18 @@ function SliderControl({ icon, iconActive, label, value, max, displaySuffix, onC
     const [local, setLocal] = useState(value);
     useEffect(() => { setLocal(value); }, [value]);
 
+    // iOS Safari fires both a touch event and a synthetic mouse event for
+    // slider drags and button taps, which can call onCommit twice in quick
+    // succession with the same value. Guard against that: ignore a second
+    // commit of the same value within 500ms.
+    const lastCommit = useRef({ value: null, ts: 0 });
+    const guardedCommit = (v) => {
+        const now = Date.now();
+        if (lastCommit.current.value === v && now - lastCommit.current.ts < 500) return;
+        lastCommit.current = { value: v, ts: now };
+        onCommit(v);
+    };
+
     return (
         <Box sx={{ mt: 2 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
@@ -123,7 +135,7 @@ function SliderControl({ icon, iconActive, label, value, max, displaySuffix, onC
                 </Box>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                <Button size="small" onClick={() => { setLocal(0); onCommit(0); }}
+                <Button size="small" onClick={() => { setLocal(0); guardedCommit(0); }}
                     sx={{ minWidth: 0, px: 1, border: '1px solid #1e2d45', color: local === 0 ? color : undefined }}>
                     {I18n.t('Close')}
                 </Button>
@@ -133,10 +145,10 @@ function SliderControl({ icon, iconActive, label, value, max, displaySuffix, onC
                     max={max}
                     step={max <= 10 ? 1 : 10}
                     onChange={(_, v) => setLocal(v)}
-                    onChangeCommitted={(_, v) => onCommit(v)}
+                    onChangeCommitted={(_, v) => guardedCommit(v)}
                     sx={{ color }}
                 />
-                <Button size="small" onClick={() => { setLocal(openValue); onCommit(openValue); }}
+                <Button size="small" onClick={() => { setLocal(openValue); guardedCommit(openValue); }}
                     sx={{ minWidth: 0, px: 1, border: '1px solid #1e2d45', color: local === openValue ? color : undefined }}>
                     {I18n.t('Open')}
                 </Button>

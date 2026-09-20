@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "vite build",
+    "postbuild": "node -e \"require('fs').renameSync('../admin/tab/index.html','../admin/tab/tab.html')\"",
     "dev": "vite"
   },
   "dependencies": {
