@@ -96,6 +96,8 @@ class LeapmotorAdapter extends utils.Adapter{
                     // region - log every field name actually present instead,
                     // once, so we can spot an equivalent under a different key.
                     this.log.debug(`  ${v.vin} rightList not found; raw vehicle-list fields: ${Object.keys(v.raw||{}).join(', ')}`);
+                    this.log.debug(`  ${v.vin} abilities: ${JSON.stringify(v.raw?.abilities)}`);
+                    this.log.debug(`  ${v.vin} funcConfig: ${JSON.stringify(v.raw?.funcConfig)}`);
                 }
                 await this.createVehicleObjects(v);
                 await this.subscribeStatesAsync(`${v.vin}.cmd.*`);
