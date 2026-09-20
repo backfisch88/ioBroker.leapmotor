@@ -67,6 +67,18 @@ class LeapmotorAdapter extends utils.Adapter{
         try{
             this.vehicles=await this.client.getVehicleList();
             this.vehicles.forEach(v=>{v.vin=String(v.vin||'').replace(this.FORBIDDEN_CHARS,'_')});
+            // The cloud can list the same vehicle in both "own" and "shared"
+            // cars (seen for a main account whose own vehicle also shows up
+            // as shared) - without deduping, subscribeStatesAsync below gets
+            // registered twice for the same VIN, causing every cmd.* write
+            // to fire the onStateChange handler (and its logging/command
+            // sending) twice. Keep the first occurrence of each VIN only.
+            const seenVins=new Set();
+            this.vehicles=this.vehicles.filter(v=>{
+                if(seenVins.has(v.vin))return false;
+                seenVins.add(v.vin);
+                return true;
+            });
             this.log.info(`Found ${this.vehicles.length} vehicle(s).`);
             for(const v of this.vehicles){
                 this.log.info(`  → ${v.name} (${v.carType}) VIN: ${v.vin}`);
