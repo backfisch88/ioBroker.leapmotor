@@ -224,6 +224,25 @@ class LeapmotorAdapter extends utils.Adapter{
         // stayed false for this long straight; if driving resumes before
         // that, the trip simply continues uninterrupted.
         const TRIP_END_GRACE_MS=600000; // 10 minutes
+        if(!this._tripStates)this._tripStates={};
+        if(!this._lastKnownMileage)this._lastKnownMileage={};
+        const prev=this._tripStates[vin]||{wasActive:false,startMileage:null,startTime:null,startSoc:null,pendingEndSince:null,hasMoved:false,sawUnlockAfterMoving:false};
+        const lastMileage=this._lastKnownMileage[vin];
+        // Second, independent fast-path signal: the vehicle auto-locks while
+        // driving, so getting out at the destination requires an unlock -
+        // followed by a re-lock (manual or auto) once the driver walks away.
+        // A full "moved, then unlocked, then locked again" cycle is just as
+        // definitive as ignition-off - and doesn't depend on a model
+        // reliably reporting ignition state at all. hasMoved/
+        // sawUnlockAfterMoving persist across polls in _tripStates so this
+        // works even if the actual unlock happened several polls before the
+        // final re-lock is seen.
+        const hasMoved=prev.wasActive?(prev.hasMoved||isMoving):isMoving;
+        const sawUnlockAfterMoving=prev.wasActive?(prev.sawUnlockAfterMoving||(hasMoved&&locked===false)):false;
+        if(prev.wasActive){
+            this._tripStates[vin]={...prev,hasMoved,sawUnlockAfterMoving};
+        }
+        const lockCycleComplete=sawUnlockAfterMoving&&locked===true;
         // Fast path: if the ignition is EXPLICITLY off (not just missing/
         // undefined - a real false reading) AND the vehicle is locked, that's
         // about as strong a "the trip is really over" signal as we can get -
@@ -231,12 +250,9 @@ class LeapmotorAdapter extends utils.Adapter{
         // unlocking first, which we'd see on the very next poll anyway. Skip
         // the 10-minute wait entirely in that case so the trip closes on the
         // same poll it's first detected as stopped, instead of up to 10
-        // minutes (2 poll cycles) later.
-        const definitelyStopped=keyPosition===false&&locked===true;
-        if(!this._tripStates)this._tripStates={};
-        if(!this._lastKnownMileage)this._lastKnownMileage={};
-        const prev=this._tripStates[vin]||{wasActive:false,startMileage:null,startTime:null,startSoc:null,pendingEndSince:null};
-        const lastMileage=this._lastKnownMileage[vin];
+        // minutes (2 poll cycles) later. The completed lock-unlock-lock
+        // cycle above is an equally strong, independent alternative signal.
+        const definitelyStopped=(keyPosition===false&&locked===true)||lockCycleComplete;
 
         if(isMoving&&!prev.wasActive){
             // Die Fahrt wird erst jetzt erkannt, aber der Kilometerstand kann sich
@@ -261,13 +277,13 @@ class LeapmotorAdapter extends utils.Adapter{
                     startTime=Date.now()-missedTimeMs;
                 }
             }
-            this._tripStates[vin]={wasActive:true,startMileage,startTime,startSoc:soc,pendingEndSince:null};
+            this._tripStates[vin]={wasActive:true,startMileage,startTime,startSoc:soc,pendingEndSince:null,hasMoved:true,sawUnlockAfterMoving:false};
             await this.setStateAsync(`${vin}.trips.current_trip_active`,{val:true,ack:true});
             this.log.debug(`Trip started at ${startMileage}km (current: ${totalMileage}km)`);
         }else if(isDriving&&prev.wasActive&&prev.pendingEndSince){
             // False alarm: driving resumed before the grace period elapsed.
             // Clear the pending-end marker so the trip continues uninterrupted.
-            this._tripStates[vin]={...prev,pendingEndSince:null};
+            this._tripStates[vin]={...prev,pendingEndSince:null,hasMoved,sawUnlockAfterMoving};
         }else if(!isDriving&&prev.wasActive){
             if(!prev.pendingEndSince){
                 // First poll where the car looks stopped: start the grace
@@ -279,11 +295,11 @@ class LeapmotorAdapter extends utils.Adapter{
                     // available) - this is when the car actually stopped,
                     // and becomes the trip's recorded end time once the
                     // grace period elapses below.
-                    this._tripStates[vin]={...prev,pendingEndSince:Date.now(),pendingEndVehicleTime:vehicleTimeMs||null};
+                    this._tripStates[vin]={...prev,pendingEndSince:Date.now(),pendingEndVehicleTime:vehicleTimeMs||null,hasMoved,sawUnlockAfterMoving};
                     this._lastKnownMileage[vin]={mileage:totalMileage,ts:Date.now()};
                     return;
                 }
-                this._tripStates[vin]={...prev,pendingEndSince:Date.now(),pendingEndVehicleTime:vehicleTimeMs||null};
+                this._tripStates[vin]={...prev,pendingEndSince:Date.now(),pendingEndVehicleTime:vehicleTimeMs||null,hasMoved,sawUnlockAfterMoving};
             }
             if(!definitelyStopped&&Date.now()-(this._tripStates[vin].pendingEndSince)<TRIP_END_GRACE_MS){
                 // Still within the grace period - keep waiting, trip stays open.
