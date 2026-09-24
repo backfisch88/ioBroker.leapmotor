@@ -10,6 +10,7 @@ import ListAltIcon from '@mui/icons-material/ListAlt';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import BuildIcon from '@mui/icons-material/Build';
 import MapIcon from '@mui/icons-material/Map';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 import { useConnection } from './useConnection';
 import DashboardTab from './components/DashboardTab';
@@ -17,6 +18,7 @@ import DatapointsTab from './components/DatapointsTab';
 import ConsumptionTab from './components/ConsumptionTab';
 import DiagnosticsTab from './components/DiagnosticsTab';
 import TripsTab from './components/TripsTab';
+import SettingsTab from './components/SettingsTab';
 
 const theme = createTheme({
     palette: {
@@ -31,7 +33,7 @@ const theme = createTheme({
 const ADAPTER = (window.adapterInstance || 'leapmotor.0').replace(/^system\.adapter\./, '');
 
 export default function App() {
-    const { connected, error, states, getStates, getObjects, setState, systemLanguage } = useConnection(ADAPTER);
+    const { connected, error, states, getStates, getObjects, setState, sendTo, systemLanguage } = useConnection(ADAPTER);
     // Sprache SYNCHRON während des Renderns setzen (nicht in einem useEffect,
     // da Effects erst NACH dem Rendern laufen - das würde bedeuten, dass genau
     // der erste Render-Durchlauf mit bekannter Sprache noch die alte/Default-
@@ -135,8 +137,9 @@ export default function App() {
                         <Tab icon={<DashboardIcon />} label={I18n.t('Dashboard')} />
                         <Tab icon={<BarChartIcon />} label={I18n.t('Consumption')} />
                         <Tab icon={<MapIcon />} label={I18n.t('Trips')} />
-                        <Tab icon={<ListAltIcon />} label={I18n.t('Datapoints')} />
                         <Tab icon={<BuildIcon />} label={I18n.t('Diagnostics')} />
+                        <Tab icon={<SettingsIcon />} label={I18n.t('Settings')} />
+                        <Tab icon={<ListAltIcon />} label={I18n.t('Datapoints')} />
                     </Tabs>
                 </AppBar>
 
@@ -144,9 +147,10 @@ export default function App() {
                     {!base && <Typography color="text.secondary">{I18n.t('No vehicle found. Is the adapter running?')}</Typography>}
                     {base && tab === 0 && <DashboardTab base={base} states={states} setState={setState} />}
                     {base && tab === 1 && <ConsumptionTab base={base} states={states} adapter={ADAPTER} />}
-                    {base && tab === 2 && <TripsTab base={base} states={states} />}
-                    {base && tab === 3 && <DatapointsTab base={base} states={states} />}
-                    {base && tab === 4 && <DiagnosticsTab base={base} states={states} setState={setState} adapter={ADAPTER} />}
+                    {base && tab === 2 && <TripsTab base={base} states={states} setState={setState} />}
+                    {base && tab === 3 && <DiagnosticsTab base={base} states={states} setState={setState} adapter={ADAPTER} />}
+                    {tab === 4 && <SettingsTab adapter={ADAPTER} base={base} states={states} setState={setState} sendTo={sendTo} />}
+                    {base && tab === 5 && <DatapointsTab base={base} states={states} />}
                 </Box>
             </Box>
         </ThemeProvider>

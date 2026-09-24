@@ -67,7 +67,7 @@ function StatTile({ label, value, color }) {
         }}>
             <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
                 <Typography variant="caption" sx={{ color: '#3a5070', letterSpacing: '0.1em', display: 'block' }}>{label}</Typography>
-                <Typography variant="h6" sx={{ fontWeight: 800, color: color || '#c8ddf0', whiteSpace: 'nowrap' }}>{value}</Typography>
+                <Typography sx={{ fontWeight: 800, fontSize: '1.05rem', color: color || '#c8ddf0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</Typography>
             </CardContent>
         </Card>
     );
@@ -159,7 +159,7 @@ function SliderControl({ icon, iconActive, label, value, max, displaySuffix, onC
 
 export default function DashboardTab({ base, states, setState }) {
     const soc = val(states, `${base}.status.battery_soc`, 0);
-    const socColor = soc > 50 ? '#00ff88' : soc > 20 ? '#ffcc00' : '#ff4444';
+    const socColor = soc > 20 ? '#00ff88' : soc > 10 ? '#ffcc00' : '#ff4444';
     const range = val(states, `${base}.status.range_km`, 0);
     const outdoor = val(states, `${base}.status.temp_outdoor`, '—');
     const parked = val(states, `${base}.status.drive_parked`, true);
@@ -292,9 +292,9 @@ export default function DashboardTab({ base, states, setState }) {
                             <Typography variant="h5" sx={{ fontWeight: 800, color: socColor }}>{soc}%</Typography>
                         </Box>
                         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                            {locked && <Chip size="small" label={I18n.t('LOCKED')} sx={{ bgcolor: '#00d4ff22', color: '#00d4ff' }} />}
-                            {charging && <Chip size="small" label={I18n.t('CHARGING')} sx={{ bgcolor: '#00ff8822', color: '#00ff88' }} />}
-                            {acOn && <Chip size="small" label={I18n.t('CLIMATE')} sx={{ bgcolor: '#7c6aff22', color: '#a090ff' }} />}
+                            {locked && <Chip size="small" label={I18n.t('LOCKED')} sx={{ bgcolor: '#00d4ff22', color: '#00d4ff', fontSize: '0.7rem' }} />}
+                            {charging && <Chip size="small" label={I18n.t('CHARGING')} sx={{ bgcolor: '#00ff8822', color: '#00ff88', fontSize: '0.7rem' }} />}
+                            {acOn && <Chip size="small" label={I18n.t('CLIMATE')} sx={{ bgcolor: '#7c6aff22', color: '#a090ff', fontSize: '0.7rem' }} />}
                             {doorOpen && <Chip size="small" label={I18n.t('DOOR OPEN')} sx={{ bgcolor: '#ff990022', color: '#ff9900' }} />}
                         </Box>
                     </Box>
@@ -309,7 +309,7 @@ export default function DashboardTab({ base, states, setState }) {
                 <Grid size={4}><StatTile label={I18n.t('OUTSIDE')} value={`${outdoor}°C`} /></Grid>
                 <Grid size={4}><StatTile label={I18n.t('RANGE')} value={`${range} km`} color="#00d4ff" /></Grid>
                 <Grid size={4}>
-                    <StatTile label={I18n.t('STATUS')} value={parked ? '🅿 Parked' : `▶ ${speed} km/h`} color={parked ? '#00ff88' : '#ffcc00'} />
+                    <StatTile label={I18n.t('STATUS')} value={parked ? `🅿 ${I18n.t('Parked')}` : `▶ ${speed} km/h`} color={parked ? '#00ff88' : '#ffcc00'} />
                 </Grid>
                 <Grid size={4}>
                     <StatTile label={I18n.t('CHARGING')} value={charging ? `⚡ ${remainMin} min` : '— —'} color={charging ? '#00ff88' : undefined} />

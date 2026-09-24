@@ -4,15 +4,25 @@
     <meta charset="UTF-8" />
     <title>Leapmotor</title>
     <script>
-        // Stelle sicher, dass ioBrokers eigene socket.io Client-Library
-        // geladen ist, bevor AdminConnection versucht sich zu verbinden.
         (function() {
+            window.registerSocketOnLoad = function (cb) { window.socketLoadedHandler = cb; };
             var script = document.createElement('script');
-            script.src = window.location.protocol + '//' + window.location.hostname + ':' + (window.location.port || 8081) + '/lib/js/socket.io.js';
+            script.onload = function () {
+                if (typeof window.socketLoadedHandler === 'function') window.socketLoadedHandler();
+            };
+            script.onerror = function () {
+                console.error('ioBroker socket.io.js failed to load');
+            };
+            // Dev server (vite, port 3000) needs absolute URL to admin port.
+            // Production: load relative to admin origin, keeps auth cookies intact.
+            script.src = window.location.port === '3000'
+                ? window.location.protocol + '//' + window.location.hostname + ':8081/lib/js/socket.io.js'
+                : '../../lib/js/socket.io.js';
             document.head.appendChild(script);
         })();
     </script>
   <script type="module" crossorigin src="./tab.js"></script>
+  <link rel="stylesheet" crossorigin href="./tab-index.css">
 </head>
 <body style="margin:0;padding:0;background:#070d1a">
     <div id="root"></div>

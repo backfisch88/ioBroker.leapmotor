@@ -130,7 +130,7 @@ Value-based commands:
 | cmd.ac_fan_speed | Fan speed, 1–7 | All models (confirmed T03) |
 | cmd.ac_position | Air position: all / up / down / front / rear | All models (confirmed T03). On B10, the vehicle's reported direction status was independently confirmed correct via a real owner's before/after tests (2026-09) - sending this specific command wasn't separately re-tested on B10 |
 | cmd.windows_set | Window position, 0–100 % | All models (confirmed T03; scale auto-adjusted per model, see WORK IN PROGRESS changelog) |
-| cmd.sunshade_set / sunshade_open / sunshade_close | Sunshade position (T03), 0–10 | T03 (confirmed); B10 has an electric sunroof instead (confirmed) |
+| cmd.sunshade_set / sunshade_open / sunshade_close | Sunshade position, 0–10 | Confirmed working on T03, but only after the vehicle has been woken from standby by a **physical door open** - locked/unlocked/ignition/climate/remote trunk-open alone don't wake the needed subsystem (confirmed on two separate test sessions, 2026-09-23). No remote workaround exists. B10 has an electric sunroof instead (confirmed working) |
 | cmd.charge_limit_set | Charge limit, 50–100 % | All models (confirmed T03) |
 | cmd.charge_schedule_enable / start / end / apply | Charging schedule | All models (confirmed T03) |
 | cmd.climate_schedule_enable / mode / time / days / apply / cancel | Recurring climate schedule | All models (confirmed T03) |
@@ -155,7 +155,7 @@ Which comfort commands actually appear depends on the detected vehicle model —
 
 ## Changelog
 
-### **WORK IN PROGRESS**
+### 0.7.0 (2026-09-24)
 - Fix: vehicles west of Greenwich (UK, Ireland, Portugal, parts of Spain/France) showed their GPS position mirrored into the wrong hemisphere; latitude/longitude now use the signed signal values instead of the absolute-value-only fields (community-confirmed via leapmotor-ha)
 - Fix: window open/close/set-to-percent commands now scale to each model's native range - B05/B10/C10 expect a 0-10 scale, not 0-100 like T03; commands sent to those models previously moved the window far less than requested
 - Fix: the "charging" status could get stuck showing active from a stale/phantom cloud flag while the car was actually being driven or just powered on and ready; it's now cross-checked against gear position, speed and ignition before being reported

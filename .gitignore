@@ -5,4 +5,6 @@ pictures_cache.json
 .commitinfo
 admin-tab/node_modules
 admin-tab/dist
+admin-tab/admin/
 build.bak/
+*.zip

@@ -22,26 +22,17 @@
       "newLine": true,
       "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12
     },
-    "pollingInterval": {
-      "type": "number",
-      "label": "Polling interval (minutes)",
-      "help": "How often to fetch vehicle status (1-60)",
-      "min": 1,
-      "max": 60,
-      "newLine": true,
-      "xs": 12, "sm": 6, "md": 6, "lg": 6, "xl": 6
-    },
     "language": {
       "type": "select",
       "label": "Cloud API Language",
-      "help": "Affects Leapmotor cloud API text only (e.g. schedule day names). Does not change the Admin Tab UI language, which follows your ioBroker Admin language setting.",
+      "help": "Affects Leapmotor cloud API text only (e.g. schedule day names). Does not change the Admin Tab UI language, which follows your ioBroker Admin language setting. Everything else (polling, GPS recording, notifications, electricity price) has moved to the Settings tab inside the Leapmotor admin tab itself.",
       "options": [
         {"label": "English", "value": "en-GB"},
         {"label": "Deutsch", "value": "de"},
         {"label": "Français", "value": "fr"},
         {"label": "Italiano", "value": "it"}
       ],
-      "newLine": false,
+      "newLine": true,
       "xs": 12, "sm": 6, "md": 6, "lg": 6, "xl": 6
     }
   }

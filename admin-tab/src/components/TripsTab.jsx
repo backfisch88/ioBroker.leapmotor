@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import {
     Box, Card, CardContent, Typography, Divider, Chip, Collapse, IconButton,
 } from '@mui/material';
@@ -7,6 +7,35 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import MergeTypeIcon from '@mui/icons-material/MergeType';
+import UndoIcon from '@mui/icons-material/Undo';
+import ExportPanel from './ExportPanel';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+// Small imperative Leaflet map for one trip's route. Plain leaflet (no
+// react-leaflet) keeps this self-contained and avoids an extra dependency
+// just for a single polyline per trip.
+function RouteMap({ points }) {
+    const mapRef = useRef(null);
+    const containerRef = useRef(null);
+
+    useEffect(() => {
+        if (!containerRef.current || !points || points.length < 2) return undefined;
+        const map = L.map(containerRef.current, { attributionControl: false, zoomControl: false });
+        mapRef.current = map;
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+        const line = L.polyline(points, { color: '#00d4ff', weight: 3 }).addTo(map);
+        L.circleMarker(points[0], { radius: 5, color: '#00ff88', fillOpacity: 1 }).addTo(map);
+        L.circleMarker(points[points.length - 1], { radius: 5, color: '#ff5566', fillOpacity: 1 }).addTo(map);
+        map.fitBounds(line.getBounds(), { padding: [12, 12] });
+        return () => { map.remove(); mapRef.current = null; };
+    }, [points]);
+
+    return <Box ref={containerRef} sx={{ height: 160, borderRadius: 1.5, mt: 0.5, mx: 3, overflow: 'hidden' }} />;
+}
 
 function val(states, id, def = null) {
     return states[id]?.val ?? def;
@@ -32,7 +61,7 @@ function fmtDateShort(iso) {
     return `${d}.${m}.`;
 }
 
-export default function TripsTab({ base, states }) {
+export default function TripsTab({ base, states, setState }) {
     const [expandedDay, setExpandedDay] = useState(null);
 
     const dailyKm = useMemo(() => {
@@ -44,6 +73,13 @@ export default function TripsTab({ base, states }) {
         const raw = val(states, `${base}.trips.history_json`, '[]');
         try { return JSON.parse(raw); } catch { return []; }
     }, [states, base]);
+
+    const tripRoutes = useMemo(() => {
+        const raw = val(states, `${base}.trips.routes_json`, '{}');
+        try { return JSON.parse(raw); } catch { return {}; }
+    }, [states, base]);
+
+    const lastMergeStartMs = val(states, `${base}.trips.last_merge_startms`, 0);
 
     const todayKm = val(states, `${base}.trips.today_km`, 0);
     const currentTripActive = val(states, `${base}.trips.current_trip_active`, false);
@@ -63,7 +99,7 @@ export default function TripsTab({ base, states }) {
     // that our detection missed).
     const days = useMemo(() => {
         const result = dailyKm.map((d) => {
-            const trips = (tripsByDay[d.date] || []).slice().sort((a, b) => a.startTime.localeCompare(b.startTime));
+            const trips = (tripsByDay[d.date] || []).slice().sort((a, b) => b.startTime.localeCompare(a.startTime));
             const tripsKm = trips.reduce((sum, t) => sum + (t.km || 0), 0);
             const otherKm = Math.max(0, Math.round((d.km - tripsKm) * 10) / 10);
             return { date: d.date, totalKm: d.km, trips, otherKm };
@@ -78,6 +114,7 @@ export default function TripsTab({ base, states }) {
 
     return (
         <Box>
+            <ExportPanel base={base} states={states} />
             {/* Overview at the top */}
             <Card sx={{ mb: 2, bgcolor: '#0d1520', border: '1px solid #1e2d45' }}>
                 <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
@@ -147,6 +184,11 @@ export default function TripsTab({ base, states }) {
                                         {day.trips.map((trip, i) => {
                                             const startClock = (trip.startTime.split(', ')[1] || trip.startTime).slice(0, 5);
                                             const endClock = (trip.endTime.split(', ')[1] || trip.endTime).slice(0, 5);
+                                            const prevTrip = i < day.trips.length - 1 ? day.trips[i + 1] : null;
+                                            const gapMin = (prevTrip && trip.startTimeMs && prevTrip.endTimeMs)
+                                                ? Math.round((trip.startTimeMs - prevTrip.endTimeMs) / 60000) : null;
+                                            const canMerge = gapMin != null && gapMin >= 0 && gapMin <= 15;
+                                            const canUndo = !!lastMergeStartMs && trip.startTimeMs === lastMergeStartMs;
                                             return (
                                                 <Box
                                                     key={i}
@@ -156,6 +198,42 @@ export default function TripsTab({ base, states }) {
                                                         display: 'flex', flexDirection: 'column', gap: 0.5,
                                                     }}
                                                 >
+                                                    {canUndo && (
+                                                        <Box
+                                                            sx={{
+                                                                display: 'flex', alignItems: 'center', gap: 0.5,
+                                                                cursor: 'pointer', color: '#5a7090', mb: 0.5,
+                                                                '&:hover': { color: '#00d4ff' },
+                                                            }}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setState(`${base}.cmd.trips_merge_undo`, true);
+                                                            }}
+                                                        >
+                                                            <UndoIcon sx={{ fontSize: 14 }} />
+                                                            <Typography variant="caption" sx={{ fontSize: '0.7rem' }}>
+                                                                {I18n.t('Undo last merge')}
+                                                            </Typography>
+                                                        </Box>
+                                                    )}
+                                                    {!canUndo && canMerge && (
+                                                        <Box
+                                                            sx={{
+                                                                display: 'flex', alignItems: 'center', gap: 0.5,
+                                                                cursor: 'pointer', color: '#5a7090', mb: 0.5,
+                                                                '&:hover': { color: '#00d4ff' },
+                                                            }}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setState(`${base}.cmd.trips_merge`, String(trip.startTimeMs));
+                                                            }}
+                                                        >
+                                                            <MergeTypeIcon sx={{ fontSize: 14 }} />
+                                                            <Typography variant="caption" sx={{ fontSize: '0.7rem' }}>
+                                                                {I18n.t('Merge with previous trip')} ({gapMin} min {I18n.t('gap')})
+                                                            </Typography>
+                                                        </Box>
+                                                    )}
                                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                                             <DirectionsCarIcon sx={{ fontSize: 16, color: '#00d4ff' }} />
@@ -177,6 +255,25 @@ export default function TripsTab({ base, states }) {
                                                             </Typography>
                                                         </Box>
                                                     </Box>
+                                                    {(trip.tempMinC != null || trip.elevGainM != null || trip.regenKwh != null) && (
+                                                        <Box sx={{ display: 'flex', gap: 1.5, pl: 3 }}>
+                                                            {trip.tempMinC != null && (
+                                                                <Typography variant="caption" sx={{ color: '#5a7090', fontSize: '0.7rem' }}>
+                                                                    🌡️ {trip.tempMinC === trip.tempMaxC ? `${trip.tempMinC}°C` : `${trip.tempMinC}–${trip.tempMaxC}°C`}
+                                                                </Typography>
+                                                            )}
+                                                            {trip.elevGainM != null && trip.elevGainM !== 0 && (
+                                                                <Typography variant="caption" sx={{ color: '#5a7090', fontSize: '0.7rem' }}>
+                                                                    {trip.elevGainM > 0 ? '⬆️' : '⬇️'} {Math.abs(trip.elevGainM)} m
+                                                                </Typography>
+                                                            )}
+                                                            {trip.regenKwh != null && (
+                                                                <Typography variant="caption" sx={{ color: '#00ff88', fontSize: '0.7rem' }}>
+                                                                    ♻️ {trip.regenKwh} kWh {I18n.t('regen')}
+                                                                </Typography>
+                                                            )}
+                                                        </Box>
+                                                    )}
                                                     {trip.energyOfficial && (
                                                         <Box sx={{ display: 'flex', gap: 1.5, pl: 3 }}>
                                                             <Typography variant="caption" sx={{ color: '#3a5070', fontSize: '0.7rem' }}>
@@ -202,6 +299,9 @@ export default function TripsTab({ base, states }) {
                                                         <Typography variant="caption" sx={{ color: '#5a7090', fontSize: '0.7rem', pl: 3, fontStyle: 'italic' }}>
                                                             ⚠️ {I18n.t('Official energy data unavailable for this trip')}
                                                         </Typography>
+                                                    )}
+                                                    {tripRoutes[trip.startTimeMs] && (
+                                                        <RouteMap points={tripRoutes[trip.startTimeMs]} />
                                                     )}
                                                 </Box>
                                             );

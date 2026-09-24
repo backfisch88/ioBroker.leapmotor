@@ -13,7 +13,19 @@ const CAPABILITIES = {
         find: true,
         trunk: true,
         windows: true,
-        sunshade: true, // sunshade under fixed glass roof (no movable roof on the T03)
+        sunshade: true, // sunshade under fixed glass roof (no movable roof
+        // on the T03); works via API, but ONLY after the vehicle has been
+        // woken from standby by a PHYSICAL door open - confirmed on two
+        // separate real-world test sessions (2026-09-23). Locked, unlocked,
+        // ignition on, climate on, and even a remote cmd.trunk_open all left
+        // it non-functional; only once a door was physically opened (driver
+        // door in both sessions) did the very next command take effect -
+        // and it stayed working afterward even with the door closed again,
+        // as long as the vehicle didn't go back to sleep. This lines up with
+        // the getEC "Ready-on" anchor finding elsewhere in this codebase -
+        // looks like the same underlying wake state gates both. No remote
+        // command can substitute for physically opening a door, so this is
+        // a real vehicle limitation, not something we can fix in software.
         sunroof: false, // T03 has no movable glass roof
         climate: true,
         quickClimate: true,

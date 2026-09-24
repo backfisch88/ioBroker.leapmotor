@@ -5,8 +5,8 @@ export default defineConfig({
   plugins: [react()],
   base: './',
   build: {
-    outDir: '../admin/tab',
-    emptyOutDir: true,
+    outDir: '../admin',
+    emptyOutDir: false,
     rollupOptions: {
       output: {
         entryFileNames: 'tab.js',

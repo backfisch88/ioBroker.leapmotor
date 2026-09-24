@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "vite build",
-    "postbuild": "node -e \"require('fs').renameSync('../admin/tab/index.html','../admin/tab/tab.html')\"",
+    "postbuild": "node -e \"require('fs').renameSync('../admin/index.html','../admin/tab.html')\"",
     "dev": "vite"
   },
   "dependencies": {
@@ -13,6 +13,9 @@
     "@iobroker/adapter-react-v5": "^8.3.3",
     "@mui/icons-material": "^6.5.0",
     "@mui/material": "^6.5.0",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.4",
+    "leaflet": "^1.9.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "recharts": "^2.10.0"

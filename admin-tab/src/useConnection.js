@@ -1,25 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { AdminConnection } from '@iobroker/adapter-react-v5';
 
-function waitForSocketIo(timeoutMs = 8000) {
-    return new Promise((resolve, reject) => {
-        if (window.io) return resolve();
-        const start = Date.now();
-        const interval = window.setInterval(() => {
-            if (window.io) {
-                window.clearInterval(interval);
-                resolve();
-            } else if (Date.now() - start > timeoutMs) {
-                window.clearInterval(interval);
-                reject(new Error('socket.io.js nicht geladen nach ' + timeoutMs + 'ms'));
-            }
-        }, 100);
-    });
-}
-
-// AdminConnection kapselt die Kommunikation mit dem ioBroker Admin-Socket
-// korrekt, inklusive Warten auf das via /lib/js/socket.io.js bereitgestellte
-// window.io. Das ist robuster als eine eigene io()-Aufruf-Logik.
+// window.registerSocketOnLoad is set up by index.html's inline loader script.
+// This is the pattern used by other ioBroker admin-tab apps: no blind polling
+// for window.io, just a callback fired once the script actually loads.
 export function useConnection(adapterInstance) {
     const [connected, setConnected] = useState(false);
     const [error, setError] = useState(null);
@@ -79,9 +63,13 @@ export function useConnection(adapterInstance) {
             cleanupConn._timeout = timeout;
         }
 
-        waitForSocketIo()
-            .then(() => { if (!cancelled) initConnection(); })
-            .catch((err) => { if (!cancelled) setError(err.message); });
+        if (window.io) {
+            initConnection();
+        } else if (window.registerSocketOnLoad) {
+            window.registerSocketOnLoad(() => { if (!cancelled) initConnection(); });
+        } else {
+            setError('ioBroker socket loader not available');
+        }
 
         return () => {
             cancelled = true;
@@ -105,6 +93,14 @@ export function useConnection(adapterInstance) {
         connRef.current?.setState(id, { val, ack: false });
     }, []);
 
+    // Used by SettingsTab to ask another adapter instance directly (e.g.
+    // "adminuser" on a Telegram instance, returning its known chat users) -
+    // same mechanism jsonConfig's selectSendTo uses server-side, just called
+    // straight from our own tab instead.
+    const sendTo = useCallback((instance, command, message) => {
+        return connRef.current?.sendTo(instance, command, message);
+    }, []);
+
     const getObjects = useCallback((pattern, cb) => {
         connRef.current?.getObjects(true)
             .then((result) => {
@@ -118,5 +114,5 @@ export function useConnection(adapterInstance) {
             .catch((err) => cb?.(err));
     }, []);
 
-    return { connected, error, states, getStates, setState, getObjects, systemLanguage, langError };
+    return { connected, error, states, getStates, setState, sendTo, getObjects, systemLanguage, langError };
 }

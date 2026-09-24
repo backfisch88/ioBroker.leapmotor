@@ -31,6 +31,17 @@ export default function ConsumptionTab({ base, states, adapter }) {
     const totalKm = val(states, `${base}.consumption.mileage_total_km`, null);
     const totalMiles = val(states, `${base}.consumption.mileage_total_miles`, null);
 
+    const homeKwh = Number(val(states, `${base}.charging.home_total_kwh`, 0)) || 0;
+    const homeCost = Number(val(states, `${base}.charging.home_total_cost`, 0)) || 0;
+    const publicKwh = Number(val(states, `${base}.charging.public_total_kwh`, 0)) || 0;
+    const publicCost = Number(val(states, `${base}.charging.public_total_cost`, 0)) || 0;
+    const unknownKwh = Number(val(states, `${base}.charging.unknown_total_kwh`, 0)) || 0;
+    const unknownCost = Number(val(states, `${base}.charging.unknown_total_cost`, 0)) || 0;
+    const sessionActive = val(states, `${base}.charging.session_active`, false);
+    const sessionKwh = Number(val(states, `${base}.charging.session_kwh`, 0)) || 0;
+    const sessionCost = Number(val(states, `${base}.charging.session_cost`, 0)) || 0;
+    const sessionLocation = val(states, `${base}.charging.session_location`, 'unknown');
+
     const fmtDate = (iso) => {
         if (!iso || iso.length < 10) return iso;
         const [y, m, d] = iso.split('-');
@@ -94,6 +105,45 @@ export default function ConsumptionTab({ base, states, adapter }) {
                     <StatBox label={I18n.t('TOTAL')} value={totalKm !== null ? `${totalKm}` : '—'} sub={totalMiles ? `km · ${totalMiles} mi` : 'km'} />
                 </Grid>
             </Grid>
+
+            <Card sx={{ mb: 2, bgcolor: '#0d1520', border: '1px solid #1e2d45' }}>
+                <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
+                    <Typography variant="caption" sx={{ color: '#3a5070', letterSpacing: '0.1em', display: 'block', mb: 1 }}>
+                        {I18n.t('CHARGING COSTS')}
+                    </Typography>
+                    <Grid container spacing={1.5}>
+                        <Grid size={4}>
+                            <StatBox
+                                label={I18n.t('Home')}
+                                value={`${homeCost.toFixed(2)}€`}
+                                sub={`${homeKwh.toFixed(1)} kWh`}
+                                color="#00ff88"
+                            />
+                        </Grid>
+                        <Grid size={4}>
+                            <StatBox
+                                label={I18n.t('Public')}
+                                value={`${publicCost.toFixed(2)}€`}
+                                sub={`${publicKwh.toFixed(1)} kWh`}
+                                color="#ffcc00"
+                            />
+                        </Grid>
+                        <Grid size={4}>
+                            <StatBox
+                                label={I18n.t('Unknown')}
+                                value={`${unknownCost.toFixed(2)}€`}
+                                sub={`${unknownKwh.toFixed(1)} kWh`}
+                                color="#5a7090"
+                            />
+                        </Grid>
+                    </Grid>
+                    {sessionActive && (
+                        <Typography variant="caption" sx={{ color: '#00d4ff', display: 'block', mt: 1.5 }}>
+                            🔌 {I18n.t('Charging now')}: {sessionKwh.toFixed(1)} kWh · {sessionCost.toFixed(2)}€ ({I18n.t(sessionLocation === 'home' ? 'Home' : sessionLocation === 'public' ? 'Public' : 'Unknown')})
+                        </Typography>
+                    )}
+                </CardContent>
+            </Card>
 
             {stats && (
                 <Grid container spacing={1.5} sx={{ mb: 2 }}>
