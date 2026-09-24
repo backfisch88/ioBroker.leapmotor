@@ -157,5 +157,7 @@
     "Diagnostics": "Diagnostics",
     "No vehicle found. Is the adapter running?": "No vehicle found. Is the adapter running?",
     "Settings": "Settings",
-    "Trips": "Trips"
+    "Trips": "Trips",
+    "Affects Leapmotor cloud API text only (e.g. schedule day names). Does not change the Admin Tab UI language, which follows your ioBroker Admin language setting. Everything else (polling, GPS recording, notifications, electricity prices, home location, Prepare-to-Drive/Work, data retention) has moved to the Settings tab inside the Leapmotor admin tab itself.": "Affects Leapmotor cloud API text only (e.g. schedule day names). Does not change the Admin Tab UI language, which follows your ioBroker Admin language setting. Everything else (polling, GPS recording, notifications, electricity prices, home location, Prepare-to-Drive/Work, data retention) has moved to the Settings tab inside the Leapmotor admin tab itself.",
+    "Notify on new vehicle message (service reminders, recalls, etc.)": "Notify on new vehicle message (service reminders, recalls, etc.)"
 }

@@ -157,5 +157,7 @@
     "Diagnostics": "Diagnostica",
     "No vehicle found. Is the adapter running?": "Nessun veicolo trovato. L'adapter è in esecuzione?",
     "Settings": "Impostazioni",
-    "Trips": "Viaggi"
+    "Trips": "Viaggi",
+    "Affects Leapmotor cloud API text only (e.g. schedule day names). Does not change the Admin Tab UI language, which follows your ioBroker Admin language setting. Everything else (polling, GPS recording, notifications, electricity prices, home location, Prepare-to-Drive/Work, data retention) has moved to the Settings tab inside the Leapmotor admin tab itself.": "Riguarda solo il testo dell'API cloud Leapmotor (es. nomi dei giorni nella pianificazione). Non modifica la lingua della scheda di amministrazione stessa, che segue l'impostazione della lingua di ioBroker Admin. Tutto il resto (polling, registrazione GPS, notifiche, prezzi dell'elettricita, posizione di casa, Pronto per guidare/lavorare, conservazione dei dati) e stato spostato nella scheda Impostazioni all'interno della dashboard Leapmotor.",
+    "Notify on new vehicle message (service reminders, recalls, etc.)": "Notifica per un nuovo messaggio dal veicolo (promemoria di manutenzione, richiami, ecc.)"
 }

@@ -67,7 +67,12 @@ Install via ioBroker Admin UI.
 | Email | Leapmotor account email (recommend using a dedicated second account) |
 | Password | Leapmotor account password |
 | Vehicle PIN | 4-digit vehicle PIN – required for all remote commands |
-| Polling interval | Status update interval in minutes (default: 5) |
+| Cloud API Language | Affects Leapmotor cloud API text only (e.g. schedule day names) |
+
+Everything else (polling intervals, GPS route recording, notifications,
+electricity prices, home location, Prepare-to-Drive/Work, data retention) has
+moved out of the native instance config into the **Settings tab** inside the
+Leapmotor admin dashboard itself.
 
 ## Datapoints
 
@@ -169,6 +174,10 @@ Which comfort commands actually appear depends on the detected vehicle model —
 `admin-tab/src/vehicleCapabilities.js` in the repository for the current capability matrix per model.
 
 ## Changelog
+
+### 0.7.1 (2026-09-24)
+- New: notification for new vehicle inbox messages (service reminders, recalls, etc.), separate from the existing software-update notification
+- Fix: the Cloud API Language field's help text (and its translations, which didn't exist in any language) referenced settings under wording that predated their move to the Settings tab
 
 ### 0.7.0 (2026-09-24)
 - New: trip merge undo (`cmd.trips_merge_undo`, one slot, lost on adapter restart)

@@ -2037,6 +2037,30 @@ export default function SettingsTab({
                         <Switch
                             checked={Boolean(
                                 cfg(
+                                    'notify_new_message',
+                                    false,
+                                ),
+                            )}
+                            onChange={e =>
+                                setState(
+                                    `${adapter}.config.notify_new_message`,
+                                    e.target.checked,
+                                )
+                            }
+                        />
+                    }
+                    label={I18n.t(
+                        'Notify on new vehicle message (service reminders, recalls, etc.)',
+                    )}
+                />
+
+                <br />
+
+                <FormControlLabel
+                    control={
+                        <Switch
+                            checked={Boolean(
+                                cfg(
                                     'notify_window_open',
                                     false,
                                 ),

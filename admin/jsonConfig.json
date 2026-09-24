@@ -25,7 +25,7 @@
     "language": {
       "type": "select",
       "label": "Cloud API Language",
-      "help": "Affects Leapmotor cloud API text only (e.g. schedule day names). Does not change the Admin Tab UI language, which follows your ioBroker Admin language setting. Everything else (polling, GPS recording, notifications, electricity price) has moved to the Settings tab inside the Leapmotor admin tab itself.",
+      "help": "Affects Leapmotor cloud API text only (e.g. schedule day names). Does not change the Admin Tab UI language, which follows your ioBroker Admin language setting. Everything else (polling, GPS recording, notifications, electricity prices, home location, Prepare-to-Drive/Work, data retention) has moved to the Settings tab inside the Leapmotor admin tab itself.",
       "options": [
         {"label": "English", "value": "en-GB"},
         {"label": "Deutsch", "value": "de"},

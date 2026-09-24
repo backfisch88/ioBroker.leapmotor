@@ -11,6 +11,7 @@
 const translations = {
     en: {},
     ru: {
+        "Notify on new vehicle message (service reminders, recalls, etc.)": "Уведомлять о новом сообщении автомобиля (напоминания о сервисе, отзывы и т.д.)",
         "4-digit PIN required for all remote commands": "Для всех удалённых команд требуется 4-значный PIN-код",
         "Affects Leapmotor cloud API text only (e.g. schedule day names). Does not change the Admin Tab UI language, which follows your ioBroker Admin language setting.": "Влияет только на текст облачного API Leapmotor (например, названия дней в расписании). Не меняет язык вкладки администрирования, который зависит от настройки языка ioBroker Admin.",
         "Cloud API Language": "Язык облачного API",
@@ -254,6 +255,7 @@ const translations = {
         "Duration": "Длительность",
     },
     de: {
+        "Notify on new vehicle message (service reminders, recalls, etc.)": "Bei neuer Fahrzeug-Nachricht benachrichtigen (Service-Erinnerungen, Rückrufe, etc.)",
         "4-digit PIN required for all remote commands": "Für alle Fernbefehle ist eine 4-stellige PIN erforderlich",
         "Affects Leapmotor cloud API text only (e.g. schedule day names). Does not change the Admin Tab UI language, which follows your ioBroker Admin language setting.": "Betrifft nur Texte der Leapmotor-Cloud-API (z. B. Wochentagsnamen im Zeitplan). Ändert nicht die Sprache der Admin-Tab-Oberfläche - diese richtet sich nach der ioBroker-Admin-Spracheinstellung.",
         "Cloud API Language": "Cloud-API-Sprache",
@@ -485,6 +487,7 @@ const translations = {
         "Duration": "Dauer",
     },
     fr: {
+        "Notify on new vehicle message (service reminders, recalls, etc.)": "Notifier en cas de nouveau message du véhicule (rappels d'entretien, rappels constructeur, etc.)",
         "4-digit PIN required for all remote commands": "Un code PIN à 4 chiffres est requis pour toutes les commandes à distance",
         "Affects Leapmotor cloud API text only (e.g. schedule day names). Does not change the Admin Tab UI language, which follows your ioBroker Admin language setting.": "N'affecte que le texte de l'API cloud Leapmotor (p. ex. noms des jours dans les horaires). Ne change pas la langue de l'onglet d'administration, qui suit le paramètre de langue d'ioBroker Admin.",
         "Cloud API Language": "Langue de l'API cloud",
@@ -722,6 +725,7 @@ const translations = {
         "Duration": "Durée",
     },
     it: {
+        "Notify on new vehicle message (service reminders, recalls, etc.)": "Notifica per un nuovo messaggio dal veicolo (promemoria di manutenzione, richiami, ecc.)",
         "4-digit PIN required for all remote commands": "È richiesto un PIN a 4 cifre per tutti i comandi remoti",
         "Affects Leapmotor cloud API text only (e.g. schedule day names). Does not change the Admin Tab UI language, which follows your ioBroker Admin language setting.": "Influisce solo sul testo dell'API cloud Leapmotor (es. nomi dei giorni negli orari). Non modifica la lingua della scheda di amministrazione, che segue l'impostazione della lingua di ioBroker Admin.",
         "Cloud API Language": "Lingua API cloud",
@@ -961,6 +965,7 @@ const translations = {
         "Duration": "Durata",
     },
     es: {
+        "Notify on new vehicle message (service reminders, recalls, etc.)": "Notificar ante un nuevo mensaje del vehículo (recordatorios de servicio, retiradas, etc.)",
         "4-digit PIN required for all remote commands": "Se requiere un PIN de 4 dígitos para todos los comandos remotos",
         "Affects Leapmotor cloud API text only (e.g. schedule day names). Does not change the Admin Tab UI language, which follows your ioBroker Admin language setting.": "Solo afecta al texto de la API en la nube de Leapmotor (p. ej. nombres de días en horarios). No cambia el idioma de la pestaña de administración, que sigue el ajuste de idioma de ioBroker Admin.",
         "Cloud API Language": "Idioma de la API en la nube",
@@ -1202,6 +1207,7 @@ const translations = {
         "Duration": "Duración",
     },
     pt: {
+        "Notify on new vehicle message (service reminders, recalls, etc.)": "Notificar em nova mensagem do veículo (lembretes de manutenção, recalls, etc.)",
         "4-digit PIN required for all remote commands": "É necessário um PIN de 4 dígitos para todos os comandos remotos",
         "Affects Leapmotor cloud API text only (e.g. schedule day names). Does not change the Admin Tab UI language, which follows your ioBroker Admin language setting.": "Afeta apenas o texto da API cloud da Leapmotor (ex.: nomes dos dias no agendamento). Não altera o idioma da aba de administração, que segue a definição de idioma do ioBroker Admin.",
         "Cloud API Language": "Idioma da API cloud",
@@ -1442,6 +1448,7 @@ const translations = {
         "Duration": "Duração",
     },
     nl: {
+        "Notify on new vehicle message (service reminders, recalls, etc.)": "Melden bij nieuw voertuigbericht (servicemeldingen, terugroepacties, enz.)",
         "4-digit PIN required for all remote commands": "4-cijferige pincode vereist voor alle afstandscommando's",
         "Affects Leapmotor cloud API text only (e.g. schedule day names). Does not change the Admin Tab UI language, which follows your ioBroker Admin language setting.": "Betreft alleen tekst van de Leapmotor cloud-API (bijv. dagnamen in schema's). Verandert niet de taal van het Admin-tabblad, die de ioBroker Admin-taalinstelling volgt.",
         "Cloud API Language": "Cloud-API-taal",
@@ -1677,6 +1684,7 @@ const translations = {
         "Duration": "Duur",
     },
     pl: {
+        "Notify on new vehicle message (service reminders, recalls, etc.)": "Powiadom o nowej wiadomości pojazdu (przypomnienia serwisowe, akcje serwisowe itp.)",
         "4-digit PIN required for all remote commands": "4-cyfrowy kod PIN jest wymagany dla wszystkich poleceń zdalnych",
         "Affects Leapmotor cloud API text only (e.g. schedule day names). Does not change the Admin Tab UI language, which follows your ioBroker Admin language setting.": "Dotyczy tylko tekstu API chmury Leapmotor (np. nazw dni w harmonogramie). Nie zmienia języka zakładki administracyjnej, który zależy od ustawienia języka ioBroker Admin.",
         "Cloud API Language": "Język API chmury",
@@ -1914,6 +1922,7 @@ const translations = {
         "Duration": "Czas trwania",
     },
     uk: {
+        "Notify on new vehicle message (service reminders, recalls, etc.)": "Сповіщати про нове повідомлення автомобіля (нагадування про сервіс, відкликання тощо)",
         "4-digit PIN required for all remote commands": "Для всіх віддалених команд потрібен 4-значний PIN-код",
         "Affects Leapmotor cloud API text only (e.g. schedule day names). Does not change the Admin Tab UI language, which follows your ioBroker Admin language setting.": "Впливає лише на текст хмарного API Leapmotor (наприклад, назви днів у розкладі). Не змінює мову вкладки адміністрування, яка залежить від налаштування мови ioBroker Admin.",
         "Cloud API Language": "Мова хмарного API",
@@ -2157,6 +2166,7 @@ const translations = {
         "Duration": "Тривалість",
     },
     "zh-cn": {
+        "Notify on new vehicle message (service reminders, recalls, etc.)": "有新车辆消息时通知(保养提醒、召回等)",
         "4-digit PIN required for all remote commands": "所有远程命令都需要4位PIN码",
         "Affects Leapmotor cloud API text only (e.g. schedule day names). Does not change the Admin Tab UI language, which follows your ioBroker Admin language setting.": "仅影响零跑云端API的文本(例如日程中的星期名称)。不会改变管理面板界面的语言,该语言取决于ioBroker管理界面的语言设置。",
         "Cloud API Language": "云端API语言",

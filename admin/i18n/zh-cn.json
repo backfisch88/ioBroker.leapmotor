@@ -157,5 +157,7 @@
     "Diagnostics": "诊断",
     "No vehicle found. Is the adapter running?": "未找到车辆。适配器是否在运行?",
     "Settings": "设置",
-    "Trips": "行程"
+    "Trips": "行程",
+    "Affects Leapmotor cloud API text only (e.g. schedule day names). Does not change the Admin Tab UI language, which follows your ioBroker Admin language setting. Everything else (polling, GPS recording, notifications, electricity prices, home location, Prepare-to-Drive/Work, data retention) has moved to the Settings tab inside the Leapmotor admin tab itself.": "仅影响零跑云端API的文本(例如日程中的星期名称)。不会改变管理选项卡本身的语言,该语言取决于ioBroker管理界面的语言设置。其他所有内容(轮询、GPS记录、通知、电价、家庭位置、驾驶/上班准备、数据保留)已移至零跑管理面板内的设置选项卡中。",
+    "Notify on new vehicle message (service reminders, recalls, etc.)": "有新车辆消息时通知(保养提醒、召回等)"
 }

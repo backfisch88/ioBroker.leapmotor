@@ -490,6 +490,12 @@ class LeapmotorAdapter extends utils.Adapter{
                 fr:v=>`🏢 Prêt pour le travail : ${v.label} à ${v.temp}°C (extérieur ${v.outdoor}°C)`,
                 it:v=>`🏢 Pronto per il lavoro: ${v.label} a ${v.temp}°C (esterno ${v.outdoor}°C)`,
             },
+            new_message:{
+                en:v=>`📩 New vehicle message: ${v.title}${v.text?' - '+v.text:''}`,
+                de:v=>`📩 Neue Fahrzeug-Nachricht: ${v.title}${v.text?' - '+v.text:''}`,
+                fr:v=>`📩 Nouveau message du véhicule : ${v.title}${v.text?' - '+v.text:''}`,
+                it:v=>`📩 Nuovo messaggio dal veicolo: ${v.title}${v.text?' - '+v.text:''}`,
+            },
             test:{
                 en:()=>'🚗 Leapmotor test notification - if you see this, it works!',
                 de:()=>'🚗 Leapmotor-Testbenachrichtigung - wenn du das siehst, funktioniert es!',
@@ -1162,9 +1168,20 @@ class LeapmotorAdapter extends utils.Adapter{
             if(messages.length>0){
                 const latest=messages[0];
                 const time=latest.sendTime?new Date(Number(latest.sendTime)).toLocaleString('de-DE',{timeZone:'Europe/Berlin'}):'';
+                const prevTimeState=await this.getStateAsync('messages.latest_time');
+                const isNewMessage=latest.sendTime!=null&&time!==''&&prevTimeState?.val!==time&&prevTimeState?.val;
                 await this.setStateAsync('messages.latest_title',{val:latest.title||'',ack:true});
                 await this.setStateAsync('messages.latest_text',{val:latest.message||latest.content||'',ack:true});
                 await this.setStateAsync('messages.latest_time',{val:time,ack:true});
+                // Separate from the OTA-specific notification below - this
+                // is for ANY new inbox message from the vehicle (service
+                // reminders, recall notices, etc.), not just software
+                // updates. Guarded on prevTimeState already having a value
+                // so the very first poll after an adapter restart doesn't
+                // re-notify about a message that was already there before.
+                if(isNewMessage){
+                    this.sendNotification('new_message',this.notificationText('new_message',{title:latest.title||'',text:latest.message||latest.content||''}));
+                }
             }
             await this.setStateAsync('messages.json',{val:JSON.stringify(messages),ack:true});
             // OTA/software-update detection: Leapmotor has no dedicated
@@ -1596,6 +1613,7 @@ class LeapmotorAdapter extends utils.Adapter{
         await this.setObjectNotExistsAsync(`config.notify_trip_done`,{type:'state',common:{name:'Notify when a trip ends',type:'boolean',role:'switch',read:true,write:true,def:false},native:{}});
         await this.setObjectNotExistsAsync(`config.notify_charge_done`,{type:'state',common:{name:'Notify when charging finishes',type:'boolean',role:'switch',read:true,write:true,def:false},native:{}});
         await this.setObjectNotExistsAsync(`config.notify_ota_update`,{type:'state',common:{name:'Notify on software update available',type:'boolean',role:'switch',read:true,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`config.notify_new_message`,{type:'state',common:{name:'Notify when the vehicle sends a new inbox message (service reminders, recalls, etc. - separate from the software-update notification)',type:'boolean',role:'switch',read:true,write:true,def:false},native:{}});
         await this.setObjectNotExistsAsync(`config.notify_window_open`,{type:'state',common:{name:'Notify if a window is left open while parked with ignition off',type:'boolean',role:'switch',read:true,write:true,def:false},native:{}});
         await this.setObjectNotExistsAsync(`config.prepare_to_drive_enabled`,{type:'state',common:{name:'Prepare-to-Drive: auto-climate on ignition-on (opt-in)',type:'boolean',role:'switch',read:true,write:true,def:false},native:{}});
         await this.setObjectNotExistsAsync(`config.prepare_to_drive_temp_cold`,{type:'state',common:{name:'Prepare-to-Drive: heat below this outdoor temp (°C)',type:'number',role:'level.temperature',read:true,write:true,unit:'°C',def:14},native:{}});
