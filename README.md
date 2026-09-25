@@ -175,9 +175,11 @@ Which comfort commands actually appear depends on the detected vehicle model —
 
 ## Changelog
 
-### 0.7.1 (2026-09-24)
+### 0.7.2 (2026-09-24)
 - New: notification for new vehicle inbox messages (service reminders, recalls, etc.), separate from the existing software-update notification
+- Fix: outdoor temperature (used for trip min/max temp and Prepare-to-Drive/Work) now falls back to Open-Meteo not just when the vehicle doesn't report a value at all, but also when its reported value has stopped updating (confirmed on T03: the cloud keeps serving the same reading once parked long enough) - same 30min staleness threshold as the existing data-age indicator, cached for 10min so this never polls Open-Meteo more than necessary
 - Fix: the Cloud API Language field's help text (and its translations, which didn't exist in any language) referenced settings under wording that predated their move to the Settings tab
+- Note: 0.7.1 was pushed to GitHub but never tagged/published to npm - its changes are included here in 0.7.2 instead
 
 ### 0.7.0 (2026-09-24)
 - New: trip merge undo (`cmd.trips_merge_undo`, one slot, lost on adapter restart)

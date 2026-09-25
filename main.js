@@ -330,7 +330,7 @@ class LeapmotorAdapter extends utils.Adapter{
     // rather than real outside conditions. Falls back to the configured
     // home location if no GPS fix is available.
     // Single shared cache (not per-vin - it's the same sky over one home
-    // area for a single-vehicle setup): refreshed at most every 30min, and
+    // area for a single-vehicle setup): refreshed at most every 10min, and
     // on ANY failure (503, timeout, network blip, whatever) falls back to
     // the last known-good reading rather than giving up - a somewhat stale
     // temperature is always better than none for a heat/cool/vent decision.
@@ -338,7 +338,7 @@ class LeapmotorAdapter extends utils.Adapter{
     async fetchWeatherTemp(lat,lon){
         if(!this._weatherTempCache)this._weatherTempCache={temp:null,at:0};
         const cache=this._weatherTempCache;
-        if(cache.temp!=null&&Date.now()-cache.at<1800000){
+        if(cache.temp!=null&&Date.now()-cache.at<600000){
             return cache.temp;
         }
         try{
@@ -638,7 +638,12 @@ class LeapmotorAdapter extends utils.Adapter{
             const pollTime=new Date().toLocaleString('de-DE',{timeZone:'Europe/Berlin'});
             await this.setStateAsync(`${vehicle.vin}.status.last_poll_time`,{val:pollTime,ack:true});
             try{await this.updateDailyMileage(vehicle.vin,s.totalMileage)}catch(e){this.log.debug(`Daily mileage error: ${e}`)}
-            try{await this.updateTripDetection(vehicle,s.totalMileage,s.speed,s.soc,s.bcmKeyPositionOn1||s.bcmKeyPositionOn3,s.collectTimeMs,s.driverDoorLockStatus,s.latitude,s.longitude,s.outdoorTemp,s.batteryCurrent,s.batteryVoltage,s.chargeState,s.gearStatus,s.bcmKeyPositionOn3)}catch(e){this.log.debug(`Trip detection error: ${e}`)}
+            // Trip min/max temp always comes from Open-Meteo, never the
+            // vehicle's own outdoorTemp sensor - even on models that DO
+            // report it (confirmed on T03), it simply stops updating once
+            // the car has been parked long enough, silently going stale.
+            const tripOutdoorTemp=await this.fetchWeatherTemp(s.latitude,s.longitude);
+            try{await this.updateTripDetection(vehicle,s.totalMileage,s.speed,s.soc,s.bcmKeyPositionOn1||s.bcmKeyPositionOn3,s.collectTimeMs,s.driverDoorLockStatus,s.latitude,s.longitude,tripOutdoorTemp,s.batteryCurrent,s.batteryVoltage,s.chargeState,s.gearStatus,s.bcmKeyPositionOn3)}catch(e){this.log.debug(`Trip detection error: ${e}`)}
             try{await this.recordRoutePoint(vehicle,s)}catch(e){this.log.debug(`Route recording error: ${e}`)}
             try{await this.resolvePendingTripEnergy(vehicle)}catch(e){this.log.debug(`Pending trip energy error: ${e}`)}
             try{await this.updateChargingCost(vehicle.vin,s.soc,s.chargeState,s.gearStatus,s.speed,s.bcmKeyPositionOn3,s.latitude,s.longitude)}catch(e){this.log.debug(`Charging cost error: ${e}`)}
@@ -1713,9 +1718,15 @@ class LeapmotorAdapter extends utils.Adapter{
         await set('status.mileage_total',s.totalMileage);
         // Temperature
         let temp_outdoor=s.outdoorTemp;
-        if(temp_outdoor==null){
+        const dataAgeMin=s.collectTimeMs!=null?(Date.now()-s.collectTimeMs)/60000:null;
+        const vehicleTempStale=dataAgeMin!=null&&dataAgeMin>30;
+        if(temp_outdoor==null||vehicleTempStale){
             // Some models don't report this at all (confirmed absent on
-            // B10). fetchWeatherTemp caches internally (30min) and falls
+            // B10); others (T03 confirmed) report it but the cloud simply
+            // stops updating it once the vehicle has been parked long
+            // enough - a "successful" poll can still be re-serving an old
+            // cached frame. Same 30min staleness threshold as data_stale
+            // below. fetchWeatherTemp caches internally (10min) and falls
             // back to its last known-good value on any API error, so this
             // is safe to call on every poll.
             temp_outdoor=await this.fetchWeatherTemp(s.latitude,s.longitude);
