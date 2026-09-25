@@ -88,6 +88,43 @@ export default function DiagnosticsTab({ base, states, setState, adapter }) {
                 </CardContent>
             </Card>
 
+            <Card sx={{ mb: 2, bgcolor: '#0d1520', border: '1px solid #1e2d45' }}>
+                <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
+                        {I18n.t('Official Charging History (cross-check)')}
+                    </Typography>
+                    <Grid container spacing={2}>
+                        <Grid size={4}>
+                            <Typography sx={{ fontSize: '1.3rem', fontWeight: 800, color: '#00d4ff' }}>
+                                {val(states, `${base}.charging.official_home_kwh_90d`, 0)} kWh
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: '#5a7090' }}>
+                                {I18n.t('Home')}
+                            </Typography>
+                        </Grid>
+                        <Grid size={4}>
+                            <Typography sx={{ fontSize: '1.3rem', fontWeight: 800, color: '#ffcc00' }}>
+                                {val(states, `${base}.charging.official_public_kwh_90d`, 0)} kWh
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: '#5a7090' }}>
+                                {I18n.t('Public')}
+                            </Typography>
+                        </Grid>
+                        <Grid size={4}>
+                            <Typography sx={{ fontSize: '1.3rem', fontWeight: 800, color: '#5a7090' }}>
+                                {val(states, `${base}.charging.official_unknown_kwh_90d`, 0)} kWh
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: '#5a7090' }}>
+                                {I18n.t('Unknown')}
+                            </Typography>
+                        </Grid>
+                    </Grid>
+                    <Typography variant="caption" sx={{ color: '#3a5070', display: 'block', mt: 1, fontStyle: 'italic' }}>
+                        {I18n.t('Last 90 days, from the cloud\'s own device-metered charging log ({{count}} sessions) - for comparison only, cost totals elsewhere still use live tracking.').replace('{{count}}', val(states, `${base}.charging.official_session_count_90d`, 0))}
+                    </Typography>
+                </CardContent>
+            </Card>
+
             <Card sx={{ bgcolor: '#0d1520', border: '1px solid #1e2d45' }}>
                 <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1.5 }}>

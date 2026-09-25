@@ -635,6 +635,18 @@ class LeapmotorAdapter extends utils.Adapter{
         // in the admin tab's Settings page takes effect on the next poll -
         // no adapter restart needed.
         this.scheduleNextPoll();
+        // Runs once at startup and then once every 24h - deliberately NOT
+        // tied to the poll cycle (which can run every 15s while driving).
+        // This is historical, cloud-aggregated data that doesn't change
+        // meaningfully more often than daily, and there's no reason to hit
+        // the endpoint any more than that.
+        const syncOfficialChargingForAllVehicles=async()=>{
+            for(const v of this.vehicles){
+                await this.syncOfficialChargingHistory(v);
+            }
+        };
+        syncOfficialChargingForAllVehicles();
+        this.officialChargingSyncTimer=this.setInterval(syncOfficialChargingForAllVehicles,86400000);
     }
 
     isAnyVehicleDriving(){
@@ -1219,6 +1231,44 @@ class LeapmotorAdapter extends utils.Adapter{
         return distM<=radiusM?'home':'public';
     }
 
+    // Cross-check against the cloud's OWN device-metered charging session
+    // log (community-documented endpoint, 2026-09) - independent of our own
+    // poll-based SoC-delta tracking, which can miss brief sessions between
+    // polls or drift slightly from rounding. This does NOT replace the
+    // live-tracked home/public totals used for cost display; it's a
+    // separate, official-sourced figure surfaced in Diagnostics for
+    // comparison, so a discrepancy is visible without silently changing
+    // numbers the user already relies on.
+    async syncOfficialChargingHistory(vehicle){
+        if(!this.client)return;
+        try{
+            const end=new Date();
+            const start=new Date(end.getTime()-90*86400000);
+            const fmt=d=>d.toISOString().slice(0,10);
+            const result=await this.client.getChargingDailyDetail(vehicle,fmt(start),fmt(end),1,200);
+            const list=result?.data?.list||result?.data?.records||[];
+            let homeKwh=0,publicKwh=0,unknownKwh=0,count=0;
+            for(const rec of list){
+                const kwh=Number(rec.chargeInEnergy)||0;
+                if(kwh<=0)continue;
+                count++;
+                const lat=Number(rec.chargeStartLatitude);
+                const lon=Number(rec.chargeStartLongitude);
+                const loc=await this.classifyChargingLocation(isNaN(lat)?null:lat,isNaN(lon)?null:lon);
+                if(loc==='home')homeKwh+=kwh;
+                else if(loc==='public')publicKwh+=kwh;
+                else unknownKwh+=kwh;
+            }
+            await this.setStateAsync(`${vehicle.vin}.charging.official_home_kwh_90d`,{val:Number(homeKwh.toFixed(2)),ack:true});
+            await this.setStateAsync(`${vehicle.vin}.charging.official_public_kwh_90d`,{val:Number(publicKwh.toFixed(2)),ack:true});
+            await this.setStateAsync(`${vehicle.vin}.charging.official_unknown_kwh_90d`,{val:Number(unknownKwh.toFixed(2)),ack:true});
+            await this.setStateAsync(`${vehicle.vin}.charging.official_session_count_90d`,{val:count,ack:true});
+            this.log.debug(`${vehicle.vin}: official charging history sync - ${count} sessions, home ${homeKwh.toFixed(1)}kWh, public ${publicKwh.toFixed(1)}kWh, unknown ${unknownKwh.toFixed(1)}kWh`);
+        }catch(e){
+            this.log.debug(`${vehicle.vin}: official charging history sync failed: ${e}`);
+        }
+    }
+
     async updateMessages(){
         if(!this.client)return;
         try{
@@ -1754,6 +1804,10 @@ class LeapmotorAdapter extends utils.Adapter{
         await this.setObjectNotExistsAsync(`${vehicle.vin}.charging.public_total_cost`,{type:'state',common:{name:'Lifetime Cost Charged At Public Stations',type:'number',role:'value',read:true,write:false,unit:'€',def:0},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.charging.unknown_total_kwh`,{type:'state',common:{name:'Lifetime Energy Charged (location unknown - no home location configured, or GPS unavailable at session start)',type:'number',role:'value',read:true,write:false,unit:'kWh',def:0},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.charging.unknown_total_cost`,{type:'state',common:{name:'Lifetime Cost Charged (location unknown)',type:'number',role:'value',read:true,write:false,unit:'€',def:0},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.charging.official_home_kwh_90d`,{type:'state',common:{name:'Official cloud-metered home charging, last 90 days (cross-check only, not used for cost)',type:'number',role:'value',read:true,write:false,unit:'kWh',def:0},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.charging.official_public_kwh_90d`,{type:'state',common:{name:'Official cloud-metered public charging, last 90 days (cross-check only, not used for cost)',type:'number',role:'value',read:true,write:false,unit:'kWh',def:0},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.charging.official_unknown_kwh_90d`,{type:'state',common:{name:'Official cloud-metered charging with no usable GPS, last 90 days',type:'number',role:'value',read:true,write:false,unit:'kWh',def:0},native:{}});
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.charging.official_session_count_90d`,{type:'state',common:{name:'Official cloud-metered charging session count, last 90 days',type:'number',role:'value',read:true,write:false,def:0},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.defrost_cycle`,{type:'state',common:{name:'Cycle Windshield Defrost (off/weak/strong)',type:'boolean',role:'button',read:false,write:true,def:false},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.quick_cool`,{type:'state',common:{name:'Quick Cool',type:'boolean',role:'button',read:false,write:true,def:false},native:{}});
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.quick_heat`,{type:'state',common:{name:'Quick Heat',type:'boolean',role:'button',read:false,write:true,def:false},native:{}});
@@ -2531,7 +2585,7 @@ class LeapmotorAdapter extends utils.Adapter{
         }catch(e){this.log.error(`Command ${cmd} failed: ${e}`)}
     }
 
-    onUnload(callback){if(this.pollTimer){this.clearTimeout(this.pollTimer);this.pollTimer=null}this.setState('info.connection',false,true);callback()}
+    onUnload(callback){if(this.pollTimer){this.clearTimeout(this.pollTimer);this.pollTimer=null}if(this.officialChargingSyncTimer){this.clearInterval(this.officialChargingSyncTimer);this.officialChargingSyncTimer=null}this.setState('info.connection',false,true);callback()}
 }
 if(require.main!==module){module.exports=options=>new LeapmotorAdapter(options)}
 else{new LeapmotorAdapter()}

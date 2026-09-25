@@ -11,6 +11,8 @@
 const translations = {
     en: {},
     ru: {
+        "Last 90 days, from the cloud's own device-metered charging log ({{count}} sessions) - for comparison only, cost totals elsewhere still use live tracking.": "Последние 90 дней, из собственного журнала зарядки облака ({{count}} сеансов) - только для сравнения, суммы затрат в других местах по-прежнему используют данные в реальном времени.",
+        "Official Charging History (cross-check)": "Официальная история зарядки (для сверки)",
         "Only close for cold below (°C)": "Закрывать только при холоде ниже (°C)",
         "Defrost threshold (°C)": "Порог обогрева стекла (°C)",
         "Also turn on windshield defrost below": "Также включать обогрев лобового стекла ниже",
@@ -262,6 +264,8 @@ const translations = {
         "Duration": "Длительность",
     },
     de: {
+        "Last 90 days, from the cloud's own device-metered charging log ({{count}} sessions) - for comparison only, cost totals elsewhere still use live tracking.": "Letzte 90 Tage, aus dem eigenen geräteseitig gemessenen Lade-Log der Cloud ({{count}} Sitzungen) - nur zum Vergleich, Kosten-Summen an anderer Stelle nutzen weiterhin das Live-Tracking.",
+        "Official Charging History (cross-check)": "Offizielle Ladehistorie (Abgleich)",
         "Only close for cold below (°C)": "Nur bei Kälte unter (°C) schließen",
         "Defrost threshold (°C)": "Enteisungsschwelle (°C)",
         "Also turn on windshield defrost below": "Auch Scheibenenteisung einschalten unter",
@@ -501,6 +505,8 @@ const translations = {
         "Duration": "Dauer",
     },
     fr: {
+        "Last 90 days, from the cloud's own device-metered charging log ({{count}} sessions) - for comparison only, cost totals elsewhere still use live tracking.": "90 derniers jours, à partir du propre journal de charge mesuré par l'appareil du cloud ({{count}} sessions) - à titre de comparaison uniquement, les totaux de coûts ailleurs utilisent toujours le suivi en direct.",
+        "Official Charging History (cross-check)": "Historique de charge officiel (vérification)",
         "Only close for cold below (°C)": "Fermer uniquement en cas de froid en dessous de (°C)",
         "Defrost threshold (°C)": "Seuil de dégivrage (°C)",
         "Also turn on windshield defrost below": "Activer aussi le dégivrage du pare-brise en dessous de",
@@ -746,6 +752,8 @@ const translations = {
         "Duration": "Durée",
     },
     it: {
+        "Last 90 days, from the cloud's own device-metered charging log ({{count}} sessions) - for comparison only, cost totals elsewhere still use live tracking.": "Ultimi 90 giorni, dal registro di ricarica misurato dal dispositivo del cloud ({{count}} sessioni) - solo per confronto, i totali dei costi altrove usano ancora il monitoraggio in tempo reale.",
+        "Official Charging History (cross-check)": "Cronologia di ricarica ufficiale (verifica)",
         "Only close for cold below (°C)": "Chiudi solo per freddo sotto (°C)",
         "Defrost threshold (°C)": "Soglia di sbrinamento (°C)",
         "Also turn on windshield defrost below": "Attiva anche lo sbrinamento del parabrezza sotto",
@@ -993,6 +1001,8 @@ const translations = {
         "Duration": "Durata",
     },
     es: {
+        "Last 90 days, from the cloud's own device-metered charging log ({{count}} sessions) - for comparison only, cost totals elsewhere still use live tracking.": "Últimos 90 días, del propio registro de carga medido por el dispositivo en la nube ({{count}} sesiones) - solo para comparación, los totales de coste en otras partes siguen usando el seguimiento en vivo.",
+        "Official Charging History (cross-check)": "Historial de carga oficial (verificación)",
         "Only close for cold below (°C)": "Cerrar solo con frío por debajo de (°C)",
         "Defrost threshold (°C)": "Umbral de descongelación (°C)",
         "Also turn on windshield defrost below": "Activar también el descongelador del parabrisas por debajo de",
@@ -1242,6 +1252,8 @@ const translations = {
         "Duration": "Duración",
     },
     pt: {
+        "Last 90 days, from the cloud's own device-metered charging log ({{count}} sessions) - for comparison only, cost totals elsewhere still use live tracking.": "Últimos 90 dias, do próprio registo de carregamento medido pelo dispositivo na cloud ({{count}} sessões) - apenas para comparação, os totais de custo noutros locais ainda usam o rastreamento em tempo real.",
+        "Official Charging History (cross-check)": "Histórico de carregamento oficial (verificação)",
         "Only close for cold below (°C)": "Fechar apenas com frio abaixo de (°C)",
         "Defrost threshold (°C)": "Limite de descongelamento (°C)",
         "Also turn on windshield defrost below": "Ativar também o descongelamento do para-brisas abaixo de",
@@ -1490,6 +1502,8 @@ const translations = {
         "Duration": "Duração",
     },
     nl: {
+        "Last 90 days, from the cloud's own device-metered charging log ({{count}} sessions) - for comparison only, cost totals elsewhere still use live tracking.": "Laatste 90 dagen, uit het eigen door het apparaat gemeten laadlogboek van de cloud ({{count}} sessies) - alleen ter vergelijking, kostentotalen elders gebruiken nog steeds live tracking.",
+        "Official Charging History (cross-check)": "Officiële laadgeschiedenis (controle)",
         "Only close for cold below (°C)": "Alleen sluiten bij kou onder (°C)",
         "Defrost threshold (°C)": "Ontdooidrempel (°C)",
         "Also turn on windshield defrost below": "Ook voorruitontdooiing inschakelen onder",
@@ -1733,6 +1747,8 @@ const translations = {
         "Duration": "Duur",
     },
     pl: {
+        "Last 90 days, from the cloud's own device-metered charging log ({{count}} sessions) - for comparison only, cost totals elsewhere still use live tracking.": "Ostatnie 90 dni, z własnego dziennika ładowania mierzonego przez urządzenie w chmurze ({{count}} sesji) - tylko do porównania, sumy kosztów w innych miejscach nadal używają śledzenia na żywo.",
+        "Official Charging History (cross-check)": "Oficjalna historia ładowania (weryfikacja)",
         "Only close for cold below (°C)": "Zamykaj tylko przy zimnie poniżej (°C)",
         "Defrost threshold (°C)": "Próg odszraniania (°C)",
         "Also turn on windshield defrost below": "Włącz też odszranianie przedniej szyby poniżej",
@@ -1978,6 +1994,8 @@ const translations = {
         "Duration": "Czas trwania",
     },
     uk: {
+        "Last 90 days, from the cloud's own device-metered charging log ({{count}} sessions) - for comparison only, cost totals elsewhere still use live tracking.": "Останні 90 днів, з власного журналу заряджання, виміряного пристроєм у хмарі ({{count}} сеансів) - лише для порівняння, суми витрат в інших місцях досі використовують живе відстеження.",
+        "Official Charging History (cross-check)": "Офіційна історія заряджання (перевірка)",
         "Only close for cold below (°C)": "Закривати лише при холоді нижче (°C)",
         "Defrost threshold (°C)": "Поріг розморожування (°C)",
         "Also turn on windshield defrost below": "Також вмикати розморожування вітрового скла нижче",
@@ -2229,6 +2247,8 @@ const translations = {
         "Duration": "Тривалість",
     },
     "zh-cn": {
+        "Last 90 days, from the cloud's own device-metered charging log ({{count}} sessions) - for comparison only, cost totals elsewhere still use live tracking.": "最近90天,来自云端自身设备计量的充电日志({{count}}次会话) - 仅供比较,其他地方的费用总计仍使用实时跟踪数据。",
+        "Official Charging History (cross-check)": "官方充电记录(交叉核对)",
         "Only close for cold below (°C)": "仅在低于此温度(°C)的寒冷天气时关闭",
         "Defrost threshold (°C)": "除霜阈值(°C)",
         "Also turn on windshield defrost below": "低于此温度时同时开启前挡风除霜",
