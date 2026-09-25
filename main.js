@@ -402,17 +402,27 @@ class LeapmotorAdapter extends utils.Adapter{
                     this.log.debug(`${prefix}: sunrise/sunset lookup failed: ${e}`);
                 }
             }
-            // The sunshade is heat/cold insulation via the glass roof,
-            // not glare protection. At night there's no solar heat gain
-            // through the glass either way, so for heat(cool)/vent the
-            // configured position is pointless in the dark - just open
-            // it instead. Cold (heat) is the one exception: heat LOSS
-            // through the glass at night is still real, so that keeps
-            // whatever position the user configured regardless of dark.
+            // Cold-protection close has its OWN threshold, separate from the
+            // general heat/cool/vent split above - confirmed in practice
+            // that the general heat threshold alone is too eager (roof
+            // closed at 14°C, which doesn't actually need insulating
+            // against). Only really-cold weather below this stricter,
+            // independently configurable threshold keeps the configured
+            // "heat" position (day or night - heat loss through the glass
+            // at night is still real). Otherwise, being in the "heat"
+            // bracket doesn't by itself justify closing the roof, so it
+            // falls through to the same open-when-dark / normal-position
+            // logic as cool/vent.
+            const sunshadeColdBelowState=await this.getStateAsync(`config.${prefix}_sunshade_cold_below`);
+            const sunshadeColdBelow=Number(sunshadeColdBelowState?.val??5);
+            const reallyCold=label==='heat'&&outdoorTemp<sunshadeColdBelow;
             let sunshadePos;
-            if(isDark&&label!=='heat'){
+            if(reallyCold){
+                const sunshadePosState=await this.getStateAsync(`config.${prefix}_sunshade_heat`);
+                sunshadePos=Number(sunshadePosState?.val??0);
+            }else if(isDark){
                 sunshadePos=10;
-                this.log.info(`${prefix}: dark outside, opening sunshade instead of the configured ${label} position (heat-loss protection doesn't apply to ${label}).`);
+                this.log.info(`${prefix}: dark outside and not cold enough for roof insulation (outdoor ${outdoorTemp}°C, threshold ${sunshadeColdBelow}°C) - opening sunshade.`);
             }else{
                 const sunshadePosState=await this.getStateAsync(`config.${prefix}_sunshade_${label}`);
                 sunshadePos=Number(sunshadePosState?.val??10);
@@ -463,7 +473,7 @@ class LeapmotorAdapter extends utils.Adapter{
             const defrostBelow=Number(defrostBelowState?.val??0);
             if(outdoorTemp<defrostBelow){
                 try{
-                    await this.setStateAsync(`${vin}.cmd.defrost_level`,{val:2,ack:false});
+                    await this.executeCommand(vehicle,'defrost');
                     this.log.info(`${prefix}: windshield defrost turned on (outdoor ${outdoorTemp}°C below ${defrostBelow}°C).`);
                 }catch(e){
                     this.log.warn(`${prefix} defrost command failed: ${e}`);
@@ -1674,6 +1684,7 @@ class LeapmotorAdapter extends utils.Adapter{
         await this.setObjectNotExistsAsync(`config.notify_prepare_to_drive`,{type:'state',common:{name:'Notify when Prepare-to-Drive triggers',type:'boolean',role:'switch',read:true,write:true,def:false},native:{}});
         await this.setObjectNotExistsAsync(`config.prepare_to_drive_sunshade_enabled`,{type:'state',common:{name:'Prepare-to-Drive: also control sunshade',type:'boolean',role:'switch',read:true,write:true,def:false},native:{}});
         await this.setObjectNotExistsAsync(`config.prepare_to_drive_sunshade_heat`,{type:'state',common:{name:'Prepare-to-Drive: sunshade position when heating (cold), 0-10',type:'number',role:'level',read:true,write:true,min:0,max:10,def:0},native:{}});
+        await this.setObjectNotExistsAsync(`config.prepare_to_drive_sunshade_cold_below`,{type:'state',common:{name:'Prepare-to-Drive: only close sunshade for cold-insulation below this outdoor temperature (°C) - independent of the general heat threshold above, which alone is too eager (e.g. 14°C does not need the roof closed)',type:'number',role:'level.temperature',read:true,write:true,unit:'°C',def:5},native:{}});
         await this.setObjectNotExistsAsync(`config.prepare_to_drive_sunshade_cool`,{type:'state',common:{name:'Prepare-to-Drive: sunshade position when cooling (hot), 0-10',type:'number',role:'level',read:true,write:true,min:0,max:10,def:0},native:{}});
         await this.setObjectNotExistsAsync(`config.prepare_to_drive_sunshade_vent`,{type:'state',common:{name:'Prepare-to-Drive: sunshade position when venting (mild), 0-10',type:'number',role:'level',read:true,write:true,min:0,max:10,def:10},native:{}});
         await this.setObjectNotExistsAsync(`config.prepare_to_drive_sunshade_skip_dark`,{type:'state',common:{name:'Prepare-to-Drive: skip sunshade movement when it is dark (sunrise/sunset at vehicle location)',type:'boolean',role:'switch',read:true,write:true,def:false},native:{}});
@@ -1695,6 +1706,7 @@ class LeapmotorAdapter extends utils.Adapter{
         await this.setObjectNotExistsAsync(`config.prepare_to_work_fan_speed`,{type:'state',common:{name:'Prepare-to-Work: fan speed, 1-7',type:'number',role:'level',read:true,write:true,min:1,max:7,def:3},native:{}});
         await this.setObjectNotExistsAsync(`config.prepare_to_work_sunshade_enabled`,{type:'state',common:{name:'Prepare-to-Work: also control sunshade',type:'boolean',role:'switch',read:true,write:true,def:false},native:{}});
         await this.setObjectNotExistsAsync(`config.prepare_to_work_sunshade_heat`,{type:'state',common:{name:'Prepare-to-Work: sunshade position when heating (cold), 0-10',type:'number',role:'level',read:true,write:true,min:0,max:10,def:0},native:{}});
+        await this.setObjectNotExistsAsync(`config.prepare_to_work_sunshade_cold_below`,{type:'state',common:{name:'Prepare-to-Work: only close sunshade for cold-insulation below this outdoor temperature (°C) - independent of the general heat threshold above, which alone is too eager (e.g. 14°C does not need the roof closed)',type:'number',role:'level.temperature',read:true,write:true,unit:'°C',def:5},native:{}});
         await this.setObjectNotExistsAsync(`config.prepare_to_work_sunshade_cool`,{type:'state',common:{name:'Prepare-to-Work: sunshade position when cooling (hot), 0-10',type:'number',role:'level',read:true,write:true,min:0,max:10,def:0},native:{}});
         await this.setObjectNotExistsAsync(`config.prepare_to_work_sunshade_vent`,{type:'state',common:{name:'Prepare-to-Work: sunshade position when venting (mild), 0-10',type:'number',role:'level',read:true,write:true,min:0,max:10,def:10},native:{}});
         await this.setObjectNotExistsAsync(`config.prepare_to_work_sunshade_skip_dark`,{type:'state',common:{name:'Prepare-to-Work: skip sunshade movement when it is dark (sunrise/sunset at vehicle location)',type:'boolean',role:'switch',read:true,write:true,def:false},native:{}});

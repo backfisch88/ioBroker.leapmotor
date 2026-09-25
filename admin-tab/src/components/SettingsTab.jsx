@@ -1290,6 +1290,31 @@ export default function SettingsTab({
                     <TextField
                         type="number"
                         label={I18n.t(
+                            'Only close for cold below (°C)',
+                        )}
+                        value={cfg(
+                            'prepare_to_drive_sunshade_cold_below',
+                            5,
+                        )}
+                        onChange={e =>
+                            setState(
+                                `${adapter}.config.prepare_to_drive_sunshade_cold_below`,
+                                Number(e.target.value),
+                            )
+                        }
+                        size="small"
+                        sx={{ width: 200 }}
+                        disabled={
+                            !cfg(
+                                'prepare_to_drive_sunshade_enabled',
+                                false,
+                            )
+                        }
+                    />
+
+                    <TextField
+                        type="number"
+                        label={I18n.t(
                             'Sunshade when cooling (hot)',
                         )}
                         value={cfg(
@@ -1720,6 +1745,31 @@ export default function SettingsTab({
                             min: 0,
                             max: 10,
                         }}
+                        size="small"
+                        sx={{ width: 200 }}
+                        disabled={
+                            !cfg(
+                                'prepare_to_work_sunshade_enabled',
+                                false,
+                            )
+                        }
+                    />
+
+                    <TextField
+                        type="number"
+                        label={I18n.t(
+                            'Only close for cold below (°C)',
+                        )}
+                        value={cfg(
+                            'prepare_to_work_sunshade_cold_below',
+                            5,
+                        )}
+                        onChange={e =>
+                            setState(
+                                `${adapter}.config.prepare_to_work_sunshade_cold_below`,
+                                Number(e.target.value),
+                            )
+                        }
                         size="small"
                         sx={{ width: 200 }}
                         disabled={

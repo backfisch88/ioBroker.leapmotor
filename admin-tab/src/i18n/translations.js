@@ -11,6 +11,7 @@
 const translations = {
     en: {},
     ru: {
+        "Only close for cold below (°C)": "Закрывать только при холоде ниже (°C)",
         "Defrost threshold (°C)": "Порог обогрева стекла (°C)",
         "Also turn on windshield defrost below": "Также включать обогрев лобового стекла ниже",
         "Also turn on steering wheel heat when heating": "Также включать подогрев руля при обогреве",
@@ -261,6 +262,7 @@ const translations = {
         "Duration": "Длительность",
     },
     de: {
+        "Only close for cold below (°C)": "Nur bei Kälte unter (°C) schließen",
         "Defrost threshold (°C)": "Enteisungsschwelle (°C)",
         "Also turn on windshield defrost below": "Auch Scheibenenteisung einschalten unter",
         "Also turn on steering wheel heat when heating": "Beim Heizen auch Lenkradheizung einschalten",
@@ -499,6 +501,7 @@ const translations = {
         "Duration": "Dauer",
     },
     fr: {
+        "Only close for cold below (°C)": "Fermer uniquement en cas de froid en dessous de (°C)",
         "Defrost threshold (°C)": "Seuil de dégivrage (°C)",
         "Also turn on windshield defrost below": "Activer aussi le dégivrage du pare-brise en dessous de",
         "Also turn on steering wheel heat when heating": "Activer aussi le chauffage du volant lors du chauffage",
@@ -743,6 +746,7 @@ const translations = {
         "Duration": "Durée",
     },
     it: {
+        "Only close for cold below (°C)": "Chiudi solo per freddo sotto (°C)",
         "Defrost threshold (°C)": "Soglia di sbrinamento (°C)",
         "Also turn on windshield defrost below": "Attiva anche lo sbrinamento del parabrezza sotto",
         "Also turn on steering wheel heat when heating": "Attiva anche il riscaldamento del volante quando riscalda",
@@ -989,6 +993,7 @@ const translations = {
         "Duration": "Durata",
     },
     es: {
+        "Only close for cold below (°C)": "Cerrar solo con frío por debajo de (°C)",
         "Defrost threshold (°C)": "Umbral de descongelación (°C)",
         "Also turn on windshield defrost below": "Activar también el descongelador del parabrisas por debajo de",
         "Also turn on steering wheel heat when heating": "Activar también la calefacción del volante al calentar",
@@ -1237,6 +1242,7 @@ const translations = {
         "Duration": "Duración",
     },
     pt: {
+        "Only close for cold below (°C)": "Fechar apenas com frio abaixo de (°C)",
         "Defrost threshold (°C)": "Limite de descongelamento (°C)",
         "Also turn on windshield defrost below": "Ativar também o descongelamento do para-brisas abaixo de",
         "Also turn on steering wheel heat when heating": "Ativar também o aquecimento do volante ao aquecer",
@@ -1484,6 +1490,7 @@ const translations = {
         "Duration": "Duração",
     },
     nl: {
+        "Only close for cold below (°C)": "Alleen sluiten bij kou onder (°C)",
         "Defrost threshold (°C)": "Ontdooidrempel (°C)",
         "Also turn on windshield defrost below": "Ook voorruitontdooiing inschakelen onder",
         "Also turn on steering wheel heat when heating": "Ook stuurverwarming inschakelen bij verwarmen",
@@ -1726,6 +1733,7 @@ const translations = {
         "Duration": "Duur",
     },
     pl: {
+        "Only close for cold below (°C)": "Zamykaj tylko przy zimnie poniżej (°C)",
         "Defrost threshold (°C)": "Próg odszraniania (°C)",
         "Also turn on windshield defrost below": "Włącz też odszranianie przedniej szyby poniżej",
         "Also turn on steering wheel heat when heating": "Włącz też ogrzewanie kierownicy przy grzaniu",
@@ -1970,6 +1978,7 @@ const translations = {
         "Duration": "Czas trwania",
     },
     uk: {
+        "Only close for cold below (°C)": "Закривати лише при холоді нижче (°C)",
         "Defrost threshold (°C)": "Поріг розморожування (°C)",
         "Also turn on windshield defrost below": "Також вмикати розморожування вітрового скла нижче",
         "Also turn on steering wheel heat when heating": "Також вмикати підігрів керма при обігріві",
@@ -2220,6 +2229,7 @@ const translations = {
         "Duration": "Тривалість",
     },
     "zh-cn": {
+        "Only close for cold below (°C)": "仅在低于此温度(°C)的寒冷天气时关闭",
         "Defrost threshold (°C)": "除霜阈值(°C)",
         "Also turn on windshield defrost below": "低于此温度时同时开启前挡风除霜",
         "Also turn on steering wheel heat when heating": "制热时同时开启方向盘加热",
