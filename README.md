@@ -175,7 +175,7 @@ Which comfort commands actually appear depends on the detected vehicle model —
 
 ## Changelog
 
-### Unreleased (work in progress)
+### **WORK IN PROGRESS**
 - New: optional comfort extras for Prepare-to-Drive/Work, opt-in and off by default since not every model/trim has them (confirmed absent on T03; unconfirmed on B10/C10/B05/C16):
   - Driver seat heat (level 1-3) when heating (cold)
   - Steering wheel heat when heating (cold)
