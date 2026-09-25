@@ -424,6 +424,52 @@ class LeapmotorAdapter extends utils.Adapter{
                 this.log.warn(`${prefix} sunshade command failed: ${e}`);
             }
         }
+        // Optional comfort extras, all opt-in (default off) since seat/
+        // steering-wheel heat don't exist on every model/trim (confirmed
+        // absent on T03; unconfirmed either way on B10/C10/B05/C16) - no
+        // reliable way to auto-detect this from the backend, so it's on the
+        // user to only enable what their own vehicle actually has.
+        if(label==='heat'){
+            // Only alongside actual cabin heating (cold), not cool/vent -
+            // heated seats/wheel in mild or hot weather makes no sense.
+            const seatHeatEnabledState=await this.getStateAsync(`config.${prefix}_seat_heat_enabled`);
+            if(seatHeatEnabledState?.val){
+                const levelState=await this.getStateAsync(`config.${prefix}_seat_heat_level`);
+                const level=Number(levelState?.val??2);
+                try{
+                    await this.setStateAsync(`${vin}.cmd.seat_heat_driver`,{val:level,ack:false});
+                    this.log.info(`${prefix}: driver seat heat set to ${level}.`);
+                }catch(e){
+                    this.log.warn(`${prefix} seat heat command failed: ${e}`);
+                }
+            }
+            const wheelHeatEnabledState=await this.getStateAsync(`config.${prefix}_steering_wheel_heat_enabled`);
+            if(wheelHeatEnabledState?.val){
+                try{
+                    await this.executeCommand(vehicle,'steering_wheel_heat_on');
+                    this.log.info(`${prefix}: steering wheel heat turned on.`);
+                }catch(e){
+                    this.log.warn(`${prefix} steering wheel heat command failed: ${e}`);
+                }
+            }
+        }
+        // Defrost has its own independent threshold (icing risk), separate
+        // from the general cold/hot/mild split above - someone might want
+        // cabin heat starting at 14°C but only want to bother de-icing the
+        // windshield below freezing.
+        const defrostEnabledState=await this.getStateAsync(`config.${prefix}_defrost_enabled`);
+        if(defrostEnabledState?.val){
+            const defrostBelowState=await this.getStateAsync(`config.${prefix}_defrost_below`);
+            const defrostBelow=Number(defrostBelowState?.val??0);
+            if(outdoorTemp<defrostBelow){
+                try{
+                    await this.setStateAsync(`${vin}.cmd.defrost_level`,{val:2,ack:false});
+                    this.log.info(`${prefix}: windshield defrost turned on (outdoor ${outdoorTemp}°C below ${defrostBelow}°C).`);
+                }catch(e){
+                    this.log.warn(`${prefix} defrost command failed: ${e}`);
+                }
+            }
+        }
         this.sendNotification(prefix,this.notificationText(prefix,{label,temp:targetTemp,outdoor:outdoorTemp}));
     }
 
@@ -1631,6 +1677,11 @@ class LeapmotorAdapter extends utils.Adapter{
         await this.setObjectNotExistsAsync(`config.prepare_to_drive_sunshade_cool`,{type:'state',common:{name:'Prepare-to-Drive: sunshade position when cooling (hot), 0-10',type:'number',role:'level',read:true,write:true,min:0,max:10,def:0},native:{}});
         await this.setObjectNotExistsAsync(`config.prepare_to_drive_sunshade_vent`,{type:'state',common:{name:'Prepare-to-Drive: sunshade position when venting (mild), 0-10',type:'number',role:'level',read:true,write:true,min:0,max:10,def:10},native:{}});
         await this.setObjectNotExistsAsync(`config.prepare_to_drive_sunshade_skip_dark`,{type:'state',common:{name:'Prepare-to-Drive: skip sunshade movement when it is dark (sunrise/sunset at vehicle location)',type:'boolean',role:'switch',read:true,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`config.prepare_to_drive_seat_heat_enabled`,{type:'state',common:{name:'Prepare-to-Drive: also turn on driver seat heat when heating (opt-in - not every model/trim has this)',type:'boolean',role:'switch',read:true,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`config.prepare_to_drive_seat_heat_level`,{type:'state',common:{name:'Prepare-to-Drive: driver seat heat level, 1-3',type:'number',role:'level',read:true,write:true,min:1,max:3,def:2},native:{}});
+        await this.setObjectNotExistsAsync(`config.prepare_to_drive_steering_wheel_heat_enabled`,{type:'state',common:{name:'Prepare-to-Drive: also turn on steering wheel heat when heating (opt-in - not every model/trim has this)',type:'boolean',role:'switch',read:true,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`config.prepare_to_drive_defrost_enabled`,{type:'state',common:{name:'Prepare-to-Drive: also turn on windshield defrost below a separate cold threshold (icing risk, independent of the general heat/cool/vent split)',type:'boolean',role:'switch',read:true,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`config.prepare_to_drive_defrost_below`,{type:'state',common:{name:'Prepare-to-Drive: turn on defrost below this outdoor temperature (°C)',type:'number',role:'level.temperature',read:true,write:true,unit:'°C',def:0},native:{}});
         // Prepare-to-Work: same core climate decision as Prepare-to-Drive,
         // but triggered explicitly via cmd.prepare_to_work (write true) -
         // for coupling to a shift schedule, calendar event, etc. instead of
@@ -1647,6 +1698,11 @@ class LeapmotorAdapter extends utils.Adapter{
         await this.setObjectNotExistsAsync(`config.prepare_to_work_sunshade_cool`,{type:'state',common:{name:'Prepare-to-Work: sunshade position when cooling (hot), 0-10',type:'number',role:'level',read:true,write:true,min:0,max:10,def:0},native:{}});
         await this.setObjectNotExistsAsync(`config.prepare_to_work_sunshade_vent`,{type:'state',common:{name:'Prepare-to-Work: sunshade position when venting (mild), 0-10',type:'number',role:'level',read:true,write:true,min:0,max:10,def:10},native:{}});
         await this.setObjectNotExistsAsync(`config.prepare_to_work_sunshade_skip_dark`,{type:'state',common:{name:'Prepare-to-Work: skip sunshade movement when it is dark (sunrise/sunset at vehicle location)',type:'boolean',role:'switch',read:true,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`config.prepare_to_work_seat_heat_enabled`,{type:'state',common:{name:'Prepare-to-Work: also turn on driver seat heat when heating (opt-in - not every model/trim has this)',type:'boolean',role:'switch',read:true,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`config.prepare_to_work_seat_heat_level`,{type:'state',common:{name:'Prepare-to-Work: driver seat heat level, 1-3',type:'number',role:'level',read:true,write:true,min:1,max:3,def:2},native:{}});
+        await this.setObjectNotExistsAsync(`config.prepare_to_work_steering_wheel_heat_enabled`,{type:'state',common:{name:'Prepare-to-Work: also turn on steering wheel heat when heating (opt-in - not every model/trim has this)',type:'boolean',role:'switch',read:true,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`config.prepare_to_work_defrost_enabled`,{type:'state',common:{name:'Prepare-to-Work: also turn on windshield defrost below a separate cold threshold (icing risk, independent of the general heat/cool/vent split)',type:'boolean',role:'switch',read:true,write:true,def:false},native:{}});
+        await this.setObjectNotExistsAsync(`config.prepare_to_work_defrost_below`,{type:'state',common:{name:'Prepare-to-Work: turn on defrost below this outdoor temperature (°C)',type:'number',role:'level.temperature',read:true,write:true,unit:'°C',def:0},native:{}});
         await this.setObjectNotExistsAsync(`config.notify_prepare_to_work`,{type:'state',common:{name:'Notify when Prepare-to-Work triggers',type:'boolean',role:'switch',read:true,write:true,def:false},native:{}});
         await this.setObjectNotExistsAsync(`config.home_latitude`,{type:'state',common:{name:'Home location latitude (for home/public charging classification, optional)',type:'number',role:'value.gps.latitude',read:true,write:true,def:0},native:{}});
         await this.setObjectNotExistsAsync(`config.home_longitude`,{type:'state',common:{name:'Home location longitude (for home/public charging classification, optional)',type:'number',role:'value.gps.longitude',read:true,write:true,def:0},native:{}});

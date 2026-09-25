@@ -1374,6 +1374,106 @@ export default function SettingsTab({
                         'Skip sunshade when dark (based on sunrise/sunset at vehicle location)',
                     )}
                 />
+
+                <Divider
+                    sx={{
+                        my: 2,
+                        borderColor: '#1e2d45',
+                    }}
+                />
+
+                <Typography
+                    variant="caption"
+                    sx={{
+                        color: '#5a7090',
+                        display: 'block',
+                        mb: 1,
+                    }}
+                >
+                    {I18n.t(
+                        'Optional extras - not every model/trim has these, only enable what your own vehicle actually supports.',
+                    )}
+                </Typography>
+
+                <FormControlLabel
+                    control={
+                        <Switch
+                            checked={Boolean(
+                                cfg('prepare_to_drive_seat_heat_enabled', false),
+                            )}
+                            onChange={e =>
+                                setState(
+                                    `${adapter}.config.prepare_to_drive_seat_heat_enabled`,
+                                    e.target.checked,
+                                )
+                            }
+                        />
+                    }
+                    label={I18n.t('Also turn on driver seat heat when heating')}
+                />
+                <TextField
+                    type="number"
+                    label={I18n.t('Seat heat level (1-3)')}
+                    value={cfg('prepare_to_drive_seat_heat_level', 2)}
+                    onChange={e =>
+                        setState(
+                            `${adapter}.config.prepare_to_drive_seat_heat_level`,
+                            Number(e.target.value),
+                        )
+                    }
+                    inputProps={{ min: 1, max: 3 }}
+                    size="small"
+                    sx={{ width: 200, ml: 2 }}
+                    disabled={!cfg('prepare_to_drive_seat_heat_enabled', false)}
+                />
+                <br />
+                <FormControlLabel
+                    control={
+                        <Switch
+                            checked={Boolean(
+                                cfg('prepare_to_drive_steering_wheel_heat_enabled', false),
+                            )}
+                            onChange={e =>
+                                setState(
+                                    `${adapter}.config.prepare_to_drive_steering_wheel_heat_enabled`,
+                                    e.target.checked,
+                                )
+                            }
+                        />
+                    }
+                    label={I18n.t('Also turn on steering wheel heat when heating')}
+                />
+                <br />
+                <FormControlLabel
+                    control={
+                        <Switch
+                            checked={Boolean(
+                                cfg('prepare_to_drive_defrost_enabled', false),
+                            )}
+                            onChange={e =>
+                                setState(
+                                    `${adapter}.config.prepare_to_drive_defrost_enabled`,
+                                    e.target.checked,
+                                )
+                            }
+                        />
+                    }
+                    label={I18n.t('Also turn on windshield defrost below')}
+                />
+                <TextField
+                    type="number"
+                    label={I18n.t('Defrost threshold (°C)')}
+                    value={cfg('prepare_to_drive_defrost_below', 0)}
+                    onChange={e =>
+                        setState(
+                            `${adapter}.config.prepare_to_drive_defrost_below`,
+                            Number(e.target.value),
+                        )
+                    }
+                    size="small"
+                    sx={{ width: 200, ml: 2 }}
+                    disabled={!cfg('prepare_to_drive_defrost_enabled', false)}
+                />
             </SectionCard>
 
             <SectionCard
@@ -1716,6 +1816,106 @@ export default function SettingsTab({
                     label={I18n.t(
                         'Skip sunshade when dark (based on sunrise/sunset at vehicle location)',
                     )}
+                />
+
+                <Divider
+                    sx={{
+                        my: 2,
+                        borderColor: '#1e2d45',
+                    }}
+                />
+
+                <Typography
+                    variant="caption"
+                    sx={{
+                        color: '#5a7090',
+                        display: 'block',
+                        mb: 1,
+                    }}
+                >
+                    {I18n.t(
+                        'Optional extras - not every model/trim has these, only enable what your own vehicle actually supports.',
+                    )}
+                </Typography>
+
+                <FormControlLabel
+                    control={
+                        <Switch
+                            checked={Boolean(
+                                cfg('prepare_to_work_seat_heat_enabled', false),
+                            )}
+                            onChange={e =>
+                                setState(
+                                    `${adapter}.config.prepare_to_work_seat_heat_enabled`,
+                                    e.target.checked,
+                                )
+                            }
+                        />
+                    }
+                    label={I18n.t('Also turn on driver seat heat when heating')}
+                />
+                <TextField
+                    type="number"
+                    label={I18n.t('Seat heat level (1-3)')}
+                    value={cfg('prepare_to_work_seat_heat_level', 2)}
+                    onChange={e =>
+                        setState(
+                            `${adapter}.config.prepare_to_work_seat_heat_level`,
+                            Number(e.target.value),
+                        )
+                    }
+                    inputProps={{ min: 1, max: 3 }}
+                    size="small"
+                    sx={{ width: 200, ml: 2 }}
+                    disabled={!cfg('prepare_to_work_seat_heat_enabled', false)}
+                />
+                <br />
+                <FormControlLabel
+                    control={
+                        <Switch
+                            checked={Boolean(
+                                cfg('prepare_to_work_steering_wheel_heat_enabled', false),
+                            )}
+                            onChange={e =>
+                                setState(
+                                    `${adapter}.config.prepare_to_work_steering_wheel_heat_enabled`,
+                                    e.target.checked,
+                                )
+                            }
+                        />
+                    }
+                    label={I18n.t('Also turn on steering wheel heat when heating')}
+                />
+                <br />
+                <FormControlLabel
+                    control={
+                        <Switch
+                            checked={Boolean(
+                                cfg('prepare_to_work_defrost_enabled', false),
+                            )}
+                            onChange={e =>
+                                setState(
+                                    `${adapter}.config.prepare_to_work_defrost_enabled`,
+                                    e.target.checked,
+                                )
+                            }
+                        />
+                    }
+                    label={I18n.t('Also turn on windshield defrost below')}
+                />
+                <TextField
+                    type="number"
+                    label={I18n.t('Defrost threshold (°C)')}
+                    value={cfg('prepare_to_work_defrost_below', 0)}
+                    onChange={e =>
+                        setState(
+                            `${adapter}.config.prepare_to_work_defrost_below`,
+                            Number(e.target.value),
+                        )
+                    }
+                    size="small"
+                    sx={{ width: 200, ml: 2 }}
+                    disabled={!cfg('prepare_to_work_defrost_enabled', false)}
                 />
             </SectionCard>
 
