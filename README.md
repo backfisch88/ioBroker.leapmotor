@@ -175,6 +175,12 @@ Which comfort commands actually appear depends on the detected vehicle model —
 
 ## Changelog
 
+### Unreleased (work in progress)
+- New: optional comfort extras for Prepare-to-Drive/Work, opt-in and off by default since not every model/trim has them (confirmed absent on T03; unconfirmed on B10/C10/B05/C16):
+  - Driver seat heat (level 1-3) when heating (cold)
+  - Steering wheel heat when heating (cold)
+  - Windshield defrost (`cmd.defrost` - the working "max defrost" command, not the ineffective `cmd.defrost_level`) below its own separate, independently configurable temperature threshold (icing risk, distinct from the general heat/cool/vent split)
+
 ### 0.7.2 (2026-09-24)
 - New: notification for new vehicle inbox messages (service reminders, recalls, etc.), separate from the existing software-update notification
 - Fix: outdoor temperature (used for trip min/max temp and Prepare-to-Drive/Work) now falls back to Open-Meteo not just when the vehicle doesn't report a value at all, but also when its reported value has stopped updating (confirmed on T03: the cloud keeps serving the same reading once parked long enough) - same 30min staleness threshold as the existing data-age indicator, cached for 10min so this never polls Open-Meteo more than necessary
