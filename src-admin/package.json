@@ -9,7 +9,7 @@
     },
     "dependencies": {},
     "devDependencies": {
-        "@vitejs/plugin-react": "^4.2.0",
+        "@vitejs/plugin-react": "^6.1.1",
         "vite": "^5.0.0",
         "@emotion/react": "^11.11.0",
         "@emotion/styled": "^11.11.0",
