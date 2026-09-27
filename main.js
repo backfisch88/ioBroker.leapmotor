@@ -486,8 +486,18 @@ class LeapmotorAdapter extends utils.Adapter {
             if (skipDarkState?.val && s.latitude != null && s.longitude != null) {
                 try {
                     const times = suncalc.getTimes(new Date(), s.latitude, s.longitude);
-                    const now = Date.now();
-                    isDark = now < times.sunrise.getTime() || now > times.sunset.getTime();
+                    if (times.sunrise && times.sunset) {
+                        const now = Date.now();
+                        isDark = now < times.sunrise.getTime() || now > times.sunset.getTime();
+                    } else {
+                        // Polar day/night at this latitude/date - suncalc 2.x
+                        // can return null here instead of throwing. Leave
+                        // isDark at its safe default (false) rather than
+                        // crash on .getTime() of null.
+                        this.log.debug(
+                            `${prefix}: sunrise/sunset unavailable at this latitude/date (polar day or night) - skipping dark-based sunshade logic.`,
+                        );
+                    }
                 } catch (e) {
                     this.log.debug(`${prefix}: sunrise/sunset lookup failed: ${e}`);
                 }
