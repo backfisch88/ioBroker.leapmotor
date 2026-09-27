@@ -612,6 +612,16 @@ class LeapmotorAdapter extends utils.Adapter {
                 fr: v => `🚗 Trajet terminé : ${v.km}km en ${v.min}min`,
                 it: v => `🚗 Viaggio terminato: ${v.km}km in ${v.min}min`,
             },
+            trip_done_extended: {
+                en: v =>
+                    `🚗 Trip finished: ${v.km}km in ${v.min}min - ${v.totalKwh}kWh (${v.drivingKwh} driving, ${v.acKwh} climate, ${v.otherKwh} other)`,
+                de: v =>
+                    `🚗 Fahrt beendet: ${v.km}km in ${v.min}min - ${v.totalKwh}kWh (${v.drivingKwh} Fahren, ${v.acKwh} Klima, ${v.otherKwh} Sonstiges)`,
+                fr: v =>
+                    `🚗 Trajet terminé : ${v.km}km en ${v.min}min - ${v.totalKwh}kWh (${v.drivingKwh} conduite, ${v.acKwh} climatisation, ${v.otherKwh} autre)`,
+                it: v =>
+                    `🚗 Viaggio terminato: ${v.km}km in ${v.min}min - ${v.totalKwh}kWh (${v.drivingKwh} guida, ${v.acKwh} clima, ${v.otherKwh} altro)`,
+            },
             charge_done: {
                 en: v => `🔌 Charging finished: ${v.kwh}kWh, ${v.cost}€`,
                 de: v => `🔌 Laden beendet: ${v.kwh}kWh, ${v.cost}€`,
@@ -758,6 +768,29 @@ class LeapmotorAdapter extends utils.Adapter {
                     this.log.info(
                         `${v.vin}: cleared a stale "trip in progress" flag left over from before the last restart.`,
                     );
+                }
+                // Same idea for an in-progress charging session: restore
+                // whatever cost/kWh had accumulated before the restart, so a
+                // charge that was already halfway done doesn't quietly start
+                // over from 0 - see updateChargingCost for where this is
+                // written. Only restored if it actually looked mid-session;
+                // an empty/missing value just means no charge was running.
+                const sessionStateRaw = await this.getStateAsync(`${v.vin}.charging.session_state_json`);
+                if (sessionStateRaw?.val) {
+                    try {
+                        const restored = JSON.parse(sessionStateRaw.val);
+                        if (restored && restored.wasCharging) {
+                            if (!this._chargingSessions) {
+                                this._chargingSessions = {};
+                            }
+                            this._chargingSessions[v.vin] = restored;
+                            this.log.info(
+                                `${v.vin}: restored an in-progress charging session from before the last restart (${restored.accumulatedKwh?.toFixed?.(2) ?? restored.accumulatedKwh}kWh, ${restored.accumulatedCost?.toFixed?.(2) ?? restored.accumulatedCost}€ so far).`,
+                            );
+                        }
+                    } catch (e) {
+                        this.log.debug(`${v.vin}: could not restore charging session state: ${e}`);
+                    }
                 }
             }
         } catch (e) {
@@ -1394,10 +1427,32 @@ class LeapmotorAdapter extends utils.Adapter {
                 history = pruneByAge(history, t => t.startTimeMs, tripRetentionDays, TRIP_HISTORY_HARD_CAP);
                 await this.setStateAsync(stateId, { val: JSON.stringify(history), ack: true });
                 this.log.info(`Trip ended: ${trip.km}km in ${durationMin}min`);
-                this.sendNotification(
-                    'trip_done',
-                    this.notificationText('trip_done', { km: trip.km, min: durationMin }),
-                );
+                const extendedState = await this.getStateAsync('config.notify_trip_extended');
+                if (extendedState?.val && trip.energyOfficial) {
+                    const totalKwh =
+                        Math.round((trip.energyDrivingKwh + trip.energyAcKwh + trip.energyOtherKwh) * 100) / 100;
+                    this.sendNotification(
+                        'trip_done',
+                        this.notificationText('trip_done_extended', {
+                            km: trip.km,
+                            min: durationMin,
+                            totalKwh,
+                            drivingKwh: trip.energyDrivingKwh,
+                            acKwh: trip.energyAcKwh,
+                            otherKwh: trip.energyOtherKwh,
+                        }),
+                    );
+                } else {
+                    // Falls back here either because the toggle is off, or
+                    // because official energy data isn't in yet for this
+                    // trip (energyPending) - the retry queue below may still
+                    // resolve it, but that happens well after this
+                    // notification would have needed to go out.
+                    this.sendNotification(
+                        'trip_done',
+                        this.notificationText('trip_done', { km: trip.km, min: durationMin }),
+                    );
+                }
                 if (trip.energyPending) {
                     if (!this._pendingEnergyTrips) {
                         this._pendingEnergyTrips = {};
@@ -1621,6 +1676,13 @@ class LeapmotorAdapter extends utils.Adapter {
             await this.setStateAsync(`${vin}.charging.session_cost`, { val: 0, ack: true });
             await this.setStateAsync(`${vin}.charging.session_kwh`, { val: 0, ack: true });
             await this.setStateAsync(`${vin}.charging.session_location`, { val: location, ack: true });
+            // Persisted so a mid-charge adapter restart (update, crash, manual
+            // restart) doesn't silently lose whatever cost/kWh had already
+            // accumulated in memory - see onReady for the matching restore.
+            await this.setStateAsync(`${vin}.charging.session_state_json`, {
+                val: JSON.stringify(this._chargingSessions[vin]),
+                ack: true,
+            });
             this.log.debug(`Charging session started at SOC=${soc}% (location: ${location})`);
         } else if (charging && prev.wasCharging) {
             // Laufende Session: Energie seit letztem Poll mit AKTUELLEM Preis verrechnen
@@ -1647,9 +1709,14 @@ class LeapmotorAdapter extends utils.Adapter {
                 val: Math.round(updated.accumulatedKwh * 100) / 100,
                 ack: true,
             });
+            await this.setStateAsync(`${vin}.charging.session_state_json`, {
+                val: JSON.stringify(updated),
+                ack: true,
+            });
         } else if (!charging && prev.wasCharging) {
             // Session beendet
             await this.setStateAsync(`${vin}.charging.session_active`, { val: false, ack: true });
+            await this.setStateAsync(`${vin}.charging.session_state_json`, { val: '', ack: true });
             this.log.info(
                 `Charging session ended: ${prev.accumulatedKwh.toFixed(2)}kWh, ${prev.accumulatedCost.toFixed(2)}€ (${prev.location})`,
             );
@@ -3068,6 +3135,18 @@ class LeapmotorAdapter extends utils.Adapter {
             },
             native: {},
         });
+        await this.setObjectNotExistsAsync(`config.notify_trip_extended`, {
+            type: 'state',
+            common: {
+                name: 'Include energy consumption in the trip-done notification (falls back to the plain message if official energy data is not yet available for this trip)',
+                type: 'boolean',
+                role: 'switch',
+                read: true,
+                write: true,
+                def: false,
+            },
+            native: {},
+        });
         await this.setObjectNotExistsAsync(`config.notify_charge_done`, {
             type: 'state',
             common: {
@@ -3865,6 +3944,18 @@ class LeapmotorAdapter extends utils.Adapter {
                 read: true,
                 write: false,
                 def: 'unknown',
+            },
+            native: {},
+        });
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.charging.session_state_json`, {
+            type: 'state',
+            common: {
+                name: 'Internal: in-progress charging session state (for surviving an adapter restart mid-charge) - not meant for direct use',
+                type: 'string',
+                role: 'json',
+                read: true,
+                write: false,
+                def: '',
             },
             native: {},
         });

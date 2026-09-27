@@ -11,6 +11,7 @@
 const translations = {
     en: {},
     ru: {
+        "Include energy consumption in trip notifications": "Указывать расход энергии в уведомлениях о поездке",
         "Last 90 days, from the cloud's own device-metered charging log ({{count}} sessions) - for comparison only, cost totals elsewhere still use live tracking.": "Последние 90 дней, из собственного журнала зарядки облака ({{count}} сеансов) - только для сравнения, суммы затрат в других местах по-прежнему используют данные в реальном времени.",
         "Official Charging History (cross-check)": "Официальная история зарядки (для сверки)",
         "Only close for cold below (°C)": "Закрывать только при холоде ниже (°C)",
@@ -264,6 +265,7 @@ const translations = {
         "Duration": "Длительность",
     },
     de: {
+        "Include energy consumption in trip notifications": "Energieverbrauch in Fahrt-Benachrichtigungen anzeigen",
         "Last 90 days, from the cloud's own device-metered charging log ({{count}} sessions) - for comparison only, cost totals elsewhere still use live tracking.": "Letzte 90 Tage, aus dem eigenen geräteseitig gemessenen Lade-Log der Cloud ({{count}} Sitzungen) - nur zum Vergleich, Kosten-Summen an anderer Stelle nutzen weiterhin das Live-Tracking.",
         "Official Charging History (cross-check)": "Offizielle Ladehistorie (Abgleich)",
         "Only close for cold below (°C)": "Nur bei Kälte unter (°C) schließen",
@@ -505,6 +507,7 @@ const translations = {
         "Duration": "Dauer",
     },
     fr: {
+        "Include energy consumption in trip notifications": "Inclure la consommation d'énergie dans les notifications de trajet",
         "Last 90 days, from the cloud's own device-metered charging log ({{count}} sessions) - for comparison only, cost totals elsewhere still use live tracking.": "90 derniers jours, à partir du propre journal de charge mesuré par l'appareil du cloud ({{count}} sessions) - à titre de comparaison uniquement, les totaux de coûts ailleurs utilisent toujours le suivi en direct.",
         "Official Charging History (cross-check)": "Historique de charge officiel (vérification)",
         "Only close for cold below (°C)": "Fermer uniquement en cas de froid en dessous de (°C)",
@@ -752,6 +755,7 @@ const translations = {
         "Duration": "Durée",
     },
     it: {
+        "Include energy consumption in trip notifications": "Includi il consumo energetico nelle notifiche di viaggio",
         "Last 90 days, from the cloud's own device-metered charging log ({{count}} sessions) - for comparison only, cost totals elsewhere still use live tracking.": "Ultimi 90 giorni, dal registro di ricarica misurato dal dispositivo del cloud ({{count}} sessioni) - solo per confronto, i totali dei costi altrove usano ancora il monitoraggio in tempo reale.",
         "Official Charging History (cross-check)": "Cronologia di ricarica ufficiale (verifica)",
         "Only close for cold below (°C)": "Chiudi solo per freddo sotto (°C)",
@@ -1001,6 +1005,7 @@ const translations = {
         "Duration": "Durata",
     },
     es: {
+        "Include energy consumption in trip notifications": "Incluir el consumo de energía en las notificaciones de trayecto",
         "Last 90 days, from the cloud's own device-metered charging log ({{count}} sessions) - for comparison only, cost totals elsewhere still use live tracking.": "Últimos 90 días, del propio registro de carga medido por el dispositivo en la nube ({{count}} sesiones) - solo para comparación, los totales de coste en otras partes siguen usando el seguimiento en vivo.",
         "Official Charging History (cross-check)": "Historial de carga oficial (verificación)",
         "Only close for cold below (°C)": "Cerrar solo con frío por debajo de (°C)",
@@ -1252,6 +1257,7 @@ const translations = {
         "Duration": "Duración",
     },
     pt: {
+        "Include energy consumption in trip notifications": "Incluir o consumo de energia nas notificações de viagem",
         "Last 90 days, from the cloud's own device-metered charging log ({{count}} sessions) - for comparison only, cost totals elsewhere still use live tracking.": "Últimos 90 dias, do próprio registo de carregamento medido pelo dispositivo na cloud ({{count}} sessões) - apenas para comparação, os totais de custo noutros locais ainda usam o rastreamento em tempo real.",
         "Official Charging History (cross-check)": "Histórico de carregamento oficial (verificação)",
         "Only close for cold below (°C)": "Fechar apenas com frio abaixo de (°C)",
@@ -1502,6 +1508,7 @@ const translations = {
         "Duration": "Duração",
     },
     nl: {
+        "Include energy consumption in trip notifications": "Energieverbruik opnemen in ritmeldingen",
         "Last 90 days, from the cloud's own device-metered charging log ({{count}} sessions) - for comparison only, cost totals elsewhere still use live tracking.": "Laatste 90 dagen, uit het eigen door het apparaat gemeten laadlogboek van de cloud ({{count}} sessies) - alleen ter vergelijking, kostentotalen elders gebruiken nog steeds live tracking.",
         "Official Charging History (cross-check)": "Officiële laadgeschiedenis (controle)",
         "Only close for cold below (°C)": "Alleen sluiten bij kou onder (°C)",
@@ -1747,6 +1754,7 @@ const translations = {
         "Duration": "Duur",
     },
     pl: {
+        "Include energy consumption in trip notifications": "Uwzględnij zużycie energii w powiadomieniach o przejeździe",
         "Last 90 days, from the cloud's own device-metered charging log ({{count}} sessions) - for comparison only, cost totals elsewhere still use live tracking.": "Ostatnie 90 dni, z własnego dziennika ładowania mierzonego przez urządzenie w chmurze ({{count}} sesji) - tylko do porównania, sumy kosztów w innych miejscach nadal używają śledzenia na żywo.",
         "Official Charging History (cross-check)": "Oficjalna historia ładowania (weryfikacja)",
         "Only close for cold below (°C)": "Zamykaj tylko przy zimnie poniżej (°C)",
@@ -1994,6 +2002,7 @@ const translations = {
         "Duration": "Czas trwania",
     },
     uk: {
+        "Include energy consumption in trip notifications": "Включати споживання енергії в сповіщення про поїздку",
         "Last 90 days, from the cloud's own device-metered charging log ({{count}} sessions) - for comparison only, cost totals elsewhere still use live tracking.": "Останні 90 днів, з власного журналу заряджання, виміряного пристроєм у хмарі ({{count}} сеансів) - лише для порівняння, суми витрат в інших місцях досі використовують живе відстеження.",
         "Official Charging History (cross-check)": "Офіційна історія заряджання (перевірка)",
         "Only close for cold below (°C)": "Закривати лише при холоді нижче (°C)",
@@ -2247,6 +2256,7 @@ const translations = {
         "Duration": "Тривалість",
     },
     "zh-cn": {
+        "Include energy consumption in trip notifications": "在行程通知中包含能耗信息",
         "Last 90 days, from the cloud's own device-metered charging log ({{count}} sessions) - for comparison only, cost totals elsewhere still use live tracking.": "最近90天,来自云端自身设备计量的充电日志({{count}}次会话) - 仅供比较,其他地方的费用总计仍使用实时跟踪数据。",
         "Official Charging History (cross-check)": "官方充电记录(交叉核对)",
         "Only close for cold below (°C)": "仅在低于此温度(°C)的寒冷天气时关闭",

@@ -2239,6 +2239,36 @@ export default function SettingsTab({
                         <Switch
                             checked={Boolean(
                                 cfg(
+                                    'notify_trip_extended',
+                                    false,
+                                ),
+                            )}
+                            onChange={e =>
+                                setState(
+                                    `${adapter}.config.notify_trip_extended`,
+                                    e.target.checked,
+                                )
+                            }
+                            disabled={
+                                !cfg(
+                                    'notify_trip_done',
+                                    false,
+                                )
+                            }
+                        />
+                    }
+                    label={I18n.t(
+                        'Include energy consumption in trip notifications',
+                    )}
+                />
+
+                <br />
+
+                <FormControlLabel
+                    control={
+                        <Switch
+                            checked={Boolean(
+                                cfg(
                                     'notify_charge_done',
                                     false,
                                 ),
