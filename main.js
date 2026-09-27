@@ -614,13 +614,13 @@ class LeapmotorAdapter extends utils.Adapter {
             },
             trip_done_extended: {
                 en: v =>
-                    `🚗 Trip finished: ${v.km}km in ${v.min}min - ${v.totalKwh}kWh (${v.drivingKwh} driving, ${v.acKwh} climate, ${v.otherKwh} other)`,
+                    `🚗 Trip finished: ${v.km}km in ${v.min}min ⚡ ${v.totalKwh}kWh used (🛣️ ${v.drivingKwh} driving · ❄️ ${v.acKwh} climate · 🔧 ${v.otherKwh} other)`,
                 de: v =>
-                    `🚗 Fahrt beendet: ${v.km}km in ${v.min}min - ${v.totalKwh}kWh (${v.drivingKwh} Fahren, ${v.acKwh} Klima, ${v.otherKwh} Sonstiges)`,
+                    `🚗 Fahrt beendet: ${v.km}km in ${v.min}min ⚡ ${v.totalKwh}kWh verbraucht (🛣️ ${v.drivingKwh} Fahren · ❄️ ${v.acKwh} Klima · 🔧 ${v.otherKwh} Sonstiges)`,
                 fr: v =>
-                    `🚗 Trajet terminé : ${v.km}km en ${v.min}min - ${v.totalKwh}kWh (${v.drivingKwh} conduite, ${v.acKwh} climatisation, ${v.otherKwh} autre)`,
+                    `🚗 Trajet terminé : ${v.km}km en ${v.min}min ⚡ ${v.totalKwh}kWh consommés (🛣️ ${v.drivingKwh} conduite · ❄️ ${v.acKwh} climatisation · 🔧 ${v.otherKwh} autre)`,
                 it: v =>
-                    `🚗 Viaggio terminato: ${v.km}km in ${v.min}min - ${v.totalKwh}kWh (${v.drivingKwh} guida, ${v.acKwh} clima, ${v.otherKwh} altro)`,
+                    `🚗 Viaggio terminato: ${v.km}km in ${v.min}min ⚡ ${v.totalKwh}kWh consumati (🛣️ ${v.drivingKwh} guida · ❄️ ${v.acKwh} clima · 🔧 ${v.otherKwh} altro)`,
             },
             charge_done: {
                 en: v => `🔌 Charging finished: ${v.kwh}kWh, ${v.cost}€`,
