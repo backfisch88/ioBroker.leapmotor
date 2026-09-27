@@ -4436,6 +4436,18 @@ class LeapmotorAdapter extends utils.Adapter {
         }
         if (cmd === 'charge_limit_set') {
             await this.setStateAsync(id, { val: state.val, ack: true });
+            // Community-confirmed (leapmotor-ha #70/#72, 2026-09): cmd_id=190
+            // (charge limit / schedule) has no verified effect on the T03,
+            // even while awake - the cloud accepts and echoes back the write,
+            // the vehicle just never actually applies it. Sent anyway (some
+            // T03 firmware may differ, and other models rely on this same
+            // path), but flagged loudly so a "did it even do anything?"
+            // moment doesn't turn into a multi-day mystery like it did once.
+            if (String(vehicle.carType).toUpperCase() === 'T03') {
+                this.log.warn(
+                    `charge_limit_set: sending anyway, but on T03 this command is known to have no verified effect on the vehicle (confirmed by the leapmotor-ha project) - check the actual limit in the official app rather than trusting this write to have worked.`,
+                );
+            }
             try {
                 // Preserve the vehicle's existing charge schedule (enabled state,
                 // recurrence, start/end time) and only change the SOC target.
@@ -4577,6 +4589,12 @@ class LeapmotorAdapter extends utils.Adapter {
         }
         if (cmd === 'charge_schedule_apply' && state.val === true) {
             await this.setStateAsync(id, { val: false, ack: true });
+            // Same T03 caveat as charge_limit_set above - see there for details.
+            if (String(vehicle.carType).toUpperCase() === 'T03') {
+                this.log.warn(
+                    `charge_schedule_apply: sending anyway, but on T03 this command is known to have no verified effect on the vehicle (confirmed by the leapmotor-ha project) - check the actual schedule in the official app rather than trusting this write to have worked.`,
+                );
+            }
             try {
                 const enState = await this.getStateAsync(`${vin}.cmd.charge_schedule_enable`);
                 const startState = await this.getStateAsync(`${vin}.cmd.charge_schedule_start`);
