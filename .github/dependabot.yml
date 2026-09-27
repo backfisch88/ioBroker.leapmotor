@@ -24,6 +24,27 @@ updates:
       timezone: 'Europe/Berlin'
     cooldown:
       default-days: 7
+    ignore:
+      # @iobroker/adapter-react-v5 pins react/react-dom to ^18.3.1 and MUI to
+      # ^6.5.0 as peer dependencies (its own changelog: "Force using React
+      # 18"). Major bumps here would conflict with that until we migrate to
+      # its React19/MUI9 successor package (@iobroker/gui-components), which
+      # is a much bigger, separate rewrite - not a routine dependency bump.
+      - dependency-name: 'react'
+        update-types:
+          - 'version-update:semver-major'
+      - dependency-name: 'react-dom'
+        update-types:
+          - 'version-update:semver-major'
+      - dependency-name: '@mui/material'
+        update-types:
+          - 'version-update:semver-major'
+      - dependency-name: '@mui/icons-material'
+        update-types:
+          - 'version-update:semver-major'
+      - dependency-name: '@iobroker/adapter-react-v5'
+        update-types:
+          - 'version-update:semver-major'
     open-pull-requests-limit: 15
 
   - package-ecosystem: 'github-actions'

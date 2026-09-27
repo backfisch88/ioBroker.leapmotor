@@ -72,10 +72,18 @@ export default function ExportPanel({ base, states }) {
     const exportPdf = async () => {
         setBusy(true);
         try {
-            const [{ default: jsPDF }] = await Promise.all([
+            const [{ default: jsPDF }, autoTableModule] = await Promise.all([
                 import('jspdf'),
                 import('jspdf-autotable'),
             ]);
+            // jspdf-autotable v5 no longer auto-applies doc.autoTable() in
+            // every environment (breaking change from the 3.x we used
+            // before) - call applyPlugin explicitly so this keeps working
+            // regardless of how Vite's build target is detected at runtime.
+            // Calling it is harmless even where auto-apply would have worked.
+            if (autoTableModule.applyPlugin) {
+                autoTableModule.applyPlugin(jsPDF);
+            }
             const trips = getTripsInRange();
             const doc = new jsPDF({ orientation: 'landscape' });
 
