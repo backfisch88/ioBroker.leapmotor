@@ -17,7 +17,7 @@ updates:
     open-pull-requests-limit: 15
 
   - package-ecosystem: 'npm'
-    directory: '/admin-tab'
+    directory: '/src-admin'
     schedule:
       interval: 'cron'
       cronjob: '0 4 * * 3'

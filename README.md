@@ -168,10 +168,10 @@ Comfort commands (only created/shown if the vehicle model supports the feature):
 | cmd.mirror_heat_on / off | Mirror heating | Untested - plausible on B10, B11/C10, B05. Confirmed **not exposed via API/app at all** on this T03 |
 | cmd.hotspot_on / off | Wi-Fi hotspot | Confirmed **not** on T03 or B10; unknown on other models |
 
-`sunroof`/`sunshade` are handled the same way — see `admin-tab/src/vehicleCapabilities.js` for the confirmed B10 vs T03 difference.
+`sunroof`/`sunshade` are handled the same way — see `src-admin/src/vehicleCapabilities.js` for the confirmed B10 vs T03 difference.
 
 Which comfort commands actually appear depends on the detected vehicle model — see
-`admin-tab/src/vehicleCapabilities.js` in the repository for the current capability matrix per model.
+`src-admin/src/vehicleCapabilities.js` in the repository for the current capability matrix per model.
 
 ## Changelog
 

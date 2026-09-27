@@ -6,5 +6,5 @@
         "allowJs": true
     },
     "include": ["main.js", "lib/**/*.js"],
-    "exclude": ["node_modules", "admin", "admin-tab", "test"]
+    "exclude": ["node_modules", "admin", "src-admin", "test"]
 }
