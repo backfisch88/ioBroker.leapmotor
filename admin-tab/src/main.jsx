@@ -1,5 +1,5 @@
 import React from 'react';
-import { createRoot } from 'react-dom/client';
+import { createRoot } from 'react-dom';
 import { I18n } from '@iobroker/adapter-react-v5';
 import translations from './i18n/translations';
 import App from './App';
