@@ -16,7 +16,7 @@
         "@emotion/styled": "^11.11.0",
         "@iobroker/adapter-react-v5": "^8.3.3",
         "@mui/icons-material": "^6.5.0",
-        "@mui/material": "^6.5.0",
+        "@mui/material": "^9.5.0",
         "jspdf": "^4.2.1",
         "jspdf-autotable": "^5.0.8",
         "leaflet": "^1.9.4",
