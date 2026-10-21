@@ -11,6 +11,12 @@ updates:
     cooldown:
       default-days: 7
     open-pull-requests-limit: 15
+    ignore:
+      # Keep @types/node pinned to the same major as engines.node (currently
+      # 22) - a higher major gives wrong IDE typing for APIs not actually
+      # available on the minimum supported Node version (repochecker W0066).
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
 
   - package-ecosystem: 'npm'
     directory: '/src-admin'
@@ -21,6 +27,20 @@ updates:
     cooldown:
       default-days: 7
     open-pull-requests-limit: 15
+    ignore:
+      # @iobroker/adapter-react-v5 peer-pins these to React 18 / MUI 6.
+      # Major bumps are architecturally blocked until migrating to its
+      # successor package (@iobroker/gui-components); don't keep proposing them.
+      - dependency-name: 'react'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'react-dom'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@mui/material'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@mui/icons-material'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@iobroker/adapter-react-v5'
+        update-types: ['version-update:semver-major']
 
   - package-ecosystem: 'github-actions'
     directory: '/'
