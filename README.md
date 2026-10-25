@@ -176,6 +176,8 @@ Which comfort commands actually appear depends on the detected vehicle model —
 ## Changelog
 
 ### **WORK IN PROGRESS**
+
+### 0.7.5 (2026-10-25)
 - Fix: several boolean status datapoints (climate active, recirculate, locked, door-control-allowed, all four doors, ignition, Bluetooth, hotspot, and the non-T03 window-open indicators) were written straight from the raw cloud signal without converting it to an actual boolean - harmless on models/signals that happen to come back as JS `true`/`false` already, but logged a "has to be type boolean but received type number" warning (and stored a 0/1 number instead of a real boolean) wherever the cloud sends a plain 0/1 flag instead, confirmed on a B10. All of the above are now explicitly coerced to boolean, `null`/`undefined` (no data) left as-is.
 
 ### 0.7.4 (2026-10-25)
