@@ -4151,6 +4151,11 @@ class LeapmotorAdapter extends utils.Adapter {
                 await this.setStateAsync(`${vin}.${id}`, { val, ack: true });
             }
         };
+        // Several raw cloud signals come back as numbers (0/1) rather than
+        // real booleans, which ioBroker logs a type-mismatch warning for when
+        // written to a boolean-typed state. Coerce, but leave null/undefined
+        // alone so "no data" doesn't turn into a false "closed"/"off".
+        const setBool = async (id, flag) => set(id, flag === null || flag === undefined ? flag : Boolean(flag));
         const tire = v => (v != null ? Math.round(v) / 100 : null);
         // Battery
         await set('status.battery_soc', s.soc);
@@ -4226,12 +4231,12 @@ class LeapmotorAdapter extends utils.Adapter {
         await set('status.dc_fast_charge', s.dcInputFastCharge != null ? s.dcInputFastCharge === 1 : null);
         await set('status.charge_time_setting', s.chargeTimeSetting);
         // Climate
-        await set('status.ac_on', s.acSwitch);
+        await setBool('status.ac_on', s.acSwitch);
         await set('status.ac_temp', s.acSetting);
         await set('status.ac_fan_speed', s.acAirVolume);
         await set('status.ac_fan_speed_setting', s.acAirVolumeSetting);
         await set('status.ac_wind_direction', s.acWindDirection);
-        await set('status.ac_recirculate', s.acCircleMode);
+        await setBool('status.ac_recirculate', s.acCircleMode);
         await set('status.ac_cooling_heating', s.acCoolingAndHeating);
         await set('status.ptc_state', s.ptcState);
         await set('status.ptc_power', s.ptcPowerSettingValue);
@@ -4239,16 +4244,16 @@ class LeapmotorAdapter extends utils.Adapter {
         await set('status.drive_speed', s.speed);
         await set('status.drive_parked', s.speed != null ? s.speed === 0 : null);
         await set('status.gear', s.gearStatus);
-        await set('status.key_position', s.bcmKeyPositionOn1 || s.bcmKeyPositionOn3);
+        await setBool('status.key_position', s.bcmKeyPositionOn1 || s.bcmKeyPositionOn3);
         // Security
-        await set('status.security_locked', s.driverDoorLockStatus);
-        await set('status.door_ctrl_allow', s.bcmDoorCtrlAllow);
+        await setBool('status.security_locked', s.driverDoorLockStatus);
+        await setBool('status.door_ctrl_allow', s.bcmDoorCtrlAllow);
         // Doors
-        await set('status.door_driver', s.lbcmDriverDoorStatus);
-        await set('status.door_front_right', s.rbcmDriverDoorStatus);
-        await set('status.door_rear_left', s.lbcmLeftRearDoorStatus);
-        await set('status.door_rear_right', s.rbcmRightRearDoorStatus);
-        await set('status.door_trunk', s.bbcmBackDoorStatus);
+        await setBool('status.door_driver', s.lbcmDriverDoorStatus);
+        await setBool('status.door_front_right', s.rbcmDriverDoorStatus);
+        await setBool('status.door_rear_left', s.lbcmLeftRearDoorStatus);
+        await setBool('status.door_rear_right', s.rbcmRightRearDoorStatus);
+        await setBool('status.door_trunk', s.bbcmBackDoorStatus);
         // Windows
         await set('status.window_fl_pct', s.leftFrontWindowPercent);
         await set('status.window_fr_pct', s.rightFrontWindowPercent);
@@ -4261,10 +4266,10 @@ class LeapmotorAdapter extends utils.Adapter {
         const vehicleForWindows = this.vehicles.find(v => v.vin === vin);
         const isT03 = String(vehicleForWindows?.carType || '').toUpperCase() === 'T03';
         const windowOpenState = (flag, percent) => (isT03 ? Boolean(flag || percent > 0) : flag);
-        await set('status.window_driver_open', windowOpenState(s.driverWindowStatus, s.leftFrontWindowPercent));
-        await set('status.window_fr_open', windowOpenState(s.rightFrontWindowStatus, s.rightFrontWindowPercent));
-        await set('status.window_rl_open', windowOpenState(s.leftRearWindowStatus, s.leftRearWindowPercent));
-        await set('status.window_rr_open', windowOpenState(s.rightRearWindowStatus, s.rightRearWindowPercent));
+        await setBool('status.window_driver_open', windowOpenState(s.driverWindowStatus, s.leftFrontWindowPercent));
+        await setBool('status.window_fr_open', windowOpenState(s.rightFrontWindowStatus, s.rightFrontWindowPercent));
+        await setBool('status.window_rl_open', windowOpenState(s.leftRearWindowStatus, s.leftRearWindowPercent));
+        await setBool('status.window_rr_open', windowOpenState(s.rightRearWindowStatus, s.rightRearWindowPercent));
         try {
             await this.checkWindowWarning(
                 vehicleForWindows,
@@ -4301,9 +4306,9 @@ class LeapmotorAdapter extends utils.Adapter {
         await set('status.privacy_gps', s.privacyGPS);
         await set('status.privacy_data', s.privacyData);
         // Connectivity
-        await set('status.bluetooth_on', s.bluetoothState);
+        await setBool('status.bluetooth_on', s.bluetoothState);
         await set('status.bluetooth_addr', s.bluetoothAddr);
-        await set('status.hotspot_on', s.hotspotState);
+        await setBool('status.hotspot_on', s.hotspotState);
         // Timestamps
         // The cloud's raw collectTime string has NO timezone marker and is
         // actually UTC - displaying it as-is looks like local time but runs
