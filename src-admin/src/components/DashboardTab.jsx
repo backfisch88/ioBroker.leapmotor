@@ -172,6 +172,7 @@ export default function DashboardTab({ base, states, setState }) {
     const can = (feature) => hasCapability(carType, feature);
     const acTemp = val(states, `${base}.status.ac_temp`, 22);
     const fanSpeed = val(states, `${base}.status.ac_fan_speed`, 3);
+    const fanMax = val(states, `${base}.status.ac_fan_max`, 7);
     const acPosition = val(states, `${base}.cmd.ac_position`, 'all');
     const chargeLimit = val(states, `${base}.status.charging_soc_limit`, 80);
     const scheduleEnabledActual = val(states, `${base}.cmd.charge_schedule_enable`, false);
@@ -348,9 +349,9 @@ export default function DashboardTab({ base, states, setState }) {
                             <Typography variant="caption" sx={{ color: '#5a7090', display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                 <AirIcon sx={{ fontSize: 14 }} /> {I18n.t('Fan Speed')}
                             </Typography>
-                            <Typography variant="caption" sx={{ color: '#00d4ff', fontWeight: 700 }}>{fanSpeed}/7</Typography>
+                            <Typography variant="caption" sx={{ color: '#00d4ff', fontWeight: 700 }}>{fanSpeed}/{fanMax}</Typography>
                         </Box>
-                        <FanSlider value={fanSpeed} onCommit={onFanCommit} />
+                        <FanSlider value={fanSpeed} max={fanMax} onCommit={onFanCommit} />
                     </Box>
                     <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
                         {can('defrost') && (
@@ -678,14 +679,14 @@ function TempSlider({ value, onCommit }) {
     );
 }
 
-function FanSlider({ value, onCommit }) {
+function FanSlider({ value, max = 7, onCommit }) {
     const [local, setLocal] = useState(value);
     useEffect(() => { setLocal(value); }, [value]);
     return (
         <Slider
             value={local}
             min={1}
-            max={7}
+            max={max}
             step={1}
             marks
             onChange={(_, v) => setLocal(v)}

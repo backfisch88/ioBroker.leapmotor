@@ -1173,7 +1173,7 @@ export default function SettingsTab({
                     </Typography>
                     <Slider
                         min={1}
-                        max={7}
+                        max={9}
                         step={1}
                         marks
                         value={cfg('prepare_to_drive_fan_speed', 3)}
@@ -1641,7 +1641,7 @@ export default function SettingsTab({
                     </Typography>
                     <Slider
                         min={1}
-                        max={7}
+                        max={9}
                         step={1}
                         marks
                         value={cfg('prepare_to_work_fan_speed', 3)}
@@ -2284,6 +2284,87 @@ export default function SettingsTab({
                     label={I18n.t(
                         'Notify when charging finishes',
                     )}
+                />
+
+                <br />
+
+                <FormControlLabel
+                    control={
+                        <Switch
+                            checked={Boolean(cfg('notify_charge_progress', false))}
+                            onChange={e =>
+                                setState(
+                                    `${adapter}.config.notify_charge_progress`,
+                                    e.target.checked,
+                                )
+                            }
+                        />
+                    }
+                    label={I18n.t('Notify about charging progress')}
+                />
+
+
+                <TextField
+                    type="number"
+                    label={I18n.t('Progress interval (min)')}
+                    value={cfg('charge_progress_interval_min', 60)}
+                    onChange={e =>
+                        setState(
+                            `${adapter}.config.charge_progress_interval_min`,
+                            Number(e.target.value),
+                        )
+                    }
+                    inputProps={{ step: 5, min: 5 }}
+                    size="small"
+                    sx={{ width: 260, ml: 4, mb: 1 }}
+                />
+
+                <br />
+
+                <FormControlLabel
+                    control={
+                        <Switch
+                            checked={Boolean(cfg('notify_charge_overstay', false))}
+                            onChange={e =>
+                                setState(
+                                    `${adapter}.config.notify_charge_overstay`,
+                                    e.target.checked,
+                                )
+                            }
+                        />
+                    }
+                    label={I18n.t('Warn before public charger time limit')}
+                />
+
+
+                <TextField
+                    type="number"
+                    label={I18n.t('Time limit (min)')}
+                    value={cfg('charge_overstay_max_min', 240)}
+                    onChange={e =>
+                        setState(
+                            `${adapter}.config.charge_overstay_max_min`,
+                            Number(e.target.value),
+                        )
+                    }
+                    inputProps={{ step: 5, min: 5 }}
+                    size="small"
+                    sx={{ width: 260, ml: 4, mb: 1 }}
+                />
+
+                <TextField
+                    type="number"
+                    label={I18n.t('Warn this many minutes before (min)')}
+                    value={cfg('charge_overstay_warn_before_min', 30)}
+                    onChange={e =>
+                        setState(
+                            `${adapter}.config.charge_overstay_warn_before_min`,
+                            Number(e.target.value),
+                        )
+                    }
+                    inputProps={{ step: 5, min: 5 }}
+                    size="small"
+                    sx={{ width: 260, ml: 4, mb: 1 }}
                 />
 
                 <br />

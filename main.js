@@ -13,6 +13,21 @@ const DEFAULT_BATTERY_CAPACITY_KWH = {
     C10: 69.9, // Standardversion; AWD-Variante hat 81.9 kWh, REEV-Variante 52.9 kWh
     C16: 69.9, // Vorlaeufige Schaetzung basierend auf C10 Plattform-Aehnlichkeit, noch nicht verifiziert
 };
+// Highest fan speed a car declares in its vehicle-list function config
+// (e.g. B10/B05: 9). Falls back to 7, never above 9.
+function getFanTop(vehicle) {
+    let cfg = vehicle?.raw?.funcConfig;
+    if (typeof cfg === 'string') {
+        try {
+            cfg = JSON.parse(cfg);
+        } catch {
+            cfg = null;
+        }
+    }
+    const max = Number(cfg?.HVAC?.fan?.max);
+    return Number.isFinite(max) ? Math.min(9, Math.max(7, Math.round(max))) : 7;
+}
+
 function getDefaultBatteryCapacity(carType) {
     return DEFAULT_BATTERY_CAPACITY_KWH[String(carType || '').toUpperCase()] || 36.0;
 }
@@ -463,7 +478,7 @@ class LeapmotorAdapter extends utils.Adapter {
         const coldBelow = Number(coldBelowState?.val ?? 14);
         const hotAbove = Number(hotAboveState?.val ?? 23);
         const targetTemp = Number(targetTempState?.val ?? 22);
-        const fanSpeed = Number(fanSpeedState?.val ?? 3);
+        const fanSpeed = Math.min(Number(fanSpeedState?.val ?? 3), getFanTop(vehicle));
         let cmd, label;
         if (outdoorTemp < coldBelow) {
             cmd = 'ac_heat';
@@ -637,6 +652,21 @@ class LeapmotorAdapter extends utils.Adapter {
                 de: v => `🔌 Laden beendet: ${v.kwh}kWh, ${v.cost}€`,
                 fr: v => `🔌 Charge terminée : ${v.kwh}kWh, ${v.cost}€`,
                 it: v => `🔌 Ricarica terminata: ${v.kwh}kWh, ${v.cost}€`,
+            },
+            charge_progress: {
+                en: v => `🔋 Charging: ${v.soc}% (+${v.kwh}kWh, ${v.cost}€)${v.remain ? `, ${v.remain}min left` : ''}`,
+                de: v => `🔋 Laden: ${v.soc}% (+${v.kwh}kWh, ${v.cost}€)${v.remain ? `, noch ${v.remain}min` : ''}`,
+                fr: v => `🔋 Charge : ${v.soc}% (+${v.kwh}kWh, ${v.cost}€)${v.remain ? `, encore ${v.remain}min` : ''}`,
+                it: v =>
+                    `🔋 Ricarica: ${v.soc}% (+${v.kwh}kWh, ${v.cost}€)${v.remain ? `, ancora ${v.remain}min` : ''}`,
+            },
+            charge_overstay: {
+                en: v => `⏰ Charging for ${v.elapsed}min - time limit in ${v.left}min, move the car soon (${v.soc}%)`,
+                de: v => `⏰ Lädt seit ${v.elapsed}min - Standzeit-Limit in ${v.left}min, bald abholen (${v.soc}%)`,
+                fr: v =>
+                    `⏰ En charge depuis ${v.elapsed}min - limite dans ${v.left}min, déplacez bientôt la voiture (${v.soc}%)`,
+                it: v =>
+                    `⏰ In ricarica da ${v.elapsed}min - limite tra ${v.left}min, spostare presto l'auto (${v.soc}%)`,
             },
             ota_update: {
                 en: v => `🔧 Software update available: ${v.title}`,
@@ -1681,6 +1711,9 @@ class LeapmotorAdapter extends utils.Adapter {
                 accumulatedKwh: 0,
                 lastSoc: soc,
                 location,
+                startedAt: Date.now(),
+                lastProgressAt: Date.now(),
+                overstayWarned: false,
             };
             await this.setStateAsync(`${vin}.charging.session_active`, { val: true, ack: true });
             await this.setStateAsync(`${vin}.charging.session_cost`, { val: 0, ack: true });
@@ -1709,8 +1742,13 @@ class LeapmotorAdapter extends utils.Adapter {
                 accumulatedKwh: prev.accumulatedKwh + kwhDelta,
                 lastSoc: soc,
                 location: prev.location,
+                // sessions restored from before 0.7.6 have no timestamps yet
+                startedAt: prev.startedAt ?? Date.now(),
+                lastProgressAt: prev.lastProgressAt ?? Date.now(),
+                overstayWarned: prev.overstayWarned ?? false,
             };
             this._chargingSessions[vin] = updated;
+            await this.checkChargingReminders(vin, updated, soc);
             await this.setStateAsync(`${vin}.charging.session_cost`, {
                 val: Math.round(updated.accumulatedCost * 100) / 100,
                 ack: true,
@@ -1764,6 +1802,49 @@ class LeapmotorAdapter extends utils.Adapter {
                 lastSoc: null,
                 location: 'unknown',
             };
+        }
+    }
+
+    // Hourly progress message and "time limit almost reached" warning for a
+    // running charging session (both opt-in, see config.notify_charge_*).
+    async checkChargingReminders(vin, session, soc) {
+        const num = async (id, def) => {
+            const v = Number((await this.getStateAsync(id))?.val);
+            return v > 0 ? v : def;
+        };
+        const now = Date.now();
+        const elapsedMin = Math.floor((now - session.startedAt) / 60000);
+
+        const intervalMin = await num('config.charge_progress_interval_min', 60);
+        if (now - session.lastProgressAt >= intervalMin * 60000) {
+            session.lastProgressAt = now;
+            const remain = Number((await this.getStateAsync(`${vin}.status.charging_remain_min`))?.val);
+            await this.sendNotification(
+                'charge_progress',
+                this.notificationText('charge_progress', {
+                    soc: soc ?? '?',
+                    kwh: session.accumulatedKwh.toFixed(1),
+                    cost: session.accumulatedCost.toFixed(2),
+                    remain: remain > 0 ? remain : 0,
+                }),
+            );
+        }
+
+        // Time limits only exist at public chargers
+        if (session.location === 'public' && !session.overstayWarned) {
+            const maxMin = await num('config.charge_overstay_max_min', 240);
+            const warnBefore = await num('config.charge_overstay_warn_before_min', 30);
+            if (elapsedMin >= maxMin - warnBefore) {
+                session.overstayWarned = true;
+                await this.sendNotification(
+                    'charge_overstay',
+                    this.notificationText('charge_overstay', {
+                        elapsed: elapsedMin,
+                        left: Math.max(0, maxMin - elapsedMin),
+                        soc: soc ?? '?',
+                    }),
+                );
+            }
         }
     }
 
@@ -2439,11 +2520,18 @@ class LeapmotorAdapter extends utils.Adapter {
                 read: true,
                 write: true,
                 min: 1,
-                max: 7,
+                max: getFanTop(vehicle),
                 def: 3,
             },
             native: {},
         });
+        await this.extendObjectAsync(`${vehicle.vin}.cmd.ac_fan_speed`, { common: { max: getFanTop(vehicle) } });
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.status.ac_fan_max`, {
+            type: 'state',
+            common: { name: 'Fan Speed Maximum', type: 'number', role: 'value', read: true, write: false },
+            native: {},
+        });
+        await this.setStateAsync(`${vehicle.vin}.status.ac_fan_max`, { val: getFanTop(vehicle), ack: true });
         await this.setObjectNotExistsAsync(`${vehicle.vin}.cmd.ac_position`, {
             type: 'state',
             common: {
@@ -3169,6 +3257,69 @@ class LeapmotorAdapter extends utils.Adapter {
             },
             native: {},
         });
+        await this.setObjectNotExistsAsync(`config.notify_charge_progress`, {
+            type: 'state',
+            common: {
+                name: 'Notify about charging progress while charging',
+                type: 'boolean',
+                role: 'switch',
+                read: true,
+                write: true,
+                def: false,
+            },
+            native: {},
+        });
+        await this.setObjectNotExistsAsync(`config.charge_progress_interval_min`, {
+            type: 'state',
+            common: {
+                name: 'Charging progress interval',
+                type: 'number',
+                role: 'value',
+                unit: 'min',
+                read: true,
+                write: true,
+                def: 60,
+            },
+            native: {},
+        });
+        await this.setObjectNotExistsAsync(`config.notify_charge_overstay`, {
+            type: 'state',
+            common: {
+                name: 'Warn before the public charger time limit is reached',
+                type: 'boolean',
+                role: 'switch',
+                read: true,
+                write: true,
+                def: false,
+            },
+            native: {},
+        });
+        await this.setObjectNotExistsAsync(`config.charge_overstay_max_min`, {
+            type: 'state',
+            common: {
+                name: 'Public charger time limit',
+                type: 'number',
+                role: 'value',
+                unit: 'min',
+                read: true,
+                write: true,
+                def: 240,
+            },
+            native: {},
+        });
+        await this.setObjectNotExistsAsync(`config.charge_overstay_warn_before_min`, {
+            type: 'state',
+            common: {
+                name: 'Warn this long before the time limit',
+                type: 'number',
+                role: 'value',
+                unit: 'min',
+                read: true,
+                write: true,
+                def: 30,
+            },
+            native: {},
+        });
         await this.setObjectNotExistsAsync(`config.notify_ota_update`, {
             type: 'state',
             common: {
@@ -3259,13 +3410,13 @@ class LeapmotorAdapter extends utils.Adapter {
         await this.setObjectNotExistsAsync(`config.prepare_to_drive_fan_speed`, {
             type: 'state',
             common: {
-                name: 'Prepare-to-Drive: fan speed, 1-7',
+                name: 'Prepare-to-Drive: fan speed, 1-9 (capped to the car maximum)',
                 type: 'number',
                 role: 'level',
                 read: true,
                 write: true,
                 min: 1,
-                max: 7,
+                max: 9,
                 def: 3,
             },
             native: {},
@@ -3484,13 +3635,13 @@ class LeapmotorAdapter extends utils.Adapter {
         await this.setObjectNotExistsAsync(`config.prepare_to_work_fan_speed`, {
             type: 'state',
             common: {
-                name: 'Prepare-to-Work: fan speed, 1-7',
+                name: 'Prepare-to-Work: fan speed, 1-9 (capped to the car maximum)',
                 type: 'number',
                 role: 'level',
                 read: true,
                 write: true,
                 min: 1,
-                max: 7,
+                max: 9,
                 def: 3,
             },
             native: {},
@@ -4358,6 +4509,9 @@ class LeapmotorAdapter extends utils.Adapter {
             return;
         }
         if (cmd === 'ac_temp' || cmd === 'ac_fan_speed' || cmd === 'ac_position' || cmd === 'ac_recirculate') {
+            if (cmd === 'ac_fan_speed') {
+                state = { ...state, val: Math.min(Number(state.val), getFanTop(vehicle)) };
+            }
             await this.setStateAsync(id, { val: state.val, ack: true });
             // These just stage a value for the NEXT climate command (ac_heat/
             // ac_cool/etc. read them back) - nothing is sent to the vehicle
