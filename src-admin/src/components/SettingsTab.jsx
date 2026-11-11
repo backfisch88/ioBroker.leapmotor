@@ -49,35 +49,93 @@ function val(states, id, def = null) {
     return states[id]?.val ?? def;
 }
 
-// Net battery capacity of the selected car. Accepts "67.1" and "67,1";
-// only valid values (10-150 kWh) are written.
-function CapacityField({ stateId, states, setState }) {
+// Usable (net) pack sizes per model, kWh
+const BATTERY_VARIANTS = {
+    T03: [{ v: 36, l: '36.0 kWh' }],
+    A10: [
+        { v: 39, l: '39.0 kWh (B03X, 292 km)' },
+        { v: 52, l: '52.0 kWh (B03X, 382 km)' },
+    ],
+    B05: [
+        { v: 55, l: '55.0 kWh (Pro)' },
+        { v: 65, l: '65.0 kWh (Pro Max)' },
+    ],
+    B10: [
+        { v: 55, l: '55.0 kWh (Pro)' },
+        { v: 65, l: '65.0 kWh (Pro Max)' },
+        { v: 18.8, l: '18.8 kWh (REEV)' },
+    ],
+    C10: [
+        { v: 67, l: '67.0 kWh (RWD)' },
+        { v: 81.9, l: '81.9 kWh (AWD)' },
+        { v: 28.4, l: '28.4 kWh (REEV)' },
+    ],
+};
+
+// Net battery capacity of the selected car: pick the variant, enter a custom
+// value ("67.1" and "67,1" both work, 10-150 kWh) or take the measured one.
+function CapacityField({ base, states, setState }) {
+    const stateId = `${base}.config.battery_capacity_kwh`;
+    const model = String(val(states, `${base}.info.model`, '')).toUpperCase();
+    const variants = BATTERY_VARIANTS[model] || [];
     const stored = val(states, stateId, '');
+    const measured = Number(val(states, `${base}.battery.estimated_capacity_kwh`, 0));
     const [text, setText] = useState(String(stored));
     useEffect(() => {
         setText(String(stored));
     }, [stored, stateId]);
-    if (!stateId) {
-        return null;
-    }
     const num = Number(text.replace(',', '.'));
     const invalid = text !== '' && !(num >= 10 && num <= 150);
+    const matched = variants.find(x => x.v === Number(stored));
     return (
-        <TextField
-            label={I18n.t('Battery capacity (kWh, net)')}
-            helperText={I18n.t('Net battery capacity of your car (kWh)')}
-            error={invalid}
-            value={text}
-            onChange={e => {
-                setText(e.target.value);
-                const n = Number(e.target.value.replace(',', '.'));
-                if (n >= 10 && n <= 150) {
-                    setState(stateId, n);
-                }
-            }}
-            inputProps={{ inputMode: 'decimal' }}
-            size="small"
-        />
+        <>
+            {variants.length > 0 && (
+                <TextField
+                    select
+                    SelectProps={{ native: true }}
+                    label={I18n.t('Battery variant')}
+                    value={matched ? String(matched.v) : 'custom'}
+                    onChange={e => {
+                        if (e.target.value !== 'custom') {
+                            setState(stateId, Number(e.target.value));
+                        }
+                    }}
+                    size="small"
+                    InputLabelProps={{ shrink: true }}
+                >
+                    {variants.map(x => (
+                        <option key={x.v} value={String(x.v)}>
+                            {x.l}
+                        </option>
+                    ))}
+                    <option value="custom">{I18n.t('Custom value')}</option>
+                </TextField>
+            )}
+            <TextField
+                label={I18n.t('Battery capacity (kWh, net)')}
+                helperText={I18n.t('Net battery capacity of your car (kWh)')}
+                error={invalid}
+                value={text}
+                onChange={e => {
+                    setText(e.target.value);
+                    const n = Number(e.target.value.replace(',', '.'));
+                    if (n >= 10 && n <= 150) {
+                        setState(stateId, n);
+                    }
+                }}
+                inputProps={{ inputMode: 'decimal' }}
+                size="small"
+            />
+            {measured >= 10 && measured <= 150 && (
+                <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() => setState(stateId, Math.round(measured * 10) / 10)}
+                >
+                    {I18n.t('Use measured value')} ({(Math.round(measured * 10) / 10).toFixed(1)} kWh)
+                </Button>
+            )}
+        </>
     );
 }
 
@@ -747,7 +805,7 @@ export default function SettingsTab({
 
                     {base && (
                         <CapacityField
-                            stateId={`${base}.config.battery_capacity_kwh`}
+                            base={base}
                             states={states}
                             setState={setState}
                         />

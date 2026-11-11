@@ -176,7 +176,8 @@ Which comfort commands actually appear depends on the detected vehicle model —
 ## Changelog
 
 ### **WORK IN PROGRESS**
-- (backfisch88) New: battery capacity can be set in the Settings tab
+- (backfisch88) New: battery variant dropdown, custom value and "use measured value" in the Settings tab
+- (backfisch88) Changed: default capacities now usable (net) values (B10/B05 55.0, C10 67.0); A10 and B05 added (A10 fell back to 36 before)
 - (backfisch88) New: charge-finished notification shows the charging duration
 - (backfisch88) New: optional custom text for the charge-finished notification (`config.charge_done_text`, placeholders {kwh} {cost} {duration} {soc_start} {soc_end} {location})
 - (backfisch88) New: fan speed up to the car's declared maximum (B10/B05: 9 instead of 7)

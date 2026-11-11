@@ -11,6 +11,9 @@
 const translations = {
     en: {},
     ru: {
+        "Battery variant": "Вариант батареи",
+        "Custom value": "Своё значение",
+        "Use measured value": "Использовать измеренное значение",
         "Battery capacity (kWh, net)": "Ёмкость батареи (кВт·ч, нетто)",
         "Net battery capacity of your car (kWh)": "Полезная ёмкость батареи вашего авто (кВт·ч)",
         "Charging finished text (optional)": "Текст уведомления об окончании зарядки (необязательно)",
@@ -273,6 +276,9 @@ const translations = {
         "Duration": "Длительность",
     },
     de: {
+        "Battery variant": "Batterievariante",
+        "Custom value": "Eigener Wert",
+        "Use measured value": "Gemessenen Wert übernehmen",
         "Battery capacity (kWh, net)": "Batteriekapazität (kWh, netto)",
         "Net battery capacity of your car (kWh)": "Nutzbare Batteriekapazität deines Autos (kWh)",
         "Charging finished text (optional)": "Text bei Laden beendet (optional)",
@@ -523,6 +529,9 @@ const translations = {
         "Duration": "Dauer",
     },
     fr: {
+        "Battery variant": "Variante de batterie",
+        "Custom value": "Valeur personnalisée",
+        "Use measured value": "Utiliser la valeur mesurée",
         "Battery capacity (kWh, net)": "Capacité de la batterie (kWh, nette)",
         "Net battery capacity of your car (kWh)": "Capacité nette de la batterie de votre voiture (kWh)",
         "Charging finished text (optional)": "Texte de fin de charge (facultatif)",
@@ -779,6 +788,9 @@ const translations = {
         "Duration": "Durée",
     },
     it: {
+        "Battery variant": "Variante batteria",
+        "Custom value": "Valore personalizzato",
+        "Use measured value": "Usa il valore misurato",
         "Battery capacity (kWh, net)": "Capacità batteria (kWh, netta)",
         "Net battery capacity of your car (kWh)": "Capacità netta della batteria della tua auto (kWh)",
         "Charging finished text (optional)": "Testo di fine ricarica (facoltativo)",
@@ -1037,6 +1049,9 @@ const translations = {
         "Duration": "Durata",
     },
     es: {
+        "Battery variant": "Variante de batería",
+        "Custom value": "Valor personalizado",
+        "Use measured value": "Usar el valor medido",
         "Battery capacity (kWh, net)": "Capacidad de la batería (kWh, neta)",
         "Net battery capacity of your car (kWh)": "Capacidad neta de la batería de tu coche (kWh)",
         "Charging finished text (optional)": "Texto de fin de carga (opcional)",
@@ -1297,6 +1312,9 @@ const translations = {
         "Duration": "Duración",
     },
     pt: {
+        "Battery variant": "Variante da bateria",
+        "Custom value": "Valor personalizado",
+        "Use measured value": "Usar o valor medido",
         "Battery capacity (kWh, net)": "Capacidade da bateria (kWh, líquida)",
         "Net battery capacity of your car (kWh)": "Capacidade líquida da bateria do seu carro (kWh)",
         "Charging finished text (optional)": "Texto de fim de carga (opcional)",
@@ -1556,6 +1574,9 @@ const translations = {
         "Duration": "Duração",
     },
     nl: {
+        "Battery variant": "Batterijvariant",
+        "Custom value": "Eigen waarde",
+        "Use measured value": "Gemeten waarde gebruiken",
         "Battery capacity (kWh, net)": "Batterijcapaciteit (kWh, netto)",
         "Net battery capacity of your car (kWh)": "Netto batterijcapaciteit van je auto (kWh)",
         "Charging finished text (optional)": "Tekst bij einde laden (optioneel)",
@@ -1810,6 +1831,9 @@ const translations = {
         "Duration": "Duur",
     },
     pl: {
+        "Battery variant": "Wariant baterii",
+        "Custom value": "Własna wartość",
+        "Use measured value": "Użyj zmierzonej wartości",
         "Battery capacity (kWh, net)": "Pojemność baterii (kWh, netto)",
         "Net battery capacity of your car (kWh)": "Użyteczna pojemność baterii twojego auta (kWh)",
         "Charging finished text (optional)": "Tekst po zakończeniu ładowania (opcjonalnie)",
@@ -2066,6 +2090,9 @@ const translations = {
         "Duration": "Czas trwania",
     },
     uk: {
+        "Battery variant": "Варіант батареї",
+        "Custom value": "Власне значення",
+        "Use measured value": "Використати виміряне значення",
         "Battery capacity (kWh, net)": "Ємність батареї (кВт·год, нетто)",
         "Net battery capacity of your car (kWh)": "Корисна ємність батареї вашого авто (кВт·год)",
         "Charging finished text (optional)": "Текст сповіщення про завершення заряджання (необов'язково)",
@@ -2328,6 +2355,9 @@ const translations = {
         "Duration": "Тривалість",
     },
     "zh-cn": {
+        "Battery variant": "电池版本",
+        "Custom value": "自定义值",
+        "Use measured value": "使用测量值",
         "Battery capacity (kWh, net)": "电池容量（kWh，净值）",
         "Net battery capacity of your car (kWh)": "您车辆的电池净容量（kWh）",
         "Charging finished text (optional)": "充电完成通知文本（可选）",

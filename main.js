@@ -8,10 +8,14 @@ const path = require('node:path');
 const CERT_DIR = path.join(__dirname, 'certs');
 
 const DEFAULT_BATTERY_CAPACITY_KWH = {
-    T03: 36.0, // 37.3 kWh brutto / 36.0 kWh netto
-    B10: 56.2, // Basisversion; Pro Max Variante hat 67.1 kWh
-    C10: 69.9, // Standardversion; AWD-Variante hat 81.9 kWh, REEV-Variante 52.9 kWh
-    C16: 69.9, // Vorlaeufige Schaetzung basierend auf C10 Plattform-Aehnlichkeit, noch nicht verifiziert
+    // Usable (net) capacity of the most common EU variant; other variants can be
+    // picked in the Settings tab (see BATTERY_VARIANTS in SettingsTab.jsx).
+    T03: 36.0, // 37.3 kWh gross
+    A10: 52.0, // sold as B03X in Europe; the smaller pack is 39.0 kWh
+    B05: 55.0, // Pro; Pro Max 65.0
+    B10: 55.0, // Pro (56.2 gross); Pro Max 65.0 (67.1 gross)
+    C10: 67.0, // RWD (69.9 gross); AWD 81.9, REEV 28.4
+    C16: 67.0, // preliminary, same platform as the C10, not verified
 };
 // 135 min -> "2h 15min", 40 min -> "40min"
 function formatDuration(ms) {
@@ -3907,6 +3911,14 @@ class LeapmotorAdapter extends utils.Adapter {
             common: { name: 'Vehicle Configuration Values' },
             native: {},
         });
+        {
+            const cur = Number((await this.getStateAsync(`${vehicle.vin}.config.battery_capacity_kwh`))?.val);
+            if (!cur || cur === defaultCapacity) {
+                this.log.info(
+                    `${vehicle.vin}: battery capacity is the ${vehicle.carType} default (${defaultCapacity} kWh) - pick your battery variant in the Settings tab if it differs`,
+                );
+            }
+        }
         await this.setObjectNotExistsAsync(`${vehicle.vin}.config.battery_capacity_kwh`, {
             type: 'state',
             common: {
