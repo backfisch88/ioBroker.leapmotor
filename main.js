@@ -13,6 +13,13 @@ const DEFAULT_BATTERY_CAPACITY_KWH = {
     C10: 69.9, // Standardversion; AWD-Variante hat 81.9 kWh, REEV-Variante 52.9 kWh
     C16: 69.9, // Vorlaeufige Schaetzung basierend auf C10 Plattform-Aehnlichkeit, noch nicht verifiziert
 };
+// 135 min -> "2h 15min", 40 min -> "40min"
+function formatDuration(ms) {
+    const total = Math.max(0, Math.round(ms / 60000));
+    const h = Math.floor(total / 60);
+    return h ? `${h}h ${String(total % 60).padStart(2, '0')}min` : `${total}min`;
+}
+
 // Highest fan speed a car declares in its vehicle-list function config
 // (e.g. B10/B05: 9). Falls back to 7, never above 9.
 function getFanTop(vehicle) {
@@ -648,10 +655,10 @@ class LeapmotorAdapter extends utils.Adapter {
                     `🚗 Viaggio terminato: ${v.km}km in ${v.min}min ⚡ ${v.totalKwh}kWh consumati (🛣️ ${v.drivingKwh} guida · ❄️ ${v.acKwh} clima · 🔧 ${v.otherKwh} altro)`,
             },
             charge_done: {
-                en: v => `🔌 Charging finished: ${v.kwh}kWh, ${v.cost}€`,
-                de: v => `🔌 Laden beendet: ${v.kwh}kWh, ${v.cost}€`,
-                fr: v => `🔌 Charge terminée : ${v.kwh}kWh, ${v.cost}€`,
-                it: v => `🔌 Ricarica terminata: ${v.kwh}kWh, ${v.cost}€`,
+                en: v => `🔌 Charging finished: ${v.kwh}kWh, ${v.cost}€${v.dur ? `, ${v.dur}` : ''}`,
+                de: v => `🔌 Laden beendet: ${v.kwh}kWh, ${v.cost}€${v.dur ? `, ${v.dur}` : ''}`,
+                fr: v => `🔌 Charge terminée : ${v.kwh}kWh, ${v.cost}€${v.dur ? `, ${v.dur}` : ''}`,
+                it: v => `🔌 Ricarica terminata: ${v.kwh}kWh, ${v.cost}€${v.dur ? `, ${v.dur}` : ''}`,
             },
             charge_progress: {
                 en: v => `🔋 Charging: ${v.soc}% (+${v.kwh}kWh, ${v.cost}€)${v.remain ? `, ${v.remain}min left` : ''}`,
@@ -1768,12 +1775,26 @@ class LeapmotorAdapter extends utils.Adapter {
             this.log.info(
                 `Charging session ended: ${prev.accumulatedKwh.toFixed(2)}kWh, ${prev.accumulatedCost.toFixed(2)}€ (${prev.location})`,
             );
+            const doneVars = {
+                kwh: prev.accumulatedKwh.toFixed(2),
+                cost: prev.accumulatedCost.toFixed(2),
+                dur: prev.startedAt ? formatDuration(Date.now() - prev.startedAt) : '',
+            };
+            // Optional user-defined text, e.g. "Charged {kwh} kWh in {duration}"
+            const customText = String((await this.getStateAsync('config.charge_done_text'))?.val || '').trim();
+            const values = {
+                kwh: doneVars.kwh,
+                cost: doneVars.cost,
+                duration: doneVars.dur,
+                soc_start: prev.startSoc ?? '',
+                soc_end: soc ?? '',
+                location: prev.location,
+            };
             this.sendNotification(
                 'charge_done',
-                this.notificationText('charge_done', {
-                    kwh: prev.accumulatedKwh.toFixed(2),
-                    cost: prev.accumulatedCost.toFixed(2),
-                }),
+                customText
+                    ? customText.replace(/\{(\w+)\}/g, (m, k) => (k in values ? values[k] : m))
+                    : this.notificationText('charge_done', doneVars),
             );
             // Roll this session's totals into the matching lifetime bucket
             // (home/public/unknown) - three separate running totals, so
@@ -3317,6 +3338,18 @@ class LeapmotorAdapter extends utils.Adapter {
                 read: true,
                 write: true,
                 def: 30,
+            },
+            native: {},
+        });
+        await this.setObjectNotExistsAsync(`config.charge_done_text`, {
+            type: 'state',
+            common: {
+                name: 'Custom text for the charging-finished notification. Placeholders: {kwh} {cost} {duration} {soc_start} {soc_end} {location}. Empty = default text',
+                type: 'string',
+                role: 'text',
+                read: true,
+                write: true,
+                def: '',
             },
             native: {},
         });

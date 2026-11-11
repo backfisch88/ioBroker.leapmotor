@@ -11,6 +11,7 @@
 const translations = {
     en: {},
     ru: {
+        "Charging finished text (optional)": "Текст уведомления об окончании зарядки (необязательно)",
         "Notify about charging progress": "Уведомлять о ходе зарядки",
         "Progress interval (min)": "Интервал (мин)",
         "Warn before public charger time limit": "Предупреждать о лимите времени на общественной станции",
@@ -270,6 +271,7 @@ const translations = {
         "Duration": "Длительность",
     },
     de: {
+        "Charging finished text (optional)": "Text bei Laden beendet (optional)",
         "Notify about charging progress": "Über Ladefortschritt benachrichtigen",
         "Progress interval (min)": "Intervall (Min.)",
         "Warn before public charger time limit": "Vor Standzeit-Limit an öffentlicher Ladesäule warnen",
@@ -517,6 +519,7 @@ const translations = {
         "Duration": "Dauer",
     },
     fr: {
+        "Charging finished text (optional)": "Texte de fin de charge (facultatif)",
         "Notify about charging progress": "Notifier la progression de la charge",
         "Progress interval (min)": "Intervalle (min)",
         "Warn before public charger time limit": "Avertir avant la limite de durée sur borne publique",
@@ -770,6 +773,7 @@ const translations = {
         "Duration": "Durée",
     },
     it: {
+        "Charging finished text (optional)": "Testo di fine ricarica (facoltativo)",
         "Notify about charging progress": "Notifica sullo stato di ricarica",
         "Progress interval (min)": "Intervallo (min)",
         "Warn before public charger time limit": "Avvisa prima del limite di sosta alla colonnina pubblica",
@@ -1025,6 +1029,7 @@ const translations = {
         "Duration": "Durata",
     },
     es: {
+        "Charging finished text (optional)": "Texto de fin de carga (opcional)",
         "Notify about charging progress": "Notificar el progreso de la carga",
         "Progress interval (min)": "Intervalo (min)",
         "Warn before public charger time limit": "Avisar antes del límite de tiempo en cargador público",
@@ -1282,6 +1287,7 @@ const translations = {
         "Duration": "Duración",
     },
     pt: {
+        "Charging finished text (optional)": "Texto de fim de carga (opcional)",
         "Notify about charging progress": "Notificar o progresso da carga",
         "Progress interval (min)": "Intervalo (min)",
         "Warn before public charger time limit": "Avisar antes do limite de tempo no carregador público",
@@ -1538,6 +1544,7 @@ const translations = {
         "Duration": "Duração",
     },
     nl: {
+        "Charging finished text (optional)": "Tekst bij einde laden (optioneel)",
         "Notify about charging progress": "Voortgang van het laden melden",
         "Progress interval (min)": "Interval (min)",
         "Warn before public charger time limit": "Waarschuwen voor tijdslimiet bij openbare laadpaal",
@@ -1789,6 +1796,7 @@ const translations = {
         "Duration": "Duur",
     },
     pl: {
+        "Charging finished text (optional)": "Tekst po zakończeniu ładowania (opcjonalnie)",
         "Notify about charging progress": "Powiadamiaj o postępie ładowania",
         "Progress interval (min)": "Interwał (min)",
         "Warn before public charger time limit": "Ostrzegaj przed limitem czasu na publicznej stacji",
@@ -2042,6 +2050,7 @@ const translations = {
         "Duration": "Czas trwania",
     },
     uk: {
+        "Charging finished text (optional)": "Текст сповіщення про завершення заряджання (необов'язково)",
         "Notify about charging progress": "Сповіщати про перебіг заряджання",
         "Progress interval (min)": "Інтервал (хв)",
         "Warn before public charger time limit": "Попереджати про ліміт часу на публічній станції",
@@ -2301,6 +2310,7 @@ const translations = {
         "Duration": "Тривалість",
     },
     "zh-cn": {
+        "Charging finished text (optional)": "充电完成通知文本（可选）",
         "Notify about charging progress": "通知充电进度",
         "Progress interval (min)": "间隔（分钟）",
         "Warn before public charger time limit": "公共充电桩超时前提醒",

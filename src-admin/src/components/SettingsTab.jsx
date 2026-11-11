@@ -2286,6 +2286,21 @@ export default function SettingsTab({
                     )}
                 />
 
+                <TextField
+                    label={I18n.t('Charging finished text (optional)')}
+                    helperText="{kwh} {cost} {duration} {soc_start} {soc_end} {location}"
+                    value={cfg('charge_done_text', '')}
+                    onChange={e =>
+                        setState(
+                            `${adapter}.config.charge_done_text`,
+                            e.target.value,
+                        )
+                    }
+                    size="small"
+                    fullWidth
+                    sx={{ ml: 4, mb: 1, maxWidth: 520 }}
+                />
+
                 <br />
 
                 <FormControlLabel
