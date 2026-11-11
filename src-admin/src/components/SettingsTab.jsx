@@ -523,7 +523,7 @@ export default function SettingsTab({
         <Box
             sx={{
                 // one common width for every text field and dropdown on this page
-                '& .MuiTextField-root': { width: 360, maxWidth: '100%' },
+                '& .MuiTextField-root': { width: 360, maxWidth: '100%', ml: 0 },
             }}
         >
             <SectionCard
