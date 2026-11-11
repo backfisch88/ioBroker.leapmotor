@@ -11,6 +11,8 @@
 const translations = {
     en: {},
     ru: {
+        "Battery capacity (kWh, gross)": "Ёмкость батареи (кВт·ч, брутто)",
+        "Used for energy calculations when set; empty = net value": "Для расчёта энергии, если задано; пусто = нетто",
         "net": "нетто",
         "gross": "брутто",
         "Battery variant": "Вариант батареи",
@@ -278,6 +280,8 @@ const translations = {
         "Duration": "Длительность",
     },
     de: {
+        "Battery capacity (kWh, gross)": "Batteriekapazität (kWh, brutto)",
+        "Used for energy calculations when set; empty = net value": "Für Energieberechnungen, wenn gesetzt; leer = Nettowert",
         "net": "netto",
         "gross": "brutto",
         "Battery variant": "Batterievariante",
@@ -533,6 +537,8 @@ const translations = {
         "Duration": "Dauer",
     },
     fr: {
+        "Battery capacity (kWh, gross)": "Capacité de la batterie (kWh, brute)",
+        "Used for energy calculations when set; empty = net value": "Utilisée pour les calculs d'énergie si renseignée ; vide = valeur nette",
         "net": "nette",
         "gross": "brute",
         "Battery variant": "Variante de batterie",
@@ -794,6 +800,8 @@ const translations = {
         "Duration": "Durée",
     },
     it: {
+        "Battery capacity (kWh, gross)": "Capacità batteria (kWh, lorda)",
+        "Used for energy calculations when set; empty = net value": "Usata per i calcoli energetici se impostata; vuoto = valore netto",
         "net": "netta",
         "gross": "lorda",
         "Battery variant": "Variante batteria",
@@ -1057,6 +1065,8 @@ const translations = {
         "Duration": "Durata",
     },
     es: {
+        "Battery capacity (kWh, gross)": "Capacidad de la batería (kWh, bruta)",
+        "Used for energy calculations when set; empty = net value": "Se usa para los cálculos de energía si se indica; vacío = valor neto",
         "net": "neta",
         "gross": "bruta",
         "Battery variant": "Variante de batería",
@@ -1322,6 +1332,8 @@ const translations = {
         "Duration": "Duración",
     },
     pt: {
+        "Battery capacity (kWh, gross)": "Capacidade da bateria (kWh, bruta)",
+        "Used for energy calculations when set; empty = net value": "Usada nos cálculos de energia se definida; vazio = valor líquido",
         "net": "líquida",
         "gross": "bruta",
         "Battery variant": "Variante da bateria",
@@ -1586,6 +1598,8 @@ const translations = {
         "Duration": "Duração",
     },
     nl: {
+        "Battery capacity (kWh, gross)": "Batterijcapaciteit (kWh, bruto)",
+        "Used for energy calculations when set; empty = net value": "Gebruikt voor energieberekeningen indien ingesteld; leeg = nettowaarde",
         "net": "netto",
         "gross": "bruto",
         "Battery variant": "Batterijvariant",
@@ -1845,6 +1859,8 @@ const translations = {
         "Duration": "Duur",
     },
     pl: {
+        "Battery capacity (kWh, gross)": "Pojemność baterii (kWh, brutto)",
+        "Used for energy calculations when set; empty = net value": "Używana do obliczeń energii, jeśli ustawiona; puste = wartość netto",
         "net": "netto",
         "gross": "brutto",
         "Battery variant": "Wariant baterii",
@@ -2106,6 +2122,8 @@ const translations = {
         "Duration": "Czas trwania",
     },
     uk: {
+        "Battery capacity (kWh, gross)": "Ємність батареї (кВт·год, брутто)",
+        "Used for energy calculations when set; empty = net value": "Для розрахунку енергії, якщо задано; порожньо = нетто",
         "net": "нетто",
         "gross": "брутто",
         "Battery variant": "Варіант батареї",
@@ -2373,6 +2391,8 @@ const translations = {
         "Duration": "Тривалість",
     },
     "zh-cn": {
+        "Battery capacity (kWh, gross)": "电池容量（kWh，总值）",
+        "Used for energy calculations when set; empty = net value": "设置后用于能量计算；留空则使用净值",
         "net": "净值",
         "gross": "总值",
         "Battery variant": "电池版本",

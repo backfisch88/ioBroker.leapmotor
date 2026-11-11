@@ -42,6 +42,18 @@ function getFanTop(vehicle) {
 function getDefaultBatteryCapacity(carType) {
     return DEFAULT_BATTERY_CAPACITY_KWH[String(carType || '').toUpperCase()] || 36.0;
 }
+
+// Capacity used for energy calculations from SoC: the gross value if one is
+// set (the displayed SoC of some models, e.g. B10 Pro Max, follows the gross
+// pack), otherwise the net value, otherwise the model default.
+async function getCalcCapacity(adapter, vin, carType) {
+    const gross = Number((await adapter.getStateAsync(`${vin}.config.battery_capacity_gross_kwh`))?.val);
+    if (gross >= 10) {
+        return gross;
+    }
+    const net = Number((await adapter.getStateAsync(`${vin}.config.battery_capacity_kwh`))?.val);
+    return net || getDefaultBatteryCapacity(carType);
+}
 // Window remote-control commands use a 0-10 native scale on B05/B10/C10
 // instead of the 0-100 scale used natively on T03. Our own datapoints are
 // always exposed as 0-100 percent to the user; this converts to whatever
@@ -1705,9 +1717,8 @@ class LeapmotorAdapter extends utils.Adapter {
         };
 
         // Battery capacity: falls back to the model-specific default (see getDefaultBatteryCapacity), overridable via datapoint
-        const capState = await this.getStateAsync(`${vin}.config.battery_capacity_kwh`);
         const vehicleForCapacity = this.vehicles.find(v => v.vin === vin);
-        const capacity = Number(capState?.val) || getDefaultBatteryCapacity(vehicleForCapacity?.carType);
+        const capacity = await getCalcCapacity(this, vin, vehicleForCapacity?.carType);
 
         if (charging && !prev.wasCharging) {
             // Neue Ladesession beginnt - classify home vs public once, from
@@ -3919,6 +3930,21 @@ class LeapmotorAdapter extends utils.Adapter {
                 );
             }
         }
+        await this.setObjectNotExistsAsync(`${vehicle.vin}.config.battery_capacity_gross_kwh`, {
+            type: 'state',
+            common: {
+                name: 'Battery Capacity (kWh, gross) - used for energy calculations when set (0 = use the net value)',
+                type: 'number',
+                role: 'level',
+                read: true,
+                write: true,
+                unit: 'kWh',
+                min: 0,
+                max: 150,
+                def: 0,
+            },
+            native: {},
+        });
         await this.setObjectNotExistsAsync(`${vehicle.vin}.config.battery_capacity_kwh`, {
             type: 'state',
             common: {
@@ -4361,9 +4387,8 @@ class LeapmotorAdapter extends utils.Adapter {
         if (batteryEnergyKwh === null && s.soc != null) {
             // No direct signal for remaining energy on this model (e.g. C10/B10) -
             // estimate it from SOC and the configured/default battery capacity instead.
-            const capState = await this.getStateAsync(`${vin}.config.battery_capacity_kwh`);
             const vehicleForCapacity = this.vehicles.find(v => v.vin === vin);
-            const capacity = Number(capState?.val) || getDefaultBatteryCapacity(vehicleForCapacity?.carType);
+            const capacity = await getCalcCapacity(this, vin, vehicleForCapacity?.carType);
             batteryEnergyKwh = Math.round((s.soc / 100) * capacity * 10) / 10;
         }
         await set('status.battery_energy_kwh', batteryEnergyKwh);

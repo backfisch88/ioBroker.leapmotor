@@ -75,26 +75,55 @@ const BATTERY_VARIANTS = {
 };
 
 const batteryOptions = model =>
-    (BATTERY_VARIANTS[model] || []).flatMap(x => [
-        { v: x.net, l: `${x.n} - ${x.net.toFixed(1)} kWh (${I18n.t('net')})` },
-        ...(x.gross ? [{ v: x.gross, l: `${x.n} - ${x.gross.toFixed(1)} kWh (${I18n.t('gross')})` }] : []),
-    ]);
+    (BATTERY_VARIANTS[model] || []).map(x => ({
+        ...x,
+        l: `${x.n} - ${x.net.toFixed(1)} kWh ${I18n.t('net')}${x.gross ? ` / ${x.gross.toFixed(1)} kWh ${I18n.t('gross')}` : ''}`,
+    }));
 
-// Net battery capacity of the selected car: pick the variant, enter a custom
-// value ("67.1" and "67,1" both work, 10-150 kWh) or take the measured one.
+// Battery capacity of the selected car. Picking a variant sets net and gross;
+// energy is calculated with the gross value when one is set. Custom values
+// accept "67.1" and "67,1" (10-150 kWh). Gross empty/0 = calculate with net.
+function CapField({ stateId, label, helper, states, setState, allowEmpty, onValid }) {
+    const stored = val(states, stateId, '');
+    const shown = Number(stored) === 0 ? '' : String(stored);
+    const [text, setText] = useState(shown);
+    useEffect(() => {
+        setText(shown);
+    }, [shown, stateId]);
+    const raw = text.replace(',', '.');
+    const num = Number(raw);
+    const invalid = text !== '' && !(num >= 10 && num <= 150);
+    return (
+        <TextField
+            label={label}
+            helperText={helper}
+            error={invalid}
+            value={text}
+            onChange={e => {
+                setText(e.target.value);
+                const t = e.target.value.replace(',', '.');
+                if (t === '' && allowEmpty) {
+                    setState(stateId, 0);
+                } else if (Number(t) >= 10 && Number(t) <= 150) {
+                    setState(stateId, Number(t));
+                    onValid?.();
+                }
+            }}
+            inputProps={{ inputMode: 'decimal' }}
+            size="small"
+        />
+    );
+}
+
 function CapacityField({ base, states, setState }) {
-    const stateId = `${base}.config.battery_capacity_kwh`;
+    const netId = `${base}.config.battery_capacity_kwh`;
+    const grossId = `${base}.config.battery_capacity_gross_kwh`;
     const model = String(val(states, `${base}.info.model`, '')).toUpperCase();
     const variants = batteryOptions(model);
-    const stored = val(states, stateId, '');
+    const net = Number(val(states, netId, 0));
+    const gross = Number(val(states, grossId, 0));
     const measured = Number(val(states, `${base}.battery.estimated_capacity_kwh`, 0));
-    const [text, setText] = useState(String(stored));
-    useEffect(() => {
-        setText(String(stored));
-    }, [stored, stateId]);
-    const num = Number(text.replace(',', '.'));
-    const invalid = text !== '' && !(num >= 10 && num <= 150);
-    const matched = variants.find(x => x.v === Number(stored));
+    const idx = variants.findIndex(x => x.net === net && (x.gross || 0) === gross);
     return (
         <>
             {variants.length > 0 && (
@@ -102,43 +131,48 @@ function CapacityField({ base, states, setState }) {
                     select
                     SelectProps={{ native: true }}
                     label={I18n.t('Battery variant')}
-                    value={matched ? String(matched.v) : 'custom'}
+                    value={idx >= 0 ? String(idx) : 'custom'}
                     onChange={e => {
-                        if (e.target.value !== 'custom') {
-                            setState(stateId, Number(e.target.value));
+                        const x = variants[Number(e.target.value)];
+                        if (x) {
+                            setState(netId, x.net);
+                            setState(grossId, x.gross || 0);
                         }
                     }}
                     size="small"
                     InputLabelProps={{ shrink: true }}
                 >
-                    {variants.map(x => (
-                        <option key={x.v} value={String(x.v)}>
+                    {variants.map((x, k) => (
+                        <option key={k} value={String(k)}>
                             {x.l}
                         </option>
                     ))}
                     <option value="custom">{I18n.t('Custom value')}</option>
                 </TextField>
             )}
-            <TextField
+            <CapField
+                stateId={netId}
                 label={I18n.t('Battery capacity (kWh, net)')}
-                helperText={I18n.t('Net battery capacity of your car (kWh)')}
-                error={invalid}
-                value={text}
-                onChange={e => {
-                    setText(e.target.value);
-                    const n = Number(e.target.value.replace(',', '.'));
-                    if (n >= 10 && n <= 150) {
-                        setState(stateId, n);
-                    }
-                }}
-                inputProps={{ inputMode: 'decimal' }}
-                size="small"
+                helper={I18n.t('Net battery capacity of your car (kWh)')}
+                states={states}
+                setState={setState}
+            />
+            <CapField
+                stateId={grossId}
+                label={I18n.t('Battery capacity (kWh, gross)')}
+                helper={I18n.t('Used for energy calculations when set; empty = net value')}
+                states={states}
+                setState={setState}
+                allowEmpty
             />
             {measured >= 10 && measured <= 150 && (
                 <Button
                     size="small"
                     variant="outlined"
-                    onClick={() => setState(stateId, Math.round(measured * 10) / 10)}
+                    onClick={() => {
+                        setState(netId, Math.round(measured * 10) / 10);
+                        setState(grossId, 0);
+                    }}
                 >
                     {I18n.t('Use measured value')} ({(Math.round(measured * 10) / 10).toFixed(1)} kWh)
                 </Button>
