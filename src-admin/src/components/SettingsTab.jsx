@@ -520,7 +520,12 @@ export default function SettingsTab({
     };
 
     return (
-        <Box>
+        <Box
+            sx={{
+                // one common width for every text field and dropdown on this page
+                '& .MuiTextField-root': { width: 360, maxWidth: '100%' },
+            }}
+        >
             <SectionCard
                 icon={
                     <SpeedIcon
@@ -2297,7 +2302,7 @@ export default function SettingsTab({
                         )
                     }
                     size="small"
-                    sx={{ width: 'calc(100% - 32px)', maxWidth: 360, ml: 4, mt: 1.5, mb: 1 }}
+                    sx={{ mt: 1.5, mb: 1 }}
                 />
 
                 <br />
@@ -2330,7 +2335,7 @@ export default function SettingsTab({
                     }
                     inputProps={{ step: 5, min: 5 }}
                     size="small"
-                    sx={{ width: 'calc(100% - 32px)', maxWidth: 360, ml: 4, mt: 1.5, mb: 1 }}
+                    sx={{ mt: 1.5, mb: 1 }}
                 />
 
                 <br />
@@ -2363,7 +2368,7 @@ export default function SettingsTab({
                     }
                     inputProps={{ step: 5, min: 5 }}
                     size="small"
-                    sx={{ width: 'calc(100% - 32px)', maxWidth: 360, ml: 4, mt: 1.5, mb: 1 }}
+                    sx={{ mt: 1.5, mb: 1 }}
                 />
 
                 <TextField
@@ -2378,7 +2383,7 @@ export default function SettingsTab({
                     }
                     inputProps={{ step: 5, min: 5 }}
                     size="small"
-                    sx={{ width: 'calc(100% - 32px)', maxWidth: 360, ml: 4, mt: 1.5, mb: 1 }}
+                    sx={{ mt: 1.5, mb: 1 }}
                 />
 
                 <br />
