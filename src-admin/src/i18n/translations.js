@@ -11,6 +11,8 @@
 const translations = {
     en: {},
     ru: {
+        "net": "нетто",
+        "gross": "брутто",
         "Battery variant": "Вариант батареи",
         "Custom value": "Своё значение",
         "Use measured value": "Использовать измеренное значение",
@@ -276,6 +278,8 @@ const translations = {
         "Duration": "Длительность",
     },
     de: {
+        "net": "netto",
+        "gross": "brutto",
         "Battery variant": "Batterievariante",
         "Custom value": "Eigener Wert",
         "Use measured value": "Gemessenen Wert übernehmen",
@@ -529,6 +533,8 @@ const translations = {
         "Duration": "Dauer",
     },
     fr: {
+        "net": "nette",
+        "gross": "brute",
         "Battery variant": "Variante de batterie",
         "Custom value": "Valeur personnalisée",
         "Use measured value": "Utiliser la valeur mesurée",
@@ -788,6 +794,8 @@ const translations = {
         "Duration": "Durée",
     },
     it: {
+        "net": "netta",
+        "gross": "lorda",
         "Battery variant": "Variante batteria",
         "Custom value": "Valore personalizzato",
         "Use measured value": "Usa il valore misurato",
@@ -1049,6 +1057,8 @@ const translations = {
         "Duration": "Durata",
     },
     es: {
+        "net": "neta",
+        "gross": "bruta",
         "Battery variant": "Variante de batería",
         "Custom value": "Valor personalizado",
         "Use measured value": "Usar el valor medido",
@@ -1312,6 +1322,8 @@ const translations = {
         "Duration": "Duración",
     },
     pt: {
+        "net": "líquida",
+        "gross": "bruta",
         "Battery variant": "Variante da bateria",
         "Custom value": "Valor personalizado",
         "Use measured value": "Usar o valor medido",
@@ -1574,6 +1586,8 @@ const translations = {
         "Duration": "Duração",
     },
     nl: {
+        "net": "netto",
+        "gross": "bruto",
         "Battery variant": "Batterijvariant",
         "Custom value": "Eigen waarde",
         "Use measured value": "Gemeten waarde gebruiken",
@@ -1831,6 +1845,8 @@ const translations = {
         "Duration": "Duur",
     },
     pl: {
+        "net": "netto",
+        "gross": "brutto",
         "Battery variant": "Wariant baterii",
         "Custom value": "Własna wartość",
         "Use measured value": "Użyj zmierzonej wartości",
@@ -2090,6 +2106,8 @@ const translations = {
         "Duration": "Czas trwania",
     },
     uk: {
+        "net": "нетто",
+        "gross": "брутто",
         "Battery variant": "Варіант батареї",
         "Custom value": "Власне значення",
         "Use measured value": "Використати виміряне значення",
@@ -2355,6 +2373,8 @@ const translations = {
         "Duration": "Тривалість",
     },
     "zh-cn": {
+        "net": "净值",
+        "gross": "总值",
         "Battery variant": "电池版本",
         "Custom value": "自定义值",
         "Use measured value": "使用测量值",

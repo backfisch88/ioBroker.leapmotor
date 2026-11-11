@@ -49,35 +49,43 @@ function val(states, id, def = null) {
     return states[id]?.val ?? def;
 }
 
-// Usable (net) pack sizes per model, kWh
+// Pack sizes per model, kWh: usable (net) and, where published, gross.
+// Both are offered; net matches the datasheet usable energy, gross matches
+// the car's displayed SoC better on some models (e.g. B10 Pro Max).
 const BATTERY_VARIANTS = {
-    T03: [{ v: 36, l: '36.0 kWh' }],
+    T03: [{ n: 'T03', net: 36, gross: 37.3 }],
     A10: [
-        { v: 39, l: '39.0 kWh (B03X, 292 km)' },
-        { v: 52, l: '52.0 kWh (B03X, 382 km)' },
+        { n: 'B03X 292 km', net: 39, gross: 39.8 },
+        { n: 'B03X 382 km', net: 52, gross: 53 },
     ],
     B05: [
-        { v: 55, l: '55.0 kWh (Pro)' },
-        { v: 65, l: '65.0 kWh (Pro Max)' },
+        { n: 'Pro', net: 55, gross: 56.2 },
+        { n: 'Pro Max', net: 65, gross: 67.1 },
     ],
     B10: [
-        { v: 55, l: '55.0 kWh (Pro)' },
-        { v: 65, l: '65.0 kWh (Pro Max)' },
-        { v: 18.8, l: '18.8 kWh (REEV)' },
+        { n: 'Pro', net: 55, gross: 56.2 },
+        { n: 'Pro Max', net: 65, gross: 67.1 },
+        { n: 'REEV', net: 18.8 },
     ],
     C10: [
-        { v: 67, l: '67.0 kWh (RWD)' },
-        { v: 81.9, l: '81.9 kWh (AWD)' },
-        { v: 28.4, l: '28.4 kWh (REEV)' },
+        { n: 'RWD', net: 67, gross: 69.9 },
+        { n: 'AWD', net: 81.9, gross: 84 },
+        { n: 'REEV', net: 28.4 },
     ],
 };
+
+const batteryOptions = model =>
+    (BATTERY_VARIANTS[model] || []).flatMap(x => [
+        { v: x.net, l: `${x.n} - ${x.net.toFixed(1)} kWh (${I18n.t('net')})` },
+        ...(x.gross ? [{ v: x.gross, l: `${x.n} - ${x.gross.toFixed(1)} kWh (${I18n.t('gross')})` }] : []),
+    ]);
 
 // Net battery capacity of the selected car: pick the variant, enter a custom
 // value ("67.1" and "67,1" both work, 10-150 kWh) or take the measured one.
 function CapacityField({ base, states, setState }) {
     const stateId = `${base}.config.battery_capacity_kwh`;
     const model = String(val(states, `${base}.info.model`, '')).toUpperCase();
-    const variants = BATTERY_VARIANTS[model] || [];
+    const variants = batteryOptions(model);
     const stored = val(states, stateId, '');
     const measured = Number(val(states, `${base}.battery.estimated_capacity_kwh`, 0));
     const [text, setText] = useState(String(stored));
