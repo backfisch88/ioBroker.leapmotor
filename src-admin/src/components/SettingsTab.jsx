@@ -2297,8 +2297,7 @@ export default function SettingsTab({
                         )
                     }
                     size="small"
-                    fullWidth
-                    sx={{ ml: 4, mb: 1, maxWidth: 520 }}
+                    sx={{ width: 'calc(100% - 32px)', maxWidth: 360, ml: 4, mt: 1.5, mb: 1 }}
                 />
 
                 <br />
@@ -2331,7 +2330,7 @@ export default function SettingsTab({
                     }
                     inputProps={{ step: 5, min: 5 }}
                     size="small"
-                    sx={{ width: 260, ml: 4, mb: 1 }}
+                    sx={{ width: 'calc(100% - 32px)', maxWidth: 360, ml: 4, mt: 1.5, mb: 1 }}
                 />
 
                 <br />
@@ -2364,7 +2363,7 @@ export default function SettingsTab({
                     }
                     inputProps={{ step: 5, min: 5 }}
                     size="small"
-                    sx={{ width: 260, ml: 4, mb: 1 }}
+                    sx={{ width: 'calc(100% - 32px)', maxWidth: 360, ml: 4, mt: 1.5, mb: 1 }}
                 />
 
                 <TextField
@@ -2379,7 +2378,7 @@ export default function SettingsTab({
                     }
                     inputProps={{ step: 5, min: 5 }}
                     size="small"
-                    sx={{ width: 260, ml: 4, mb: 1 }}
+                    sx={{ width: 'calc(100% - 32px)', maxWidth: 360, ml: 4, mt: 1.5, mb: 1 }}
                 />
 
                 <br />
