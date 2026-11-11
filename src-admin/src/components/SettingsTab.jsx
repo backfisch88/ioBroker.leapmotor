@@ -49,6 +49,38 @@ function val(states, id, def = null) {
     return states[id]?.val ?? def;
 }
 
+// Net battery capacity of the selected car. Accepts "67.1" and "67,1";
+// only valid values (10-150 kWh) are written.
+function CapacityField({ stateId, states, setState }) {
+    const stored = val(states, stateId, '');
+    const [text, setText] = useState(String(stored));
+    useEffect(() => {
+        setText(String(stored));
+    }, [stored, stateId]);
+    if (!stateId) {
+        return null;
+    }
+    const num = Number(text.replace(',', '.'));
+    const invalid = text !== '' && !(num >= 10 && num <= 150);
+    return (
+        <TextField
+            label={I18n.t('Battery capacity (kWh, net)')}
+            helperText={I18n.t('Net battery capacity of your car (kWh)')}
+            error={invalid}
+            value={text}
+            onChange={e => {
+                setText(e.target.value);
+                const n = Number(e.target.value.replace(',', '.'));
+                if (n >= 10 && n <= 150) {
+                    setState(stateId, n);
+                }
+            }}
+            inputProps={{ inputMode: 'decimal' }}
+            size="small"
+        />
+    );
+}
+
 // Draggable-marker map for fine-tuning the home location after picking an
 // address suggestion (or just dragging directly, no search needed).
 function HomeLocationMap({ lat, lon, radiusM, onChange }) {
@@ -712,6 +744,14 @@ export default function SettingsTab({
                         size="small"
                         sx={{ width: 220 }}
                     />
+
+                    {base && (
+                        <CapacityField
+                            stateId={`${base}.config.battery_capacity_kwh`}
+                            states={states}
+                            setState={setState}
+                        />
+                    )}
                 </Box>
 
                 <Typography

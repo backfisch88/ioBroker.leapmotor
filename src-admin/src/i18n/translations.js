@@ -11,6 +11,8 @@
 const translations = {
     en: {},
     ru: {
+        "Battery capacity (kWh, net)": "Ёмкость батареи (кВт·ч, нетто)",
+        "Net battery capacity of your car (kWh)": "Полезная ёмкость батареи вашего авто (кВт·ч)",
         "Charging finished text (optional)": "Текст уведомления об окончании зарядки (необязательно)",
         "Notify about charging progress": "Уведомлять о ходе зарядки",
         "Progress interval (min)": "Интервал (мин)",
@@ -271,6 +273,8 @@ const translations = {
         "Duration": "Длительность",
     },
     de: {
+        "Battery capacity (kWh, net)": "Batteriekapazität (kWh, netto)",
+        "Net battery capacity of your car (kWh)": "Nutzbare Batteriekapazität deines Autos (kWh)",
         "Charging finished text (optional)": "Text bei Laden beendet (optional)",
         "Notify about charging progress": "Über Ladefortschritt benachrichtigen",
         "Progress interval (min)": "Intervall (Min.)",
@@ -519,6 +523,8 @@ const translations = {
         "Duration": "Dauer",
     },
     fr: {
+        "Battery capacity (kWh, net)": "Capacité de la batterie (kWh, nette)",
+        "Net battery capacity of your car (kWh)": "Capacité nette de la batterie de votre voiture (kWh)",
         "Charging finished text (optional)": "Texte de fin de charge (facultatif)",
         "Notify about charging progress": "Notifier la progression de la charge",
         "Progress interval (min)": "Intervalle (min)",
@@ -773,6 +779,8 @@ const translations = {
         "Duration": "Durée",
     },
     it: {
+        "Battery capacity (kWh, net)": "Capacità batteria (kWh, netta)",
+        "Net battery capacity of your car (kWh)": "Capacità netta della batteria della tua auto (kWh)",
         "Charging finished text (optional)": "Testo di fine ricarica (facoltativo)",
         "Notify about charging progress": "Notifica sullo stato di ricarica",
         "Progress interval (min)": "Intervallo (min)",
@@ -1029,6 +1037,8 @@ const translations = {
         "Duration": "Durata",
     },
     es: {
+        "Battery capacity (kWh, net)": "Capacidad de la batería (kWh, neta)",
+        "Net battery capacity of your car (kWh)": "Capacidad neta de la batería de tu coche (kWh)",
         "Charging finished text (optional)": "Texto de fin de carga (opcional)",
         "Notify about charging progress": "Notificar el progreso de la carga",
         "Progress interval (min)": "Intervalo (min)",
@@ -1287,6 +1297,8 @@ const translations = {
         "Duration": "Duración",
     },
     pt: {
+        "Battery capacity (kWh, net)": "Capacidade da bateria (kWh, líquida)",
+        "Net battery capacity of your car (kWh)": "Capacidade líquida da bateria do seu carro (kWh)",
         "Charging finished text (optional)": "Texto de fim de carga (opcional)",
         "Notify about charging progress": "Notificar o progresso da carga",
         "Progress interval (min)": "Intervalo (min)",
@@ -1544,6 +1556,8 @@ const translations = {
         "Duration": "Duração",
     },
     nl: {
+        "Battery capacity (kWh, net)": "Batterijcapaciteit (kWh, netto)",
+        "Net battery capacity of your car (kWh)": "Netto batterijcapaciteit van je auto (kWh)",
         "Charging finished text (optional)": "Tekst bij einde laden (optioneel)",
         "Notify about charging progress": "Voortgang van het laden melden",
         "Progress interval (min)": "Interval (min)",
@@ -1796,6 +1810,8 @@ const translations = {
         "Duration": "Duur",
     },
     pl: {
+        "Battery capacity (kWh, net)": "Pojemność baterii (kWh, netto)",
+        "Net battery capacity of your car (kWh)": "Użyteczna pojemność baterii twojego auta (kWh)",
         "Charging finished text (optional)": "Tekst po zakończeniu ładowania (opcjonalnie)",
         "Notify about charging progress": "Powiadamiaj o postępie ładowania",
         "Progress interval (min)": "Interwał (min)",
@@ -2050,6 +2066,8 @@ const translations = {
         "Duration": "Czas trwania",
     },
     uk: {
+        "Battery capacity (kWh, net)": "Ємність батареї (кВт·год, нетто)",
+        "Net battery capacity of your car (kWh)": "Корисна ємність батареї вашого авто (кВт·год)",
         "Charging finished text (optional)": "Текст сповіщення про завершення заряджання (необов'язково)",
         "Notify about charging progress": "Сповіщати про перебіг заряджання",
         "Progress interval (min)": "Інтервал (хв)",
@@ -2310,6 +2328,8 @@ const translations = {
         "Duration": "Тривалість",
     },
     "zh-cn": {
+        "Battery capacity (kWh, net)": "电池容量（kWh，净值）",
+        "Net battery capacity of your car (kWh)": "您车辆的电池净容量（kWh）",
         "Charging finished text (optional)": "充电完成通知文本（可选）",
         "Notify about charging progress": "通知充电进度",
         "Progress interval (min)": "间隔（分钟）",
