@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "leapmotor",
-        "version": "0.8.0",
+        "version": "0.8.1",
         "news": {
+            "0.8.1": {
+                "en": "Faster start of the admin page (vehicles are read from the adapter's states instead of loading every object of the system).",
+                "de": "Schnellerer Start der Admin-Seite (Fahrzeuge werden aus den States des Adapters gelesen statt alle Objekte des Systems zu laden).",
+                "es": "Faster start of the admin page (vehicles are read from the adapter's states instead of loading every object of the system).",
+                "fr": "Faster start of the admin page (vehicles are read from the adapter's states instead of loading every object of the system).",
+                "it": "Faster start of the admin page (vehicles are read from the adapter's states instead of loading every object of the system).",
+                "nl": "Faster start of the admin page (vehicles are read from the adapter's states instead of loading every object of the system).",
+                "pl": "Faster start of the admin page (vehicles are read from the adapter's states instead of loading every object of the system).",
+                "pt": "Faster start of the admin page (vehicles are read from the adapter's states instead of loading every object of the system).",
+                "ru": "Faster start of the admin page (vehicles are read from the adapter's states instead of loading every object of the system).",
+                "uk": "Faster start of the admin page (vehicles are read from the adapter's states instead of loading every object of the system).",
+                "zh-cn": "Faster start of the admin page (vehicles are read from the adapter's states instead of loading every object of the system)."
+            },
             "0.8.0": {
                 "en": "New: redesigned admin (light/dark follows ioBroker, hero view, quick actions, cards). New: charging progress and public-charger time-limit notifications, charge duration and custom text in the charge-finished message. New: battery variant dropdown with net/gross capacity. New: fan speed up to the car's maximum.",
                 "de": "Neu: überarbeitetes Admin (hell/dunkel folgt ioBroker, Hero-Ansicht, Schnellaktionen, Karten). Neu: Lade-Fortschritts- und Standzeit-Warnung an öffentlichen Ladesäulen, Ladedauer und eigener Text in der Lade-fertig-Meldung. Neu: Batterievariante mit Netto-/Brutto-Kapazität. Neu: Lüfterstufe bis zum Maximum des Fahrzeugs.",

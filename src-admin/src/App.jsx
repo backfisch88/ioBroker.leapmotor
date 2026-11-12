@@ -106,7 +106,7 @@ function GlobalTokens({ type }) {
 const ADAPTER = (window.adapterInstance || 'leapmotor.0').replace(/^system\.adapter\./, '');
 
 export default function App() {
-    const { connected, error, states, getStates, getObjects, setState, sendTo, systemLanguage } = useConnection(ADAPTER);
+    const { connected, error, states, getStates, setState, sendTo, systemLanguage } = useConnection(ADAPTER);
     // Sprache SYNCHRON während des Renderns setzen (nicht in einem useEffect,
     // da Effects erst NACH dem Rendern laufen - das würde bedeuten, dass genau
     // der erste Render-Durchlauf mit bekannter Sprache noch die alte/Default-
@@ -128,17 +128,20 @@ export default function App() {
 
     useEffect(() => {
         if (!connected) return;
-        getObjects(`${ADAPTER}.*`, (err, objs) => {
-            if (err || !objs) { setLoading(false); return; }
-            const found = new Set();
-            Object.keys(objs).forEach(id => {
-                const m = id.match(new RegExp(`^${ADAPTER}\\.([A-Z0-9]+)\\.info\\.vin$`));
-                if (m) found.add(m[1]);
-            });
-            const list = Array.from(found).sort();
-            setVins(list);
-            if (list.length && !selectedVin) setSelectedVin(list[0]);
-            getStates(`${ADAPTER}.*`, () => setLoading(false));
+        // Fahrzeuge direkt aus den States ableiten (ein einziger Abruf). Der frühere
+        // getObjects(true)-Abruf lud alle Objekte des gesamten Systems und bremste den Start.
+        getStates(`${ADAPTER}.*`, (err, result) => {
+            if (!err && result) {
+                const found = new Set();
+                Object.keys(result).forEach(id => {
+                    const m = id.match(new RegExp(`^${ADAPTER}\\.([A-Z0-9]+)\\.info\\.vin$`));
+                    if (m) found.add(m[1]);
+                });
+                const list = Array.from(found).sort();
+                setVins(list);
+                if (list.length && !selectedVin) setSelectedVin(list[0]);
+            }
+            setLoading(false);
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [connected]);

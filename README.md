@@ -177,6 +177,9 @@ Which comfort commands actually appear depends on the detected vehicle model —
 
 ### **WORK IN PROGRESS**
 
+### 0.8.1 (2026-11-12)
+- (backfisch88) Changed: faster start of the admin page
+
 ### 0.8.0 (2026-11-12)
 - (backfisch88) New: redesigned admin - light/dark follows ioBroker, hero view with quick actions, card layout, simpler tab bar
 - (backfisch88) New: battery variant dropdown, custom value and "use measured value" in the Settings tab
