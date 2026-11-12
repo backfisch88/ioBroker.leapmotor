@@ -170,12 +170,16 @@ export default function App() {
                     <Alert severity={error ? 'error' : 'info'} sx={{ mb: 2 }}>
                         {error || I18n.t('Connecting...')}
                     </Alert>
+                    {error && (
+                        <>
                     <Typography variant="caption" sx={{ display: 'block', color: 'var(--lm-muted)', fontFamily: 'monospace' }}>
                         Debug: {debugInfo}
                     </Typography>
                     <Typography variant="caption" sx={{ display: 'block', color: 'var(--lm-muted)', fontFamily: 'monospace' }}>
                         connected={String(connected)}, loading={String(loading)}
                     </Typography>
+                        </>
+                    )}
                     {!error && <CircularProgress sx={{ mt: 2 }} />}
                 </Box>
             </ThemeProvider>
