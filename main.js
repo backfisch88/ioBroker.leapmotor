@@ -1703,7 +1703,19 @@ class LeapmotorAdapter extends utils.Adapter {
     }
 
     async updateChargingCost(vin, soc, chargeState, gearStatus, speed, vehicleReady, latitude, longitude) {
-        const charging = isActuallyCharging(chargeState, gearStatus, speed, vehicleReady);
+        if (!this._chargingSessions) {
+            this._chargingSessions = {};
+        }
+        // A running session must not end just because the car was switched on
+        // while still plugged in and charging (vehicleReady alone). Such a
+        // "ready" flag only blocks STARTING a session, not continuing one.
+        const sessionBefore = this._chargingSessions[vin];
+        const readyWhileCharging =
+            !!sessionBefore?.wasCharging &&
+            [1, 2, 3].includes(chargeState) &&
+            ![1, 2, 3].includes(gearStatus) &&
+            !(speed != null && speed > 0);
+        const charging = isActuallyCharging(chargeState, gearStatus, speed, vehicleReady) || readyWhileCharging;
         if (!this._chargingSessions) {
             this._chargingSessions = {};
         }

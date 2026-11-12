@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "leapmotor",
-        "version": "0.8.2",
+        "version": "0.8.3",
         "news": {
+            "0.8.3": {
+                "en": "Fix: switching the car on while charging no longer ends the charging session early (no false 'charging finished' message).",
+                "de": "Fix: Einschalten des Autos während des Ladens beendet die Ladesitzung nicht mehr vorzeitig (keine falsche Lade-beendet-Meldung).",
+                "es": "Fix: switching the car on while charging no longer ends the charging session early (no false 'charging finished' message).",
+                "fr": "Fix: switching the car on while charging no longer ends the charging session early (no false 'charging finished' message).",
+                "it": "Fix: switching the car on while charging no longer ends the charging session early (no false 'charging finished' message).",
+                "nl": "Fix: switching the car on while charging no longer ends the charging session early (no false 'charging finished' message).",
+                "pl": "Fix: switching the car on while charging no longer ends the charging session early (no false 'charging finished' message).",
+                "pt": "Fix: switching the car on while charging no longer ends the charging session early (no false 'charging finished' message).",
+                "ru": "Fix: switching the car on while charging no longer ends the charging session early (no false 'charging finished' message).",
+                "uk": "Fix: switching the car on while charging no longer ends the charging session early (no false 'charging finished' message).",
+                "zh-cn": "Fix: switching the car on while charging no longer ends the charging session early (no false 'charging finished' message)."
+            },
             "0.8.2": {
                 "en": "Admin start shows a spinner while loading and remembers the last vehicle; connection debug lines only shown on error.",
                 "de": "Admin-Start zeigt beim Laden einen Spinner und merkt sich das letzte Fahrzeug; Debug-Zeilen der Verbindung nur noch bei Fehler.",
