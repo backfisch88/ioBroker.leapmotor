@@ -203,13 +203,11 @@ Which comfort commands actually appear depends on the detected vehicle model —
 - Fix: login failed with "Could not open account certificate" for accounts with a very large internal ID (number precision lost in JSON parsing)
 
 ### 0.7.3 (2026-10-15)
-- New: optional comfort extras for Prepare-to-Drive/Work (seat heat, steering wheel heat, windshield defrost), off by default
-- New: cloud-metered charging session history cross-check (Diagnostics tab)
-- New: optional extended trip-done notification with energy split
-- Fix: separate, stricter sunshade cold-protection threshold (default 5 °C)
-- Fix: running charging session is restored after an adapter restart
-- Chore: CI linting enabled, code formatted with Prettier
-- Known limitation: `cmd.charge_limit_set` has no effect on the T03; the charging schedule works
+- New: optional comfort extras for Prepare-to-Drive/Work (seat heat, steering wheel heat, defrost)
+- New: charging session history cross-check (Diagnostics tab)
+- New: optional extended trip-done notification
+- Fix: separate sunshade cold-protection threshold
+- Fix: running charging session restored after restart
 
 Older changes can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 
