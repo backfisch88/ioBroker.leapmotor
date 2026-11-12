@@ -176,6 +176,7 @@ Which comfort commands actually appear depends on the detected vehicle model —
 ## Changelog
 
 ### **WORK IN PROGRESS**
+- (backfisch88) Changed: admin start shows a spinner instead of "No vehicle found" while loading, remembers the last selected vehicle
 
 ### 0.8.1 (2026-11-12)
 - (backfisch88) Changed: faster start of the admin page

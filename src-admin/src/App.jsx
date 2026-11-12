@@ -118,7 +118,9 @@ export default function App() {
     const themeType = useMemo(detectThemeType, []);
     const theme = useMemo(() => buildTheme(themeType), [themeType]);
     const [vins, setVins] = useState([]);
-    const [selectedVin, setSelectedVin] = useState(null);
+    const [selectedVin, setSelectedVin] = useState(() => {
+        try { return window.localStorage.getItem('leapmotor.lastVin') || null; } catch { return null; }
+    });
     const [loading, setLoading] = useState(true);
     const [debugInfo, setDebugInfo] = useState('');
 
@@ -139,12 +141,17 @@ export default function App() {
                 });
                 const list = Array.from(found).sort();
                 setVins(list);
-                if (list.length && !selectedVin) setSelectedVin(list[0]);
+                if (list.length && (!selectedVin || !list.includes(selectedVin))) setSelectedVin(list[0]);
             }
             setLoading(false);
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [connected]);
+
+    useEffect(() => {
+        if (!selectedVin) return;
+        try { window.localStorage.setItem('leapmotor.lastVin', selectedVin); } catch { /* ignore */ }
+    }, [selectedVin]);
 
     const base = selectedVin ? `${ADAPTER}.${selectedVin}` : null;
 
@@ -219,7 +226,8 @@ export default function App() {
                 </Tabs>
 
                 <Box>
-                    {!base && <Typography color="text.secondary">{I18n.t('No vehicle found. Is the adapter running?')}</Typography>}
+                    {!base && loading && <CircularProgress size={28} sx={{ color: 'var(--lm-muted)' }} />}
+                    {!base && !loading && <Typography color="text.secondary">{I18n.t('No vehicle found. Is the adapter running?')}</Typography>}
                     {base && tab === 0 && <DashboardTab base={base} states={states} setState={setState} />}
                     {base && tab === 1 && <ConsumptionTab base={base} states={states} adapter={ADAPTER} />}
                     {base && tab === 2 && <TripsTab base={base} states={states} setState={setState} />}
