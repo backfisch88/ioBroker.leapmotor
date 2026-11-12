@@ -126,11 +126,11 @@ export default function ExportPanel({ base, states }) {
     };
 
     return (
-        <Card sx={{ mb: 2, bgcolor: '#0d1520', border: '1px solid #1e2d45' }}>
+        <Card sx={{ mb: 2, bgcolor: 'var(--lm-surface)', border: '1px solid var(--lm-line)' }}>
             <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
                 <Typography
                     variant="caption"
-                    sx={{ color: '#3a5070', letterSpacing: '0.1em', display: 'block', mb: 1 }}
+                    sx={{ color: 'var(--lm-muted)', letterSpacing: '0.1em', display: 'block', mb: 1 }}
                 >
                     {I18n.t('EXPORT')}
                 </Typography>

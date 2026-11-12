@@ -176,6 +176,9 @@ Which comfort commands actually appear depends on the detected vehicle model —
 ## Changelog
 
 ### **WORK IN PROGRESS**
+
+### 0.8.0 (2026-11-12)
+- (backfisch88) New: redesigned admin - light/dark follows ioBroker, hero view with quick actions, card layout, simpler tab bar
 - (backfisch88) New: battery variant dropdown, custom value and "use measured value" in the Settings tab
 - (backfisch88) New: separate gross battery capacity (`config.battery_capacity_gross_kwh`); the variant dropdown sets net and gross, energy is calculated with gross when set
 - (backfisch88) Changed: default capacities now usable (net) values (B10/B05 55.0, C10 67.0); A10 and B05 added (A10 fell back to 36 before)

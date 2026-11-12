@@ -11,6 +11,9 @@
 const translations = {
     en: {},
     ru: {
+        'Last update': 'Последнее обновление',
+        'Refresh': 'Обновить',
+        'Connected': 'Подключено',
         "Battery capacity (kWh, gross)": "Ёмкость батареи (кВт·ч, брутто)",
         "Used for energy calculations when set; empty = net value": "Для расчёта энергии, если задано; пусто = нетто",
         "net": "нетто",
@@ -280,6 +283,9 @@ const translations = {
         "Duration": "Длительность",
     },
     de: {
+        'Last update': 'Statusupdate',
+        'Refresh': 'Aktualisieren',
+        'Connected': 'Verbunden',
         "Battery capacity (kWh, gross)": "Batteriekapazität (kWh, brutto)",
         "Used for energy calculations when set; empty = net value": "Für Energieberechnungen, wenn gesetzt; leer = Nettowert",
         "net": "netto",
@@ -537,6 +543,9 @@ const translations = {
         "Duration": "Dauer",
     },
     fr: {
+        'Last update': 'Dernière mise à jour',
+        'Refresh': 'Actualiser',
+        'Connected': 'Connecté',
         "Battery capacity (kWh, gross)": "Capacité de la batterie (kWh, brute)",
         "Used for energy calculations when set; empty = net value": "Utilisée pour les calculs d'énergie si renseignée ; vide = valeur nette",
         "net": "nette",
@@ -800,6 +809,9 @@ const translations = {
         "Duration": "Durée",
     },
     it: {
+        'Last update': 'Ultimo aggiornamento',
+        'Refresh': 'Aggiorna',
+        'Connected': 'Connesso',
         "Battery capacity (kWh, gross)": "Capacità batteria (kWh, lorda)",
         "Used for energy calculations when set; empty = net value": "Usata per i calcoli energetici se impostata; vuoto = valore netto",
         "net": "netta",
@@ -1065,6 +1077,9 @@ const translations = {
         "Duration": "Durata",
     },
     es: {
+        'Last update': 'Última actualización',
+        'Refresh': 'Actualizar',
+        'Connected': 'Conectado',
         "Battery capacity (kWh, gross)": "Capacidad de la batería (kWh, bruta)",
         "Used for energy calculations when set; empty = net value": "Se usa para los cálculos de energía si se indica; vacío = valor neto",
         "net": "neta",
@@ -1332,6 +1347,9 @@ const translations = {
         "Duration": "Duración",
     },
     pt: {
+        'Last update': 'Última atualização',
+        'Refresh': 'Atualizar',
+        'Connected': 'Conectado',
         "Battery capacity (kWh, gross)": "Capacidade da bateria (kWh, bruta)",
         "Used for energy calculations when set; empty = net value": "Usada nos cálculos de energia se definida; vazio = valor líquido",
         "net": "líquida",
@@ -1598,6 +1616,9 @@ const translations = {
         "Duration": "Duração",
     },
     nl: {
+        'Last update': 'Laatste update',
+        'Refresh': 'Vernieuwen',
+        'Connected': 'Verbonden',
         "Battery capacity (kWh, gross)": "Batterijcapaciteit (kWh, bruto)",
         "Used for energy calculations when set; empty = net value": "Gebruikt voor energieberekeningen indien ingesteld; leeg = nettowaarde",
         "net": "netto",
@@ -1859,6 +1880,9 @@ const translations = {
         "Duration": "Duur",
     },
     pl: {
+        'Last update': 'Ostatnia aktualizacja',
+        'Refresh': 'Odśwież',
+        'Connected': 'Połączono',
         "Battery capacity (kWh, gross)": "Pojemność baterii (kWh, brutto)",
         "Used for energy calculations when set; empty = net value": "Używana do obliczeń energii, jeśli ustawiona; puste = wartość netto",
         "net": "netto",
@@ -2122,6 +2146,9 @@ const translations = {
         "Duration": "Czas trwania",
     },
     uk: {
+        'Last update': 'Останнє оновлення',
+        'Refresh': 'Оновити',
+        'Connected': 'Підключено',
         "Battery capacity (kWh, gross)": "Ємність батареї (кВт·год, брутто)",
         "Used for energy calculations when set; empty = net value": "Для розрахунку енергії, якщо задано; порожньо = нетто",
         "net": "нетто",

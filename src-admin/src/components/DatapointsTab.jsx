@@ -38,7 +38,7 @@ export default function DatapointsTab({ base, states }) {
                     key={groupName}
                     expanded={expanded === groupName}
                     onChange={() => setExpanded(expanded === groupName ? null : groupName)}
-                    sx={{ bgcolor: '#0d1520', border: '1px solid #1e2d45', mb: 1 }}
+                    sx={{ bgcolor: 'var(--lm-surface)', border: '1px solid var(--lm-line)', mb: 1 }}
                 >
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                         <Typography sx={{ fontWeight: 700 }}>{I18n.t(groupName)}</Typography>
@@ -53,10 +53,10 @@ export default function DatapointsTab({ base, states }) {
                                     const unavailable = (v === null || v === undefined) && isKnownUnavailable(carType, k);
                                     return (
                                         <TableRow key={k}>
-                                            <TableCell sx={{ color: '#5a7090', borderColor: '#1e2d45' }}>{k}</TableCell>
+                                            <TableCell sx={{ color: 'var(--lm-muted)', borderColor: 'var(--lm-line)' }}>{k}</TableCell>
                                             <TableCell sx={{
-                                                color: unavailable ? '#5a7090' : '#c8ddf0',
-                                                borderColor: '#1e2d45', fontFamily: 'monospace',
+                                                color: unavailable ? 'var(--lm-muted)' : 'var(--lm-text)',
+                                                borderColor: 'var(--lm-line)', fontFamily: 'monospace',
                                                 fontStyle: unavailable ? 'italic' : 'normal',
                                             }}>
                                                 {unavailable ? I18n.t('n/a (not supported on this model)') : formatVal(v)}

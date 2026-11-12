@@ -225,9 +225,9 @@ function HomeLocationMap({ lat, lon, radiusM, onChange }) {
 
         const circle = L.circle(center, {
             radius: Number(radiusM) || 300,
-            color: '#00d4ff',
+            color: 'var(--lm-accent)',
             weight: 1.5,
-            fillColor: '#00d4ff',
+            fillColor: 'var(--lm-accent)',
             fillOpacity: 0.12,
         }).addTo(map);
         circleRef.current = circle;
@@ -309,7 +309,7 @@ function HomeLocationMap({ lat, lon, radiusM, onChange }) {
                 borderRadius: 1.5,
                 overflow: 'hidden',
                 mt: 1.5,
-                bgcolor: '#08101a',
+                bgcolor: 'var(--lm-sunken)',
             }}
         />
     );
@@ -320,8 +320,8 @@ function SectionCard({ icon, title, children }) {
         <Card
             sx={{
                 mb: 2,
-                bgcolor: '#0d1520',
-                border: '1px solid #1e2d45',
+                bgcolor: 'var(--lm-surface)',
+                border: '1px solid var(--lm-line)',
             }}
         >
             <CardContent>
@@ -661,7 +661,7 @@ export default function SettingsTab({
             <SectionCard
                 icon={
                     <SpeedIcon
-                        sx={{ color: '#00d4ff' }}
+                        sx={{ color: 'var(--lm-accent)' }}
                     />
                 }
                 title={I18n.t('Polling')}
@@ -723,7 +723,7 @@ export default function SettingsTab({
                 <Typography
                     variant="caption"
                     sx={{
-                        color: '#5a7090',
+                        color: 'var(--lm-muted)',
                         display: 'block',
                         mt: 1,
                     }}
@@ -737,7 +737,7 @@ export default function SettingsTab({
             <SectionCard
                 icon={
                     <RouteIcon
-                        sx={{ color: '#00d4ff' }}
+                        sx={{ color: 'var(--lm-accent)' }}
                     />
                 }
                 title={I18n.t(
@@ -769,7 +769,7 @@ export default function SettingsTab({
                 <Typography
                     variant="caption"
                     sx={{
-                        color: '#5a7090',
+                        color: 'var(--lm-muted)',
                         display: 'block',
                     }}
                 >
@@ -782,7 +782,7 @@ export default function SettingsTab({
             <SectionCard
                 icon={
                     <BoltIcon
-                        sx={{ color: '#00d4ff' }}
+                        sx={{ color: 'var(--lm-accent)' }}
                     />
                 }
                 title={I18n.t(
@@ -857,7 +857,7 @@ export default function SettingsTab({
                 <Typography
                     variant="caption"
                     sx={{
-                        color: '#5a7090',
+                        color: 'var(--lm-muted)',
                         display: 'block',
                         mb: 1.5,
                     }}
@@ -870,7 +870,7 @@ export default function SettingsTab({
                 <Divider
                     sx={{
                         my: 1.5,
-                        borderColor: '#1e2d45',
+                        borderColor: 'var(--lm-line)',
                     }}
                 />
 
@@ -898,7 +898,7 @@ export default function SettingsTab({
                 <Typography
                     variant="caption"
                     sx={{
-                        color: '#5a7090',
+                        color: 'var(--lm-muted)',
                         display: 'block',
                         mt: 1,
                     }}
@@ -912,7 +912,7 @@ export default function SettingsTab({
             <SectionCard
                 icon={
                     <StorageIcon
-                        sx={{ color: '#00d4ff' }}
+                        sx={{ color: 'var(--lm-accent)' }}
                     />
                 }
                 title={I18n.t(
@@ -922,7 +922,7 @@ export default function SettingsTab({
                 <Typography
                     variant="caption"
                     sx={{
-                        color: '#5a7090',
+                        color: 'var(--lm-muted)',
                         display: 'block',
                         mb: 1.5,
                     }}
@@ -968,7 +968,7 @@ export default function SettingsTab({
             <SectionCard
                 icon={
                     <HomeIcon
-                        sx={{ color: '#00d4ff' }}
+                        sx={{ color: 'var(--lm-accent)' }}
                     />
                 }
                 title={I18n.t(
@@ -978,7 +978,7 @@ export default function SettingsTab({
                 <Typography
                     variant="caption"
                     sx={{
-                        color: '#5a7090',
+                        color: 'var(--lm-muted)',
                         display: 'block',
                         mb: 1.5,
                     }}
@@ -1009,7 +1009,7 @@ export default function SettingsTab({
                     <Typography
                         variant="caption"
                         sx={{
-                            color: '#5a7090',
+                            color: 'var(--lm-muted)',
                             display: 'block',
                             mt: 0.5,
                         }}
@@ -1027,7 +1027,7 @@ export default function SettingsTab({
                             sx={{
                                 mt: 0.5,
                                 border:
-                                    '1px solid #1e2d45',
+                                    '1px solid var(--lm-line)',
                                 borderRadius: 1,
                                 overflow: 'hidden',
                             }}
@@ -1043,10 +1043,10 @@ export default function SettingsTab({
                                             fontSize:
                                                 '0.85rem',
                                             borderBottom:
-                                                '1px solid #1e2d4555',
+                                                '1px solid color-mix(in srgb, var(--lm-line) 33%, transparent)',
                                             '&:hover': {
                                                 bgcolor:
-                                                    '#0d1520',
+                                                    'var(--lm-surface)',
                                             },
                                         }}
                                         onClick={() => {
@@ -1157,7 +1157,7 @@ export default function SettingsTab({
                 <Typography
                     variant="caption"
                     sx={{
-                        color: '#5a7090',
+                        color: 'var(--lm-muted)',
                         display: 'block',
                         mt: 1,
                     }}
@@ -1202,7 +1202,7 @@ export default function SettingsTab({
             <SectionCard
                 icon={
                     <AcUnitIcon
-                        sx={{ color: '#00d4ff' }}
+                        sx={{ color: 'var(--lm-accent)' }}
                     />
                 }
                 title={I18n.t(
@@ -1234,7 +1234,7 @@ export default function SettingsTab({
                 <Typography
                     variant="caption"
                     sx={{
-                        color: '#5a7090',
+                        color: 'var(--lm-muted)',
                         display: 'block',
                         mb: 1.5,
                     }}
@@ -1312,7 +1312,7 @@ export default function SettingsTab({
                 <Box sx={{ width: 260, mb: 1 }}>
                     <Typography
                         variant="caption"
-                        sx={{ color: '#5a7090' }}
+                        sx={{ color: 'var(--lm-muted)' }}
                     >
                         {I18n.t('Fan speed')}: {cfg('prepare_to_drive_fan_speed', 3)}
                     </Typography>
@@ -1357,7 +1357,7 @@ export default function SettingsTab({
                 <Divider
                     sx={{
                         my: 2,
-                        borderColor: '#1e2d45',
+                        borderColor: 'var(--lm-line)',
                     }}
                 />
 
@@ -1386,7 +1386,7 @@ export default function SettingsTab({
                 <Typography
                     variant="caption"
                     sx={{
-                        color: '#5a7090',
+                        color: 'var(--lm-muted)',
                         display: 'block',
                         mb: 1.5,
                     }}
@@ -1548,14 +1548,14 @@ export default function SettingsTab({
                 <Divider
                     sx={{
                         my: 2,
-                        borderColor: '#1e2d45',
+                        borderColor: 'var(--lm-line)',
                     }}
                 />
 
                 <Typography
                     variant="caption"
                     sx={{
-                        color: '#5a7090',
+                        color: 'var(--lm-muted)',
                         display: 'block',
                         mb: 1,
                     }}
@@ -1649,7 +1649,7 @@ export default function SettingsTab({
             <SectionCard
                 icon={
                     <WorkIcon
-                        sx={{ color: '#00d4ff' }}
+                        sx={{ color: 'var(--lm-accent)' }}
                     />
                 }
                 title={I18n.t(
@@ -1681,7 +1681,7 @@ export default function SettingsTab({
                 <Typography
                     variant="caption"
                     sx={{
-                        color: '#5a7090',
+                        color: 'var(--lm-muted)',
                         display: 'block',
                         mb: 1.5,
                     }}
@@ -1780,7 +1780,7 @@ export default function SettingsTab({
                 <Box sx={{ width: 260, mb: 1 }}>
                     <Typography
                         variant="caption"
-                        sx={{ color: '#5a7090' }}
+                        sx={{ color: 'var(--lm-muted)' }}
                     >
                         {I18n.t('Fan speed')}: {cfg('prepare_to_work_fan_speed', 3)}
                     </Typography>
@@ -1825,7 +1825,7 @@ export default function SettingsTab({
                 <Divider
                     sx={{
                         my: 2,
-                        borderColor: '#1e2d45',
+                        borderColor: 'var(--lm-line)',
                     }}
                 />
 
@@ -1854,7 +1854,7 @@ export default function SettingsTab({
                 <Typography
                     variant="caption"
                     sx={{
-                        color: '#5a7090',
+                        color: 'var(--lm-muted)',
                         display: 'block',
                         mb: 1.5,
                     }}
@@ -2016,14 +2016,14 @@ export default function SettingsTab({
                 <Divider
                     sx={{
                         my: 2,
-                        borderColor: '#1e2d45',
+                        borderColor: 'var(--lm-line)',
                     }}
                 />
 
                 <Typography
                     variant="caption"
                     sx={{
-                        color: '#5a7090',
+                        color: 'var(--lm-muted)',
                         display: 'block',
                         mb: 1,
                     }}
@@ -2117,7 +2117,7 @@ export default function SettingsTab({
             <SectionCard
                 icon={
                     <NotificationsIcon
-                        sx={{ color: '#00d4ff' }}
+                        sx={{ color: 'var(--lm-accent)' }}
                     />
                 }
                 title={I18n.t(
@@ -2127,7 +2127,7 @@ export default function SettingsTab({
                 <Typography
                     variant="caption"
                     sx={{
-                        color: '#5a7090',
+                        color: 'var(--lm-muted)',
                         display: 'block',
                         mb: 1.5,
                     }}
@@ -2351,7 +2351,7 @@ export default function SettingsTab({
                 <Divider
                     sx={{
                         my: 2,
-                        borderColor: '#1e2d45',
+                        borderColor: 'var(--lm-line)',
                     }}
                 />
 
@@ -2601,7 +2601,7 @@ export default function SettingsTab({
                 <Divider
                     sx={{
                         my: 2,
-                        borderColor: '#1e2d45',
+                        borderColor: 'var(--lm-line)',
                     }}
                 />
 
@@ -2645,7 +2645,7 @@ export default function SettingsTab({
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: 0.5,
-                                color: '#00ff88',
+                                color: 'var(--lm-ok)',
                             }}
                         >
                             <CheckCircleIcon
@@ -2673,7 +2673,7 @@ export default function SettingsTab({
                                         'center',
                                     gap: 0.5,
                                     color:
-                                        '#ff4444',
+                                        'var(--lm-bad)',
                                 }}
                             >
                                 <ErrorIcon

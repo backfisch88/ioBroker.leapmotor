@@ -30,20 +30,20 @@ export default function DiagnosticsTab({ base, states, setState, adapter }) {
 
     return (
         <Box>
-            <Card sx={{ mb: 2, bgcolor: '#0d1520', border: '1px solid #1e2d45' }}>
+            <Card sx={{ mb: 2, bgcolor: 'var(--lm-surface)', border: '1px solid var(--lm-line)' }}>
                 <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                        {connection ? <WifiIcon sx={{ color: '#00ff88' }} /> : <WifiOffIcon sx={{ color: '#ff4444' }} />}
+                        {connection ? <WifiIcon sx={{ color: 'var(--lm-ok)' }} /> : <WifiOffIcon sx={{ color: 'var(--lm-bad)' }} />}
                         <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
                             {I18n.t('Cloud Connection')}
                         </Typography>
                         <Chip
                             size="small"
                             label={connection ? I18n.t('Connected') : I18n.t('Disconnected')}
-                            sx={{ bgcolor: connection ? '#00ff8822' : '#ff444422', color: connection ? '#00ff88' : '#ff4444' }}
+                            sx={{ bgcolor: connection ? 'color-mix(in srgb, var(--lm-ok) 14%, transparent)' : 'color-mix(in srgb, var(--lm-bad) 14%, transparent)', color: connection ? 'var(--lm-ok)' : 'var(--lm-bad)' }}
                         />
                     </Box>
-                    <Typography variant="body2" sx={{ color: '#5a7090' }}>
+                    <Typography variant="body2" sx={{ color: 'var(--lm-muted)' }}>
                         {I18n.t('Vehicle last reported')}: {collectTime}
                         {dataAgeMin != null && ` (${dataAgeMin} ${I18n.t('min ago')})`}
                     </Typography>
@@ -63,74 +63,74 @@ export default function DiagnosticsTab({ base, states, setState, adapter }) {
                 </CardContent>
             </Card>
 
-            <Card sx={{ mb: 2, bgcolor: '#0d1520', border: '1px solid #1e2d45' }}>
+            <Card sx={{ mb: 2, bgcolor: 'var(--lm-surface)', border: '1px solid var(--lm-line)' }}>
                 <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
                         {I18n.t('Battery Health (estimated)')}
                     </Typography>
                     {sohPercent ? (
                         <>
-                            <Typography sx={{ fontSize: '1.8rem', fontWeight: 800, color: sohPercent >= 90 ? '#00ff88' : sohPercent >= 80 ? '#ffcc00' : '#ff6644' }}>
+                            <Typography sx={{ fontSize: '1.8rem', fontWeight: 800, color: sohPercent >= 90 ? 'var(--lm-ok)' : sohPercent >= 80 ? 'var(--lm-warn)' : '#ff6644' }}>
                                 {sohPercent}%
                             </Typography>
-                            <Typography variant="caption" sx={{ color: '#5a7090', display: 'block' }}>
+                            <Typography variant="caption" sx={{ color: 'var(--lm-muted)', display: 'block' }}>
                                 {I18n.t('Estimated capacity')}: {estimatedCapacity} kWh · {I18n.t('based on')} {sohSampleCount} {I18n.t('trips')}
                             </Typography>
                         </>
                     ) : (
-                        <Typography variant="caption" sx={{ color: '#5a7090' }}>
+                        <Typography variant="caption" sx={{ color: 'var(--lm-muted)' }}>
                             {I18n.t('Not enough trip data yet - needs at least 3 trips with official cloud energy data and a meaningful SoC drop.')}
                         </Typography>
                     )}
-                    <Typography variant="caption" sx={{ color: '#3a5070', display: 'block', mt: 1, fontStyle: 'italic' }}>
+                    <Typography variant="caption" sx={{ color: 'var(--lm-muted)', display: 'block', mt: 1, fontStyle: 'italic' }}>
                         {I18n.t('Rough estimate from official per-trip energy vs. SoC used - not a manufacturer diagnostic figure.')}
                     </Typography>
                 </CardContent>
             </Card>
 
-            <Card sx={{ mb: 2, bgcolor: '#0d1520', border: '1px solid #1e2d45' }}>
+            <Card sx={{ mb: 2, bgcolor: 'var(--lm-surface)', border: '1px solid var(--lm-line)' }}>
                 <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
                         {I18n.t('Official Charging History (cross-check)')}
                     </Typography>
                     <Grid container spacing={2}>
                         <Grid size={4}>
-                            <Typography sx={{ fontSize: '1.3rem', fontWeight: 800, color: '#00d4ff' }}>
+                            <Typography sx={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--lm-accent)' }}>
                                 {val(states, `${base}.charging.official_home_kwh_90d`, 0)} kWh
                             </Typography>
-                            <Typography variant="caption" sx={{ color: '#5a7090' }}>
+                            <Typography variant="caption" sx={{ color: 'var(--lm-muted)' }}>
                                 {I18n.t('Home')}
                             </Typography>
                         </Grid>
                         <Grid size={4}>
-                            <Typography sx={{ fontSize: '1.3rem', fontWeight: 800, color: '#ffcc00' }}>
+                            <Typography sx={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--lm-warn)' }}>
                                 {val(states, `${base}.charging.official_public_kwh_90d`, 0)} kWh
                             </Typography>
-                            <Typography variant="caption" sx={{ color: '#5a7090' }}>
+                            <Typography variant="caption" sx={{ color: 'var(--lm-muted)' }}>
                                 {I18n.t('Public')}
                             </Typography>
                         </Grid>
                         <Grid size={4}>
-                            <Typography sx={{ fontSize: '1.3rem', fontWeight: 800, color: '#5a7090' }}>
+                            <Typography sx={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--lm-muted)' }}>
                                 {val(states, `${base}.charging.official_unknown_kwh_90d`, 0)} kWh
                             </Typography>
-                            <Typography variant="caption" sx={{ color: '#5a7090' }}>
+                            <Typography variant="caption" sx={{ color: 'var(--lm-muted)' }}>
                                 {I18n.t('Unknown')}
                             </Typography>
                         </Grid>
                     </Grid>
-                    <Typography variant="caption" sx={{ color: '#3a5070', display: 'block', mt: 1, fontStyle: 'italic' }}>
+                    <Typography variant="caption" sx={{ color: 'var(--lm-muted)', display: 'block', mt: 1, fontStyle: 'italic' }}>
                         {I18n.t('Last 90 days, from the cloud\'s own device-metered charging log ({{count}} sessions) - for comparison only, cost totals elsewhere still use live tracking.').replace('{{count}}', val(states, `${base}.charging.official_session_count_90d`, 0))}
                     </Typography>
                 </CardContent>
             </Card>
 
-            <Card sx={{ bgcolor: '#0d1520', border: '1px solid #1e2d45' }}>
+            <Card sx={{ bgcolor: 'var(--lm-surface)', border: '1px solid var(--lm-line)' }}>
                 <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1.5 }}>
                         {I18n.t('Vehicle Information')}
                     </Typography>
-                    <Divider sx={{ borderColor: '#1e2d45', mb: 1.5 }} />
+                    <Divider sx={{ borderColor: 'var(--lm-line)', mb: 1.5 }} />
                     <Grid container spacing={1.5}>
                         {[
                             ['VIN', vin],
@@ -140,8 +140,8 @@ export default function DiagnosticsTab({ base, states, setState, adapter }) {
                             [I18n.t('Allocation Code'), allocationCode],
                         ].map(([label, value]) => (
                             <Grid size={6} key={label}>
-                                <Typography variant="caption" sx={{ color: '#3a5070' }}>{label}</Typography>
-                                <Typography sx={{ fontFamily: 'monospace', color: '#c8ddf0' }}>{value}</Typography>
+                                <Typography variant="caption" sx={{ color: 'var(--lm-muted)' }}>{label}</Typography>
+                                <Typography sx={{ fontFamily: 'monospace', color: 'var(--lm-text)' }}>{value}</Typography>
                             </Grid>
                         ))}
                     </Grid>

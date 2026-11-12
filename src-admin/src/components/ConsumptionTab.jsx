@@ -13,13 +13,13 @@ function val(states, id, def = null) {
 function StatBox({ label, value, sub, color }) {
     return (
         <Card sx={{
-            bgcolor: '#0d1520', border: '1px solid #1e2d45', textAlign: 'center',
+            bgcolor: 'var(--lm-surface)', border: '1px solid var(--lm-line)', textAlign: 'center',
             height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center',
         }}>
             <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
-                <Typography variant="caption" sx={{ color: '#3a5070', letterSpacing: '0.1em', display: 'block' }}>{label}</Typography>
-                <Typography variant="h6" sx={{ fontWeight: 800, color: color || '#c8ddf0', whiteSpace: 'nowrap' }}>{value}</Typography>
-                {sub && <Typography variant="caption" sx={{ color: '#5a7090', display: 'block' }}>{sub}</Typography>}
+                <Typography variant="caption" sx={{ color: 'var(--lm-muted)', letterSpacing: '0.1em', display: 'block' }}>{label}</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 800, color: color || 'var(--lm-text)', whiteSpace: 'nowrap' }}>{value}</Typography>
+                {sub && <Typography variant="caption" sx={{ color: 'var(--lm-muted)', display: 'block' }}>{sub}</Typography>}
             </CardContent>
         </Card>
     );
@@ -96,7 +96,7 @@ export default function ConsumptionTab({ base, states, adapter }) {
         <Box>
             <Grid container spacing={1.5} sx={{ mb: 2 }}>
                 <Grid size={4}>
-                    <StatBox label={I18n.t('AVG CONSUMPTION')} value={avgKwh !== null ? `${avgKwh}` : '—'} sub={avgKwh !== null ? `kWh/100km · ≈${(avgKwh * energyPrice).toFixed(2)}€` : 'kWh/100km (Cloud)'} color="#00d4ff" />
+                    <StatBox label={I18n.t('AVG CONSUMPTION')} value={avgKwh !== null ? `${avgKwh}` : '—'} sub={avgKwh !== null ? `kWh/100km · ≈${(avgKwh * energyPrice).toFixed(2)}€` : 'kWh/100km (Cloud)'} color="var(--lm-accent)" />
                 </Grid>
                 <Grid size={4}>
                     <StatBox label={I18n.t('RANKING')} value={rank ?? '—'} />
@@ -106,9 +106,9 @@ export default function ConsumptionTab({ base, states, adapter }) {
                 </Grid>
             </Grid>
 
-            <Card sx={{ mb: 2, bgcolor: '#0d1520', border: '1px solid #1e2d45' }}>
+            <Card sx={{ mb: 2, bgcolor: 'var(--lm-surface)', border: '1px solid var(--lm-line)' }}>
                 <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
-                    <Typography variant="caption" sx={{ color: '#3a5070', letterSpacing: '0.1em', display: 'block', mb: 1 }}>
+                    <Typography variant="caption" sx={{ color: 'var(--lm-muted)', letterSpacing: '0.1em', display: 'block', mb: 1 }}>
                         {I18n.t('CHARGING COSTS')}
                     </Typography>
                     <Grid container spacing={1.5}>
@@ -117,7 +117,7 @@ export default function ConsumptionTab({ base, states, adapter }) {
                                 label={I18n.t('Home')}
                                 value={`${homeCost.toFixed(2)}€`}
                                 sub={`${homeKwh.toFixed(1)} kWh`}
-                                color="#00ff88"
+                                color="var(--lm-ok)"
                             />
                         </Grid>
                         <Grid size={4}>
@@ -125,7 +125,7 @@ export default function ConsumptionTab({ base, states, adapter }) {
                                 label={I18n.t('Public')}
                                 value={`${publicCost.toFixed(2)}€`}
                                 sub={`${publicKwh.toFixed(1)} kWh`}
-                                color="#ffcc00"
+                                color="var(--lm-warn)"
                             />
                         </Grid>
                         <Grid size={4}>
@@ -133,12 +133,12 @@ export default function ConsumptionTab({ base, states, adapter }) {
                                 label={I18n.t('Unknown')}
                                 value={`${unknownCost.toFixed(2)}€`}
                                 sub={`${unknownKwh.toFixed(1)} kWh`}
-                                color="#5a7090"
+                                color="var(--lm-muted)"
                             />
                         </Grid>
                     </Grid>
                     {sessionActive && (
-                        <Typography variant="caption" sx={{ color: '#00d4ff', display: 'block', mt: 1.5 }}>
+                        <Typography variant="caption" sx={{ color: 'var(--lm-accent)', display: 'block', mt: 1.5 }}>
                             🔌 {I18n.t('Charging now')}: {sessionKwh.toFixed(1)} kWh · {sessionCost.toFixed(2)}€ ({I18n.t(sessionLocation === 'home' ? 'Home' : sessionLocation === 'public' ? 'Public' : 'Unknown')})
                         </Typography>
                     )}
@@ -148,7 +148,7 @@ export default function ConsumptionTab({ base, states, adapter }) {
             {stats && (
                 <Grid container spacing={1.5} sx={{ mb: 2 }}>
                     <Grid size={4}>
-                        <StatBox label={I18n.t('BEST WEEK')} value={`${stats.min}`} sub={stats.best?.week} color="#00ff88" />
+                        <StatBox label={I18n.t('BEST WEEK')} value={`${stats.min}`} sub={stats.best?.week} color="var(--lm-ok)" />
                     </Grid>
                     <Grid size={4}>
                         <StatBox label={I18n.t('WORST WEEK')} value={`${stats.max}`} sub={stats.worst?.week} color="#ff6644" />
@@ -158,13 +158,13 @@ export default function ConsumptionTab({ base, states, adapter }) {
                             label={I18n.t('TREND')}
                             value={`${stats.trend > 0 ? '+' : ''}${stats.trend.toFixed(1)}`}
                             sub={I18n.t('vs. average')}
-                            color={stats.trend > 0 ? '#ff6644' : '#00ff88'}
+                            color={stats.trend > 0 ? '#ff6644' : 'var(--lm-ok)'}
                         />
                     </Grid>
                 </Grid>
             )}
 
-            <Card sx={{ bgcolor: '#0d1520', border: '1px solid #1e2d45' }}>
+            <Card sx={{ bgcolor: 'var(--lm-surface)', border: '1px solid var(--lm-line)' }}>
                 <CardContent>
                     <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>
                         {I18n.t('Consumption over the last 6 weeks')}
@@ -175,45 +175,45 @@ export default function ConsumptionTab({ base, states, adapter }) {
                         <>
                             <ResponsiveContainer width="100%" height={300}>
                                 <ComposedChart data={chartData} margin={{ top: 28, right: 8, left: -8, bottom: 4 }}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#1e2d45" vertical={false} />
-                                    <XAxis dataKey="week" stroke="#5a7090" fontSize={12} tickLine={false} tick={{ fill: '#8aa0bd', fontWeight: 600 }} />
-                                    <YAxis stroke="#5a7090" fontSize={12} tickLine={false} width={36} domain={[dataMin => Math.floor(dataMin - 1), dataMax => Math.ceil(dataMax + 1)]} tick={{ fill: '#8aa0bd' }} />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--lm-line)" vertical={false} />
+                                    <XAxis dataKey="week" stroke="var(--lm-muted)" fontSize={12} tickLine={false} tick={{ fill: 'var(--lm-muted)', fontWeight: 600 }} />
+                                    <YAxis stroke="var(--lm-muted)" fontSize={12} tickLine={false} width={36} domain={[dataMin => Math.floor(dataMin - 1), dataMax => Math.ceil(dataMax + 1)]} tick={{ fill: 'var(--lm-muted)' }} />
                                     <Tooltip
-                                        contentStyle={{ background: '#0d1520', border: '1px solid #2a4060', borderRadius: 10, color: '#c8ddf0', fontSize: 13 }}
-                                        labelStyle={{ color: '#00d4ff', fontWeight: 700, marginBottom: 4 }}
-                                        itemStyle={{ color: '#c8ddf0' }}
+                                        contentStyle={{ background: 'var(--lm-surface)', border: '1px solid var(--lm-line)', borderRadius: 10, color: 'var(--lm-text)', fontSize: 13 }}
+                                        labelStyle={{ color: 'var(--lm-accent)', fontWeight: 700, marginBottom: 4 }}
+                                        itemStyle={{ color: 'var(--lm-text)' }}
                                         formatter={(v, name) => name === 'kwh100km' ? [`${v} kWh/100km`, I18n.t('Consumption')] : [null, null]}
                                         labelFormatter={(label, payload) => payload?.[0]?.payload?.fullRange || label}
                                     />
                                     {stats && (
                                         <ReferenceLine
                                             y={stats.avg}
-                                            stroke="#3a5070"
+                                            stroke="var(--lm-muted)"
                                             strokeDasharray="6 3"
-                                            label={{ value: `Ø ${stats.avg.toFixed(1)}`, position: 'insideTopRight', fill: '#5a7090', fontSize: 12 }}
+                                            label={{ value: `Ø ${stats.avg.toFixed(1)}`, position: 'insideTopRight', fill: 'var(--lm-muted)', fontSize: 12 }}
                                         />
                                     )}
                                     <Bar dataKey="kwh100km" name="kwh100km" radius={[8, 8, 0, 0]} maxBarSize={52}>
-                                        <LabelList dataKey="kwh100km" position="top" style={{ fill: '#ffffff', fontSize: 14, fontWeight: 800 }} />
+                                        <LabelList dataKey="kwh100km" position="top" style={{ fill: 'var(--lm-text)', fontSize: 14, fontWeight: 800 }} />
                                         {weeklyData.map((entry, idx) => (
-                                            <Cell key={idx} fill={entry.kwh100km > 18 ? '#ff6644' : entry.kwh100km > 14 ? '#ffcc00' : '#00cc66'} fillOpacity={0.9} />
+                                            <Cell key={idx} fill={entry.kwh100km > 18 ? '#ff6644' : entry.kwh100km > 14 ? 'var(--lm-warn)' : 'var(--lm-ok)'} fillOpacity={0.9} />
                                         ))}
                                     </Bar>
                                 </ComposedChart>
                             </ResponsiveContainer>
-                            <Divider sx={{ borderColor: '#1e2d45', my: 2 }} />
+                            <Divider sx={{ borderColor: 'var(--lm-line)', my: 2 }} />
                             <Grid container spacing={1}>
                                 {weeklyData.map((w, i) => (
                                     <Grid size={6} key={i}>
-                                        <Box sx={{ bgcolor: '#070d1a', border: '1px solid #1e2d45', borderRadius: 1.5, px: 1.5, py: 1 }}>
-                                            <Typography variant="caption" sx={{ color: '#5a7090', display: 'block', fontSize: '0.7rem' }}>{w.fullRange || w.week}</Typography>
+                                        <Box sx={{ bgcolor: 'var(--lm-sunken)', border: '1px solid var(--lm-line)', borderRadius: 1.5, px: 1.5, py: 1 }}>
+                                            <Typography variant="caption" sx={{ color: 'var(--lm-muted)', display: 'block', fontSize: '0.7rem' }}>{w.fullRange || w.week}</Typography>
                                             <Typography sx={{
-                                                color: w.kwh100km > 18 ? '#ff6644' : w.kwh100km > 14 ? '#ffcc00' : '#00cc66',
+                                                color: w.kwh100km > 18 ? '#ff6644' : w.kwh100km > 14 ? 'var(--lm-warn)' : 'var(--lm-ok)',
                                                 fontWeight: 800, fontSize: '1rem',
                                             }}>
-                                                {w.kwh100km} <Typography component="span" variant="caption" sx={{ color: '#5a7090' }}>kWh/100km</Typography>
+                                                {w.kwh100km} <Typography component="span" variant="caption" sx={{ color: 'var(--lm-muted)' }}>kWh/100km</Typography>
                                             </Typography>
-                                            <Typography variant="caption" sx={{ color: '#00ff88', display: 'block' }}>
+                                            <Typography variant="caption" sx={{ color: 'var(--lm-ok)', display: 'block' }}>
                                                 ≈ {(w.kwh100km * energyPrice).toFixed(2)} €/100km
                                             </Typography>
                                         </Box>

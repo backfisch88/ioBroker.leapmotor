@@ -84,7 +84,7 @@ export default function VehicleImage({ base, states }) {
     return (
         <Box sx={{
             position: 'relative', width: '100%', paddingBottom: '46%',
-            background: 'radial-gradient(ellipse at center, #111f35 0%, #070d1a 70%)',
+            background: 'transparent',
             borderRadius: 2, overflow: 'hidden', mb: 2,
         }}>
             {chargeFrames.length > 0 && (

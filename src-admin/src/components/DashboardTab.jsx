@@ -62,12 +62,12 @@ function useOptimistic(actualActive, delayMs = 6000) {
 function StatTile({ label, value, color }) {
     return (
         <Card variant="outlined" sx={{
-            borderColor: '#1e2d45', bgcolor: '#0d1520', textAlign: 'center',
+            borderColor: 'var(--lm-line)', bgcolor: 'var(--lm-surface)', textAlign: 'center',
             height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center',
         }}>
             <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
-                <Typography variant="caption" sx={{ color: '#3a5070', letterSpacing: '0.1em', display: 'block' }}>{label}</Typography>
-                <Typography sx={{ fontWeight: 800, fontSize: '1.05rem', color: color || '#c8ddf0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</Typography>
+                <Typography variant="caption" sx={{ color: 'var(--lm-muted)', letterSpacing: '0.1em', display: 'block' }}>{label}</Typography>
+                <Typography sx={{ fontWeight: 800, fontSize: '1.05rem', color: color || 'var(--lm-text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</Typography>
             </CardContent>
         </Card>
     );
@@ -85,13 +85,13 @@ function ToggleButton({ active, color, icon, label, onClick }) {
                 px: 0.5,
                 minWidth: 0,
                 fontSize: '0.72rem',
-                color: active ? '#070d1a' : color,
+                color: active ? 'var(--lm-ink)' : color,
                 bgcolor: active ? color : 'transparent',
-                border: `2px solid ${active ? color : '#1e2d45'}`,
+                border: `2px solid ${active ? color : 'var(--lm-line)'}`,
                 fontWeight: active ? 800 : 500,
                 transition: 'background-color 0.15s, color 0.15s',
                 '& .MuiButton-startIcon': { mr: 0.3 },
-                '&:hover': { bgcolor: active ? color : `${color}22` },
+                '&:hover': { bgcolor: active ? color : `color-mix(in srgb, ${color} 14%, transparent)` },
             }}
         >
             {label}
@@ -101,13 +101,13 @@ function ToggleButton({ active, color, icon, label, onClick }) {
 
 function SectionLabel({ children }) {
     return (
-        <Typography variant="caption" sx={{ color: '#3a5070', letterSpacing: '0.1em', display: 'block', mb: 1 }}>
+        <Typography variant="caption" sx={{ color: 'var(--lm-muted)', letterSpacing: '0.1em', display: 'block', mb: 1 }}>
             {children}
         </Typography>
     );
 }
 
-function SliderControl({ icon, iconActive, label, value, max, displaySuffix, onCommit, openValue, color = '#00d4ff' }) {
+function SliderControl({ icon, iconActive, label, value, max, displaySuffix, onCommit, openValue, color = 'var(--lm-accent)' }) {
     const [local, setLocal] = useState(value);
     useEffect(() => { setLocal(value); }, [value]);
 
@@ -126,7 +126,7 @@ function SliderControl({ icon, iconActive, label, value, max, displaySuffix, onC
     return (
         <Box sx={{ mt: 2 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
-                <Typography variant="caption" sx={{ color: '#5a7090', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <Typography variant="caption" sx={{ color: 'var(--lm-muted)', display: 'flex', alignItems: 'center', gap: 0.5 }}>
                     {local > 0 ? iconActive : icon}
                     {label}
                 </Typography>
@@ -136,7 +136,7 @@ function SliderControl({ icon, iconActive, label, value, max, displaySuffix, onC
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                 <Button size="small" onClick={() => { setLocal(0); guardedCommit(0); }}
-                    sx={{ minWidth: 0, px: 1, border: '1px solid #1e2d45', color: local === 0 ? color : undefined }}>
+                    sx={{ minWidth: 0, px: 1, border: '1px solid var(--lm-line)', color: local === 0 ? color : undefined }}>
                     {I18n.t('Close')}
                 </Button>
                 <Slider
@@ -149,7 +149,7 @@ function SliderControl({ icon, iconActive, label, value, max, displaySuffix, onC
                     sx={{ color }}
                 />
                 <Button size="small" onClick={() => { setLocal(openValue); guardedCommit(openValue); }}
-                    sx={{ minWidth: 0, px: 1, border: '1px solid #1e2d45', color: local === openValue ? color : undefined }}>
+                    sx={{ minWidth: 0, px: 1, border: '1px solid var(--lm-line)', color: local === openValue ? color : undefined }}>
                     {I18n.t('Open')}
                 </Button>
             </Box>
@@ -159,7 +159,10 @@ function SliderControl({ icon, iconActive, label, value, max, displaySuffix, onC
 
 export default function DashboardTab({ base, states, setState }) {
     const soc = val(states, `${base}.status.battery_soc`, 0);
-    const socColor = soc > 20 ? '#00ff88' : soc > 10 ? '#ffcc00' : '#ff4444';
+    const socColor = soc > 20 ? 'var(--lm-accent)' : soc > 10 ? 'var(--lm-warn)' : 'var(--lm-bad)';
+    const vehicleName = val(states, `${base}.info.name`, '');
+    const socTs = states[`${base}.status.battery_soc`]?.ts;
+    const updatedAt = socTs ? new Date(socTs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
     const range = val(states, `${base}.status.range_km`, 0);
     const outdoor = val(states, `${base}.status.temp_outdoor`, '—');
     const parked = val(states, `${base}.status.drive_parked`, true);
@@ -283,96 +286,111 @@ export default function DashboardTab({ base, states, setState }) {
 
     return (
         <Box>
-            <VehicleImage base={base} states={states} />
-
-            <Card sx={{ mb: 2, bgcolor: '#0d1520', border: '1px solid #1e2d45' }}>
-                <CardContent>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1, flexWrap: 'wrap', gap: 1 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <BatteryFullIcon sx={{ color: socColor }} />
-                            <Typography variant="h5" sx={{ fontWeight: 800, color: socColor }}>{soc}%</Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                            {locked && <Chip size="small" label={I18n.t('LOCKED')} sx={{ bgcolor: '#00d4ff22', color: '#00d4ff', fontSize: '0.7rem' }} />}
-                            {charging && <Chip size="small" label={I18n.t('CHARGING')} sx={{ bgcolor: '#00ff8822', color: '#00ff88', fontSize: '0.7rem' }} />}
-                            {acOn && <Chip size="small" label={I18n.t('CLIMATE')} sx={{ bgcolor: '#7c6aff22', color: '#a090ff', fontSize: '0.7rem' }} />}
-                            {doorOpen && <Chip size="small" label={I18n.t('DOOR OPEN')} sx={{ bgcolor: '#ff990022', color: '#ff9900' }} />}
-                        </Box>
+            {/* Hero: Reichweite, Ladestand, Status, Fahrzeugbild */}
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1.1fr' }, gap: { xs: 2, md: 5 }, alignItems: 'center' }}>
+                <Box>
+                    <Typography sx={{ fontSize: 24, fontWeight: 600, letterSpacing: '-0.02em' }}>{vehicleName}</Typography>
+                    {updatedAt && <Typography sx={{ fontSize: 13, color: 'var(--lm-muted)' }}>{I18n.t('Last update')} {updatedAt}</Typography>}
+                    <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1, mt: 2.5 }}>
+                        <Typography component="span" sx={{ fontSize: 'clamp(64px, 12vw, 96px)', fontWeight: 500, lineHeight: 1, letterSpacing: '-0.05em', fontVariantNumeric: 'tabular-nums' }}>{range}</Typography>
+                        <Typography component="span" sx={{ fontSize: 18, color: 'var(--lm-muted)' }}>km</Typography>
                     </Box>
-                    <LinearProgress variant="determinate" value={soc} sx={{
-                        height: 6, borderRadius: 3, bgcolor: '#1e2d45',
-                        '& .MuiLinearProgress-bar': { bgcolor: socColor },
-                    }} />
-                </CardContent>
-            </Card>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 1.5, maxWidth: 380 }}>
+                        <LinearProgress variant="determinate" value={soc} sx={{
+                            flex: 1, height: 5, borderRadius: 3, bgcolor: 'color-mix(in srgb, var(--lm-accent) 18%, var(--lm-sunken))',
+                            '& .MuiLinearProgress-bar': { bgcolor: socColor, borderRadius: 3 },
+                        }} />
+                        <Typography sx={{ fontSize: 14, fontVariantNumeric: 'tabular-nums' }}>{soc} %</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 2.5 }}>
+                        <Chip icon={locked ? <LockIcon /> : <LockOpenIcon />} label={locked ? I18n.t('Locked') : I18n.t('Unlocked')}
+                            sx={{ bgcolor: 'var(--lm-surface)', border: '1px solid var(--lm-line)', '& .MuiChip-icon': { fontSize: 18, color: 'var(--lm-text)' } }} />
+                        {charging && <Chip label={`${I18n.t('CHARGING')} · ${remainMin} min`} sx={{ bgcolor: 'var(--lm-soft)', textTransform: 'capitalize' }} />}
+                        {acOn && <Chip label={I18n.t('CLIMATE')} sx={{ bgcolor: 'var(--lm-soft)', textTransform: 'capitalize' }} />}
+                        {doorOpen && <Chip label={I18n.t('DOOR OPEN')} sx={{ bgcolor: 'color-mix(in srgb, var(--lm-warn) 18%, transparent)', textTransform: 'capitalize' }} />}
+                        {outdoor !== '—' && <Chip label={`${outdoor} °C`} sx={{ bgcolor: 'var(--lm-surface)', border: '1px solid var(--lm-line)' }} />}
+                    </Box>
+                </Box>
+                <Box sx={{ position: 'relative', minHeight: 180 }}>
+                    <VehicleImage base={base} states={states} />
+                    <Typography sx={{ textAlign: 'center', fontSize: 15, mt: 0.5 }}>
+                        {parked ? I18n.t('Parked') : `${speed} km/h`}
+                    </Typography>
+                </Box>
+            </Box>
 
-            <Grid container spacing={1.5} sx={{ mb: 2 }}>
-                <Grid size={4}><StatTile label={I18n.t('OUTSIDE')} value={`${outdoor}°C`} /></Grid>
-                <Grid size={4}><StatTile label={I18n.t('RANGE')} value={`${range} km`} color="#00d4ff" /></Grid>
-                <Grid size={4}>
-                    <StatTile label={I18n.t('STATUS')} value={parked ? `🅿 ${I18n.t('Parked')}` : `▶ ${speed} km/h`} color={parked ? '#00ff88' : '#ffcc00'} />
-                </Grid>
-                <Grid size={4}>
-                    <StatTile label={I18n.t('CHARGING')} value={charging ? `⚡ ${remainMin} min` : '— —'} color={charging ? '#00ff88' : undefined} />
-                </Grid>
-                <Grid size={4}>
-                    <StatTile label={I18n.t('DOORS')} value={doorOpen ? `🚪 ${I18n.t('Open')}` : `✓ ${I18n.t('Closed')}`} color={doorOpen ? '#ff4444' : '#00ff88'} />
-                </Grid>
-                <Grid size={4}>
-                    <StatTile label={I18n.t('LOCK')} value={locked ? `🔒 ${I18n.t('Locked')}` : `🔓 ${I18n.t('Unlocked')}`} color={locked ? '#00d4ff' : '#ff4444'} />
-                </Grid>
-            </Grid>
+            {/* Schnellaktionen */}
+            <Box sx={{ display: 'flex', gap: 1, mt: 3, mb: 3.5, overflowX: 'auto', overflowY: 'hidden', touchAction: 'pan-x', scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
+                {[
+                    { label: locked ? I18n.t('Locked') : I18n.t('Unlocked'), icon: locked ? <LockIcon /> : <LockOpenIcon />, on: locked, run: () => { triggerLocked(!locked); send(locked ? 'unlock' : 'lock'); } },
+                    { label: I18n.t('Trunk'), icon: <DirectionsCarIcon />, on: doorTrunk, run: () => { triggerDoorTrunk(!doorTrunk); send(doorTrunk ? 'trunk_close' : 'trunk_open'); } },
+                    { label: I18n.t('Locate Vehicle'), icon: <LocationSearchingIcon />, on: false, run: () => send('find') },
+                    { label: I18n.t('Refresh'), icon: <RefreshIcon />, on: false, run: () => send('refresh') },
+                ].map(q => (
+                    <Box key={q.label} component="button" type="button" onClick={q.run} sx={{
+                        flex: '1 1 0', minWidth: 72, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1,
+                        background: 'none', border: 0, p: 0, cursor: 'pointer', color: 'var(--lm-text)', fontFamily: 'inherit', fontSize: 14,
+                        '& .circle': { width: 64, height: 64, borderRadius: '50%', display: 'grid', placeItems: 'center', bgcolor: q.on ? 'var(--lm-soft)' : 'var(--lm-surface)', border: '1px solid var(--lm-line)', transition: 'transform 160ms cubic-bezier(0.23,1,0.32,1), background-color 160ms' },
+                        '&:active .circle': { transform: 'scale(0.94)' },
+                        '@media (hover: hover) and (pointer: fine)': { '&:hover .circle': { bgcolor: 'var(--lm-sunken)' } },
+                    }}>
+                        <span className="circle">{q.icon}</span>
+                        {q.label}
+                    </Box>
+                ))}
+            </Box>
 
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 1.5, alignItems: 'start' }}>
             {/* Climate control */}
-            <Card sx={{ mb: 2, bgcolor: '#0d1520', border: '1px solid #1e2d45' }}>
+            <Card >
                 <CardContent>
                     <SectionLabel>{I18n.t('CLIMATE CONTROL')}</SectionLabel>
                     <Box sx={{ display: 'flex', gap: 1, mt: 1, mb: 2, flexWrap: 'wrap' }}>
                         <ToggleButton active={isHeat} color="#ff6644" icon={<WhatshotIcon />} label={I18n.t('Heat')} onClick={() => sendClimate('heat', 'ac_heat')} />
-                        <ToggleButton active={isCool} color="#00d4ff" icon={<AcUnitIcon />} label={I18n.t('Cool')} onClick={() => sendClimate('cool', 'ac_cool')} />
-                        <ToggleButton active={isVent} color="#a090ff" icon={<AirIcon />} label={I18n.t('Vent')} onClick={() => sendClimate('vent', 'ac_vent')} />
-                        <ToggleButton active={isOff} color="#ff4444" icon={<PowerOffIcon />} label={I18n.t('Off')} onClick={() => sendClimate('off', 'ac_off')} />
+                        <ToggleButton active={isCool} color="var(--lm-accent)" icon={<AcUnitIcon />} label={I18n.t('Cool')} onClick={() => sendClimate('cool', 'ac_cool')} />
+                        <ToggleButton active={isVent} color="var(--lm-accent)" icon={<AirIcon />} label={I18n.t('Vent')} onClick={() => sendClimate('vent', 'ac_vent')} />
+                        <ToggleButton active={isOff} color="var(--lm-bad)" icon={<PowerOffIcon />} label={I18n.t('Off')} onClick={() => sendClimate('off', 'ac_off')} />
                     </Box>
                     {acModeUnknown && (
-                        <Typography variant="caption" sx={{ display: 'block', mt: -1, mb: 2, color: acOn ? '#00ff88' : '#5a7090' }}>
+                        <Typography variant="caption" sx={{ display: 'block', mt: -1, mb: 2, color: acOn ? 'var(--lm-ok)' : 'var(--lm-muted)' }}>
                             ℹ️ {acOn ? I18n.t('Climate is currently ON (exact mode not reported by this vehicle model)') : I18n.t('Climate is currently OFF')}
                         </Typography>
                     )}
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                        <IconButton size="small" onClick={() => onTempCommit(Math.max(16, acTemp - 1))} sx={{ border: '1px solid #1e2d45' }}><RemoveIcon /></IconButton>
-                        <Typography sx={{ minWidth: 60, textAlign: 'center', fontWeight: 800, color: '#00d4ff', fontSize: '1.3rem' }}>{acTemp}°C</Typography>
-                        <IconButton size="small" onClick={() => onTempCommit(Math.min(30, acTemp + 1))} sx={{ border: '1px solid #1e2d45' }}><AddIcon /></IconButton>
+                        <IconButton size="small" onClick={() => onTempCommit(Math.max(16, acTemp - 1))} sx={{ border: '1px solid var(--lm-line)' }}><RemoveIcon /></IconButton>
+                        <Typography sx={{ minWidth: 60, textAlign: 'center', fontWeight: 800, color: 'var(--lm-accent)', fontSize: '1.3rem' }}>{acTemp}°C</Typography>
+                        <IconButton size="small" onClick={() => onTempCommit(Math.min(30, acTemp + 1))} sx={{ border: '1px solid var(--lm-line)' }}><AddIcon /></IconButton>
                         <TempSlider value={acTemp} onCommit={onTempCommit} />
                     </Box>
                     <Box sx={{ mb: 2 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                            <Typography variant="caption" sx={{ color: '#5a7090', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <Typography variant="caption" sx={{ color: 'var(--lm-muted)', display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                 <AirIcon sx={{ fontSize: 14 }} /> {I18n.t('Fan Speed')}
                             </Typography>
-                            <Typography variant="caption" sx={{ color: '#00d4ff', fontWeight: 700 }}>{fanSpeed}/{fanMax}</Typography>
+                            <Typography variant="caption" sx={{ color: 'var(--lm-accent)', fontWeight: 700 }}>{fanSpeed}/{fanMax}</Typography>
                         </Box>
                         <FanSlider value={fanSpeed} max={fanMax} onCommit={onFanCommit} />
                     </Box>
                     <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
                         {can('defrost') && (
                         <Button size="small" startIcon={<AcUnitOutlinedIcon />} onClick={() => send('defrost')}
-                            sx={{ border: '1px solid #1e2d45' }}>
+                            sx={{ border: '1px solid var(--lm-line)' }}>
                             {I18n.t('Windshield Defrost (full heat)')}
                         </Button>
                         )}
                         {can('batteryPreheat') && (
                         <Button size="small" startIcon={<BatteryFullIcon />}
                             onClick={() => { triggerPtc(!ptcState); send(ptcState ? 'battery_preheat_off' : 'battery_preheat'); }}
-                            sx={{ border: '1px solid #1e2d45', color: ptcState ? '#ff9900' : undefined }}>
+                            sx={{ border: '1px solid var(--lm-line)', color: ptcState ? 'var(--lm-warn)' : undefined }}>
                             {ptcState ? I18n.t('Battery Preheat Off') : I18n.t('Preheat Battery')}
                         </Button>
                         )}
                         <Button size="small" startIcon={<AcUnitIcon />} onClick={() => sendQuick('cool', 'quick_cool')}
-                            sx={{ border: `1px solid ${quickActive === 'quick_cool' ? '#00d4ff' : '#1e2d45'}`, color: quickActive === 'quick_cool' ? '#070d1a' : undefined, bgcolor: quickActive === 'quick_cool' ? '#00d4ff' : 'transparent' }}>
+                            sx={{ border: `1px solid ${quickActive === 'quick_cool' ? 'var(--lm-accent)' : 'var(--lm-line)'}`, color: quickActive === 'quick_cool' ? 'var(--lm-ink)' : undefined, bgcolor: quickActive === 'quick_cool' ? 'var(--lm-accent)' : 'transparent' }}>
                             {I18n.t('Quick Cool')}
                         </Button>
                         <Button size="small" startIcon={<WhatshotIcon />} onClick={() => sendQuick('heat', 'quick_heat')}
-                            sx={{ border: `1px solid ${quickActive === 'quick_heat' ? '#ff6644' : '#1e2d45'}`, color: quickActive === 'quick_heat' ? '#070d1a' : undefined, bgcolor: quickActive === 'quick_heat' ? '#ff6644' : 'transparent' }}>
+                            sx={{ border: `1px solid ${quickActive === 'quick_heat' ? '#ff6644' : 'var(--lm-line)'}`, color: quickActive === 'quick_heat' ? 'var(--lm-ink)' : undefined, bgcolor: quickActive === 'quick_heat' ? '#ff6644' : 'transparent' }}>
                             {I18n.t('Quick Heat')}
                         </Button>
                     </Box>
@@ -380,54 +398,54 @@ export default function DashboardTab({ base, states, setState }) {
             </Card>
 
             {/* Charging */}
-            <Card sx={{ mb: 2, bgcolor: '#0d1520', border: '1px solid #1e2d45' }}>
+            <Card >
                 <CardContent>
                     <SectionLabel>{I18n.t('CHARGE')}</SectionLabel>
                     <ChargeLimitSlider value={chargeLimit} onCommit={(v) => setState(`${base}.cmd.charge_limit_set`, v)} />
                     <Box sx={{ mt: 3 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
-                            <Typography variant="caption" sx={{ color: '#5a7090' }}>{I18n.t('Charge Schedule')}</Typography>
+                            <Typography variant="caption" sx={{ color: 'var(--lm-muted)' }}>{I18n.t('Charge Schedule')}</Typography>
                             <Button
                                 size="small"
                                 onClick={() => { setScheduleEnabled(!scheduleEnabled); setState(`${base}.cmd.charge_schedule_enable`, !scheduleEnabled); }}
                                 sx={{
                                     minWidth: 0, px: 1.5,
-                                    border: '1px solid #1e2d45',
-                                    color: scheduleEnabled ? '#070d1a' : '#5a7090',
-                                    bgcolor: scheduleEnabled ? '#00ff88' : 'transparent',
+                                    border: '1px solid var(--lm-line)',
+                                    color: scheduleEnabled ? 'var(--lm-ink)' : 'var(--lm-muted)',
+                                    bgcolor: scheduleEnabled ? 'var(--lm-ok)' : 'transparent',
                                 }}>
                                 {scheduleEnabled ? I18n.t('Active') : I18n.t('Inactive')}
                             </Button>
                         </Box>
                         <Box sx={{ display: 'flex', gap: 1.5, mb: 1.5 }}>
                             <Box sx={{ flex: 1 }}>
-                                <Typography variant="caption" sx={{ color: '#5a7090', display: 'block', mb: 0.5 }}>{I18n.t('Start')}</Typography>
+                                <Typography variant="caption" sx={{ color: 'var(--lm-muted)', display: 'block', mb: 0.5 }}>{I18n.t('Start')}</Typography>
                                 <input
                                     type="time"
                                     value={scheduleStart}
                                     onChange={(e) => { setScheduleStart(e.target.value); setState(`${base}.cmd.charge_schedule_start`, e.target.value); }}
                                     style={{
                                         width: '100%', padding: '8px', borderRadius: 6,
-                                        border: '1px solid #1e2d45', background: '#070d1a', color: '#c8ddf0',
+                                        border: '1px solid var(--lm-line)', background: 'var(--lm-sunken)', color: 'var(--lm-text)',
                                         fontSize: '0.95rem', colorScheme: 'dark',
                                     }}
                                 />
                             </Box>
                             <Box sx={{ flex: 1 }}>
-                                <Typography variant="caption" sx={{ color: '#5a7090', display: 'block', mb: 0.5 }}>{I18n.t('End')}</Typography>
+                                <Typography variant="caption" sx={{ color: 'var(--lm-muted)', display: 'block', mb: 0.5 }}>{I18n.t('End')}</Typography>
                                 <input
                                     type="time"
                                     value={scheduleEnd}
                                     onChange={(e) => { setScheduleEnd(e.target.value); setState(`${base}.cmd.charge_schedule_end`, e.target.value); }}
                                     style={{
                                         width: '100%', padding: '8px', borderRadius: 6,
-                                        border: '1px solid #1e2d45', background: '#070d1a', color: '#c8ddf0',
+                                        border: '1px solid var(--lm-line)', background: 'var(--lm-sunken)', color: 'var(--lm-text)',
                                         fontSize: '0.95rem', colorScheme: 'dark',
                                     }}
                                 />
                             </Box>
                         </Box>
-                        <Button fullWidth onClick={() => send('charge_schedule_apply')} sx={{ border: '1px solid #00d4ff55', color: '#00d4ff' }}>
+                        <Button fullWidth onClick={() => send('charge_schedule_apply')} sx={{ border: '1px solid color-mix(in srgb, var(--lm-accent) 33%, transparent)', color: 'var(--lm-accent)' }}>
                             {I18n.t('Apply Schedule')}
                         </Button>
                     </Box>
@@ -435,13 +453,13 @@ export default function DashboardTab({ base, states, setState }) {
             </Card>
 
             {/* Climate schedule */}
-            <Card sx={{ mb: 2, bgcolor: '#0d1520', border: '1px solid #1e2d45' }}>
+            <Card >
                 <CardContent>
                     <SectionLabel>{I18n.t('CLIMATE SCHEDULE')}</SectionLabel>
 
                     {/* Current schedule status */}
-                    <Box sx={{ mb: 2, p: 1, bgcolor: climateScheduleActive ? '#00d4ff11' : '#1e2d45', borderRadius: 1, border: `1px solid ${climateScheduleActive ? '#00d4ff33' : '#1e2d45'}` }}>
-                        <Typography variant="caption" sx={{ color: climateScheduleActive ? '#00d4ff' : '#5a7090' }}>
+                    <Box sx={{ mb: 2, p: 1, bgcolor: climateScheduleActive ? 'color-mix(in srgb, var(--lm-accent) 7%, transparent)' : 'var(--lm-line)', borderRadius: 1, border: `1px solid ${climateScheduleActive ? 'color-mix(in srgb, var(--lm-accent) 20%, transparent)' : 'var(--lm-line)'}` }}>
+                        <Typography variant="caption" sx={{ color: climateScheduleActive ? 'var(--lm-accent)' : 'var(--lm-muted)' }}>
                             {climateScheduleActive
                                 ? `⏰ ${I18n.t('Active schedule')}: ${climateScheduleInfo}`
                                 : climateScheduleInfo
@@ -452,7 +470,7 @@ export default function DashboardTab({ base, states, setState }) {
 
                     {/* Active/Inactive */}
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
-                        <Typography variant="caption" sx={{ color: '#5a7090' }}>{I18n.t('Climate Schedule')}</Typography>
+                        <Typography variant="caption" sx={{ color: 'var(--lm-muted)' }}>{I18n.t('Climate Schedule')}</Typography>
                         <Button size="small"
                             onClick={() => {
                                 const next = !climateScheduleEnabled;
@@ -460,19 +478,19 @@ export default function DashboardTab({ base, states, setState }) {
                                 setState(`${base}.cmd.climate_schedule_enable`, next);
                                 setState(`${base}.status.climate_schedule_active`, next);
                             }}
-                            sx={{ minWidth: 0, px: 1.5, border: '1px solid #1e2d45', color: climateScheduleEnabled ? '#070d1a' : '#5a7090', bgcolor: climateScheduleEnabled ? '#00d4ff' : 'transparent' }}>
+                            sx={{ minWidth: 0, px: 1.5, border: '1px solid var(--lm-line)', color: climateScheduleEnabled ? 'var(--lm-ink)' : 'var(--lm-muted)', bgcolor: climateScheduleEnabled ? 'var(--lm-accent)' : 'transparent' }}>
                             {climateScheduleEnabled ? I18n.t('Active') : I18n.t('Inactive')}
                         </Button>
                     </Box>
 
                     {/* Mode */}
                     <Box sx={{ mb: 1.5 }}>
-                        <Typography variant="caption" sx={{ color: '#5a7090', display: 'block', mb: 0.5 }}>{I18n.t('Mode')}</Typography>
+                        <Typography variant="caption" sx={{ color: 'var(--lm-muted)', display: 'block', mb: 0.5 }}>{I18n.t('Mode')}</Typography>
                         <Box sx={{ display: 'flex', gap: 0.5 }}>
-                            {[{v:'hot',l:`🔥 ${I18n.t('Heat')}`,c:'#ff6b35'},{v:'cold',l:`❄️ ${I18n.t('Cool')}`,c:'#00d4ff'},{v:'wind',l:`💨 ${I18n.t('Vent')}`,c:'#00ff88'}].map(({v,l,c})=>(
+                            {[{v:'hot',l:`🔥 ${I18n.t('Heat')}`,c:'#ff6b35'},{v:'cold',l:`❄️ ${I18n.t('Cool')}`,c:'var(--lm-accent)'},{v:'wind',l:`💨 ${I18n.t('Vent')}`,c:'var(--lm-ok)'}].map(({v,l,c})=>(
                                 <Button key={v} size="small"
                                     onClick={() => { setClimateScheduleMode(v); setState(`${base}.cmd.climate_schedule_mode`, v); }}
-                                    sx={{ flex:1, minWidth:0, px:0.5, border:'1px solid #1e2d45', color: climateScheduleMode===v ? '#070d1a' : '#5a7090', bgcolor: climateScheduleMode===v ? c : 'transparent', fontSize:'0.7rem' }}>
+                                    sx={{ flex:1, minWidth:0, px:0.5, border:'1px solid var(--lm-line)', color: climateScheduleMode===v ? 'var(--lm-ink)' : 'var(--lm-muted)', bgcolor: climateScheduleMode===v ? c : 'transparent', fontSize:'0.7rem' }}>
                                     {l}
                                 </Button>
                             ))}
@@ -481,16 +499,16 @@ export default function DashboardTab({ base, states, setState }) {
 
                     {/* Time */}
                     <Box sx={{ mb: 1.5 }}>
-                        <Typography variant="caption" sx={{ color: '#5a7090', display: 'block', mb: 0.5 }}>{I18n.t('Start Time')}</Typography>
+                        <Typography variant="caption" sx={{ color: 'var(--lm-muted)', display: 'block', mb: 0.5 }}>{I18n.t('Start Time')}</Typography>
                         <input type="time" value={climateScheduleTime}
                             onChange={(e) => { setClimateScheduleTime(e.target.value); setState(`${base}.cmd.climate_schedule_time`, e.target.value); }}
-                            style={{ width:'100%', padding:'8px', borderRadius:6, border:'1px solid #1e2d45', background:'#070d1a', color:'#c8ddf0', fontSize:'0.95rem', colorScheme:'dark' }}
+                            style={{ width:'100%', padding:'8px', borderRadius:6, border:'1px solid var(--lm-line)', background:'var(--lm-sunken)', color:'var(--lm-text)', fontSize:'0.95rem', colorScheme:'light dark' }}
                         />
                     </Box>
 
                     {/* Weekdays */}
                     <Box sx={{ mb: 1.5 }}>
-                        <Typography variant="caption" sx={{ color: '#5a7090', display: 'block', mb: 0.5 }}>{I18n.t('Repeat')}</Typography>
+                        <Typography variant="caption" sx={{ color: 'var(--lm-muted)', display: 'block', mb: 0.5 }}>{I18n.t('Repeat')}</Typography>
                         <Box sx={{ display: 'flex', gap: 0.5 }}>
                             {[{d:1,l:I18n.t('Mon')},{d:2,l:I18n.t('Tue')},{d:3,l:I18n.t('Wed')},{d:4,l:I18n.t('Thu')},{d:5,l:I18n.t('Fri')},{d:6,l:I18n.t('Sat')},{d:0,l:I18n.t('Sun')}].map(({d,l})=>{
                                 const sel = climateScheduleDays.includes(d);
@@ -501,7 +519,7 @@ export default function DashboardTab({ base, states, setState }) {
                                             setClimateScheduleDays(next);
                                             setState(`${base}.cmd.climate_schedule_days`, next.join(','));
                                         }}
-                                        sx={{ minWidth:0, flex:1, px:0, border:'1px solid #1e2d45', color: sel ? '#070d1a' : '#5a7090', bgcolor: sel ? '#00d4ff' : 'transparent', fontSize:'0.65rem' }}>
+                                        sx={{ minWidth:0, flex:1, px:0, border:'1px solid var(--lm-line)', color: sel ? 'var(--lm-ink)' : 'var(--lm-muted)', bgcolor: sel ? 'var(--lm-accent)' : 'transparent', fontSize:'0.65rem' }}>
                                         {l}
                                     </Button>
                                 );
@@ -511,10 +529,10 @@ export default function DashboardTab({ base, states, setState }) {
 
                     {/* Buttons */}
                     <Box sx={{ display: 'flex', gap: 1 }}>
-                        <Button fullWidth onClick={() => { send('climate_schedule_apply'); setTimeout(() => send('refresh'), 3000); }} sx={{ border: '1px solid #00d4ff55', color: '#00d4ff' }}>
+                        <Button fullWidth onClick={() => { send('climate_schedule_apply'); setTimeout(() => send('refresh'), 3000); }} sx={{ border: '1px solid color-mix(in srgb, var(--lm-accent) 33%, transparent)', color: 'var(--lm-accent)' }}>
                             {I18n.t('Apply Schedule')}
                         </Button>
-                        <Button onClick={() => { send('climate_schedule_cancel'); setTimeout(() => send('refresh'), 3000); }} sx={{ border: '1px solid #ff444455', color: '#ff4444', minWidth: 0, px: 1.5 }}>
+                        <Button onClick={() => { send('climate_schedule_cancel'); setTimeout(() => send('refresh'), 3000); }} sx={{ border: '1px solid color-mix(in srgb, var(--lm-bad) 33%, transparent)', color: 'var(--lm-bad)', minWidth: 0, px: 1.5 }}>
                             {I18n.t('Delete')}
                         </Button>
                     </Box>
@@ -522,31 +540,31 @@ export default function DashboardTab({ base, states, setState }) {
             </Card>
 
             {/* Doors, trunk, windows, sunshade */}
-            <Card sx={{ mb: 2, bgcolor: '#0d1520', border: '1px solid #1e2d45' }}>
+            <Card >
                 <CardContent>
                     <SectionLabel>{I18n.t('LOCKS & OPENINGS')}</SectionLabel>
                     <Grid container spacing={1}>
                         <Grid size={{ xs: 6, sm: 4 }}>
                             <Button fullWidth startIcon={<LockIcon />} onClick={() => { triggerLocked(true); send('lock'); }}
-                                sx={{ color: locked ? '#070d1a' : '#00d4ff', bgcolor: locked ? '#00d4ff' : 'transparent', border: '1px solid #1e2d45', transition: 'background-color 0.15s' }}>
+                                sx={{ color: locked ? 'var(--lm-ink)' : 'var(--lm-accent)', bgcolor: locked ? 'var(--lm-accent)' : 'transparent', border: '1px solid var(--lm-line)', transition: 'background-color 0.15s' }}>
                                 {I18n.t('Lock')}
                             </Button>
                         </Grid>
                         <Grid size={{ xs: 6, sm: 4 }}>
                             <Button fullWidth startIcon={<LockOpenIcon />} onClick={() => { triggerLocked(false); send('unlock'); }}
-                                sx={{ color: !locked ? '#070d1a' : '#ff9900', bgcolor: !locked ? '#ff9900' : 'transparent', border: '1px solid #1e2d45', transition: 'background-color 0.15s' }}>
+                                sx={{ color: !locked ? 'var(--lm-ink)' : 'var(--lm-warn)', bgcolor: !locked ? 'var(--lm-warn)' : 'transparent', border: '1px solid var(--lm-line)', transition: 'background-color 0.15s' }}>
                                 {I18n.t('Unlock')}
                             </Button>
                         </Grid>
                         <Grid size={{ xs: 6, sm: 4 }}>
                             <Button fullWidth startIcon={<DirectionsCarIcon />}
                                 onClick={() => { triggerDoorTrunk(!doorTrunk); send(doorTrunk ? 'trunk_close' : 'trunk_open'); }}
-                                sx={{ border: '1px solid #1e2d45' }}>
+                                sx={{ border: '1px solid var(--lm-line)' }}>
                                 {I18n.t('Trunk')} {doorTrunk ? I18n.t('Close') : I18n.t('Open')}
                             </Button>
                         </Grid>
                         <Grid size={{ xs: 6, sm: 4 }}>
-                            <Button fullWidth startIcon={<LocationSearchingIcon />} onClick={() => send('find')} sx={{ border: '1px solid #1e2d45' }}>
+                            <Button fullWidth startIcon={<LocationSearchingIcon />} onClick={() => send('find')} sx={{ border: '1px solid var(--lm-line)' }}>
                                 {I18n.t('Locate Vehicle')}
                             </Button>
                         </Grid>
@@ -578,54 +596,54 @@ export default function DashboardTab({ base, states, setState }) {
 
             {/* Comfort (Sentry Mode, Speed Limit, Seat Heat etc.) */}
             {(can('sentryMode') || can('speedLimit') || can('seatHeat') || can('steeringWheelHeat') || can('mirrorHeat')) && (
-            <Card sx={{ mb: 2, bgcolor: '#0d1520', border: '1px solid #1e2d45' }}>
+            <Card >
                 <CardContent>
                     <SectionLabel>{I18n.t('COMFORT')}</SectionLabel>
                     <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                         {can('sentryMode') && (
-                            <Button size="small" onClick={() => send('sentry_mode_on')} sx={{ border: '1px solid #1e2d45' }}>
+                            <Button size="small" onClick={() => send('sentry_mode_on')} sx={{ border: '1px solid var(--lm-line)' }}>
                                 {I18n.t('Sentry Mode On')}
                             </Button>
                         )}
                         {can('sentryMode') && (
-                            <Button size="small" onClick={() => send('sentry_mode_off')} sx={{ border: '1px solid #1e2d45' }}>
+                            <Button size="small" onClick={() => send('sentry_mode_off')} sx={{ border: '1px solid var(--lm-line)' }}>
                                 {I18n.t('Sentry Mode Off')}
                             </Button>
                         )}
                         {can('steeringWheelHeat') && (
-                            <Button size="small" onClick={() => send('steering_wheel_heat_on')} sx={{ border: '1px solid #1e2d45' }}>
+                            <Button size="small" onClick={() => send('steering_wheel_heat_on')} sx={{ border: '1px solid var(--lm-line)' }}>
                                 {I18n.t('Steering Wheel Heat On')}
                             </Button>
                         )}
                         {can('steeringWheelHeat') && (
-                            <Button size="small" onClick={() => send('steering_wheel_heat_off')} sx={{ border: '1px solid #1e2d45' }}>
+                            <Button size="small" onClick={() => send('steering_wheel_heat_off')} sx={{ border: '1px solid var(--lm-line)' }}>
                                 {I18n.t('Steering Wheel Heat Off')}
                             </Button>
                         )}
                         {can('mirrorHeat') && (
-                            <Button size="small" onClick={() => send('mirror_heat_on')} sx={{ border: '1px solid #1e2d45' }}>
+                            <Button size="small" onClick={() => send('mirror_heat_on')} sx={{ border: '1px solid var(--lm-line)' }}>
                                 {I18n.t('Mirror/Rear Window Heat On')}
                             </Button>
                         )}
                         {can('mirrorHeat') && (
-                            <Button size="small" onClick={() => send('mirror_heat_off')} sx={{ border: '1px solid #1e2d45' }}>
+                            <Button size="small" onClick={() => send('mirror_heat_off')} sx={{ border: '1px solid var(--lm-line)' }}>
                                 {I18n.t('Mirror/Rear Window Heat Off')}
                             </Button>
                         )}
                     </Box>
                     {can('speedLimit') && (
                         <Box sx={{ mt: 2 }}>
-                            <Typography variant="caption" sx={{ color: '#5a7090', display: 'block', mb: 0.5 }}>{I18n.t('Speed Limit (0 = off)')}</Typography>
+                            <Typography variant="caption" sx={{ color: 'var(--lm-muted)', display: 'block', mb: 0.5 }}>{I18n.t('Speed Limit (0 = off)')}</Typography>
                             <input type="number" min="0" max="150" defaultValue={0}
                                 onBlur={(e) => setState(`${base}.cmd.speed_limit_set`, Number(e.target.value))}
-                                style={{ width: '100%', padding: '8px', borderRadius: 6, border: '1px solid #1e2d45', background: '#070d1a', color: '#c8ddf0', fontSize: '0.95rem' }}
+                                style={{ width: '100%', padding: '8px', borderRadius: 6, border: '1px solid var(--lm-line)', background: 'var(--lm-sunken)', color: 'var(--lm-text)', fontSize: '0.95rem' }}
                             />
                         </Box>
                     )}
                     {can('seatHeat') && (
                         <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
                             {[0, 1, 2, 3].map((lvl) => (
-                                <Button key={lvl} size="small" onClick={() => setState(`${base}.cmd.seat_heat_driver`, lvl)} sx={{ minWidth: 0, flex: 1, border: '1px solid #1e2d45' }}>
+                                <Button key={lvl} size="small" onClick={() => setState(`${base}.cmd.seat_heat_driver`, lvl)} sx={{ minWidth: 0, flex: 1, border: '1px solid var(--lm-line)' }}>
                                     {I18n.t('Seat Heat')} {lvl}
                                 </Button>
                             ))}
@@ -637,7 +655,7 @@ export default function DashboardTab({ base, states, setState }) {
 
             {/* Connectivity */}
             {can('hotspot') && (
-            <Card sx={{ mb: 2, bgcolor: '#0d1520', border: '1px solid #1e2d45' }}>
+            <Card >
                 <CardContent>
                     <SectionLabel>{I18n.t('CONNECTIVITY')}</SectionLabel>
                     <Button
@@ -645,9 +663,9 @@ export default function DashboardTab({ base, states, setState }) {
                         startIcon={hotspotOn ? <WifiIcon /> : <WifiOffIcon />}
                         onClick={() => { triggerHotspot(!hotspotOn); send(hotspotOn ? 'hotspot_off' : 'hotspot_on'); }}
                         sx={{
-                            color: hotspotOn ? '#070d1a' : '#00d4ff',
-                            bgcolor: hotspotOn ? '#00d4ff' : 'transparent',
-                            border: '1px solid #1e2d45',
+                            color: hotspotOn ? 'var(--lm-ink)' : 'var(--lm-accent)',
+                            bgcolor: hotspotOn ? 'var(--lm-accent)' : 'transparent',
+                            border: '1px solid var(--lm-line)',
                             transition: 'background-color 0.15s',
                         }}
                     >
@@ -657,7 +675,8 @@ export default function DashboardTab({ base, states, setState }) {
             </Card>
             )}
 
-            <Button fullWidth startIcon={<RefreshIcon />} onClick={() => send('refresh')} sx={{ border: '1px solid #1e2d45' }}>
+            </Box>
+            <Button fullWidth startIcon={<RefreshIcon />} onClick={() => send('refresh')} sx={{ border: '1px solid var(--lm-line)' }}>
                 {I18n.t('Refresh Status')}
             </Button>
         </Box>
@@ -674,7 +693,7 @@ function TempSlider({ value, onCommit }) {
             max={30}
             onChange={(_, v) => setLocal(v)}
             onChangeCommitted={(_, v) => onCommit(v)}
-            sx={{ ml: 2, color: '#00d4ff' }}
+            sx={{ ml: 2, color: 'var(--lm-accent)' }}
         />
     );
 }
@@ -691,7 +710,7 @@ function FanSlider({ value, max = 7, onCommit }) {
             marks
             onChange={(_, v) => setLocal(v)}
             onChangeCommitted={(_, v) => onCommit(v)}
-            sx={{ color: '#00d4ff' }}
+            sx={{ color: 'var(--lm-accent)' }}
         />
     );
 }
@@ -702,8 +721,8 @@ function ChargeLimitSlider({ value, onCommit }) {
     return (
         <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                <Typography variant="caption" sx={{ color: '#5a7090' }}>{I18n.t('Charge Limit')}</Typography>
-                <Typography variant="caption" sx={{ color: '#00ff88', fontWeight: 700 }}>{local}%</Typography>
+                <Typography variant="caption" sx={{ color: 'var(--lm-muted)' }}>{I18n.t('Charge Limit')}</Typography>
+                <Typography variant="caption" sx={{ color: 'var(--lm-ok)', fontWeight: 700 }}>{local}%</Typography>
             </Box>
             <Slider
                 value={local}
@@ -713,7 +732,7 @@ function ChargeLimitSlider({ value, onCommit }) {
                 marks
                 onChange={(_, v) => setLocal(v)}
                 onChangeCommitted={(_, v) => onCommit(v)}
-                sx={{ color: '#00ff88' }}
+                sx={{ color: 'var(--lm-ok)' }}
             />
         </Box>
     );

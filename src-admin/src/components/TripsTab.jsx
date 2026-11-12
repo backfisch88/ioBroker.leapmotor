@@ -27,8 +27,8 @@ function RouteMap({ points }) {
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
         }).addTo(map);
-        const line = L.polyline(points, { color: '#00d4ff', weight: 3 }).addTo(map);
-        L.circleMarker(points[0], { radius: 5, color: '#00ff88', fillOpacity: 1 }).addTo(map);
+        const line = L.polyline(points, { color: 'var(--lm-accent)', weight: 3 }).addTo(map);
+        L.circleMarker(points[0], { radius: 5, color: 'var(--lm-ok)', fillOpacity: 1 }).addTo(map);
         L.circleMarker(points[points.length - 1], { radius: 5, color: '#ff5566', fillOpacity: 1 }).addTo(map);
         map.fitBounds(line.getBounds(), { padding: [12, 12] });
         return () => { map.remove(); mapRef.current = null; };
@@ -43,7 +43,7 @@ function val(states, id, def = null) {
 
 function SectionLabel({ children }) {
     return (
-        <Typography variant="overline" sx={{ color: '#5a7090', letterSpacing: 1.2, display: 'block', mb: 1.5 }}>
+        <Typography variant="overline" sx={{ color: 'var(--lm-muted)', letterSpacing: 1.2, display: 'block', mb: 1.5 }}>
             {children}
         </Typography>
     );
@@ -116,22 +116,22 @@ export default function TripsTab({ base, states, setState }) {
         <Box>
             <ExportPanel base={base} states={states} />
             {/* Overview at the top */}
-            <Card sx={{ mb: 2, bgcolor: '#0d1520', border: '1px solid #1e2d45' }}>
+            <Card sx={{ mb: 2, bgcolor: 'var(--lm-surface)', border: '1px solid var(--lm-line)' }}>
                 <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
                     <SectionLabel>{I18n.t('TRIP OVERVIEW')}</SectionLabel>
                     <Box sx={{ display: 'flex', gap: 2 }}>
                         <Box sx={{ flex: 1, textAlign: 'center' }}>
-                            <Typography sx={{ fontSize: '1.6rem', fontWeight: 800, color: '#00d4ff' }}>
+                            <Typography sx={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--lm-accent)' }}>
                                 {todayKm} km
                             </Typography>
-                            <Typography variant="caption" sx={{ color: '#5a7090' }}>{I18n.t('Today')}</Typography>
+                            <Typography variant="caption" sx={{ color: 'var(--lm-muted)' }}>{I18n.t('Today')}</Typography>
                         </Box>
-                        <Divider orientation="vertical" flexItem sx={{ borderColor: '#1e2d45' }} />
+                        <Divider orientation="vertical" flexItem sx={{ borderColor: 'var(--lm-line)' }} />
                         <Box sx={{ flex: 1, textAlign: 'center' }}>
-                            <Typography sx={{ fontSize: '1.6rem', fontWeight: 800, color: '#00ff88' }}>
+                            <Typography sx={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--lm-ok)' }}>
                                 {weekTotal} km
                             </Typography>
-                            <Typography variant="caption" sx={{ color: '#5a7090' }}>{I18n.t('Last 7 days')}</Typography>
+                            <Typography variant="caption" sx={{ color: 'var(--lm-muted)' }}>{I18n.t('Last 7 days')}</Typography>
                         </Box>
                     </Box>
                     {currentTripActive && (
@@ -139,7 +139,7 @@ export default function TripsTab({ base, states, setState }) {
                             icon={<DirectionsCarIcon sx={{ fontSize: 16 }} />}
                             label={I18n.t('Trip in progress')}
                             size="small"
-                            sx={{ mt: 1.5, bgcolor: '#00d4ff22', color: '#00d4ff', border: '1px solid #00d4ff55' }}
+                            sx={{ mt: 1.5, bgcolor: 'color-mix(in srgb, var(--lm-accent) 14%, transparent)', color: 'var(--lm-accent)', border: '1px solid color-mix(in srgb, var(--lm-accent) 33%, transparent)' }}
                         />
                     )}
                 </CardContent>
@@ -147,39 +147,39 @@ export default function TripsTab({ base, states, setState }) {
 
             {/* Daily list */}
             {days.length === 0 ? (
-                <Typography sx={{ color: '#5a7090', textAlign: 'center', mt: 4 }}>
+                <Typography sx={{ color: 'var(--lm-muted)', textAlign: 'center', mt: 4 }}>
                     {I18n.t('No trip data recorded yet.')}
                 </Typography>
             ) : (
                 days.map((day) => {
                     const isExpanded = expandedDay === day.date;
                     return (
-                        <Card key={day.date} sx={{ mb: 1.5, bgcolor: '#0d1520', border: '1px solid #1e2d45' }}>
+                        <Card key={day.date} sx={{ mb: 1.5, bgcolor: 'var(--lm-surface)', border: '1px solid var(--lm-line)' }}>
                             <CardContent
                                 sx={{ cursor: 'pointer', '&:last-child': { pb: 2 } }}
                                 onClick={() => setExpandedDay(isExpanded ? null : day.date)}
                             >
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <Box>
-                                        <Typography sx={{ fontWeight: 700, color: '#c8ddf0' }}>
+                                        <Typography sx={{ fontWeight: 700, color: 'var(--lm-text)' }}>
                                             {fmtDateLong(day.date)}
                                         </Typography>
-                                        <Typography variant="caption" sx={{ color: '#5a7090' }}>
+                                        <Typography variant="caption" sx={{ color: 'var(--lm-muted)' }}>
                                             {day.trips.length} {day.trips.length === 1 ? I18n.t('trip detected') : I18n.t('trips detected')}
                                         </Typography>
                                     </Box>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <Typography sx={{ fontWeight: 800, fontSize: '1.1rem', color: '#00d4ff' }}>
+                                        <Typography sx={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--lm-accent)' }}>
                                             {day.totalKm} km
                                         </Typography>
-                                        <IconButton size="small" sx={{ color: '#5a7090' }}>
+                                        <IconButton size="small" sx={{ color: 'var(--lm-muted)' }}>
                                             {isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                                         </IconButton>
                                     </Box>
                                 </Box>
 
                                 <Collapse in={isExpanded}>
-                                    <Divider sx={{ borderColor: '#1e2d45', my: 1.5 }} />
+                                    <Divider sx={{ borderColor: 'var(--lm-line)', my: 1.5 }} />
                                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                                         {day.trips.map((trip, i) => {
                                             const startClock = (trip.startTime.split(', ')[1] || trip.startTime).slice(0, 5);
@@ -193,8 +193,8 @@ export default function TripsTab({ base, states, setState }) {
                                                 <Box
                                                     key={i}
                                                     sx={{
-                                                        bgcolor: '#070d1a', borderRadius: 1.5, px: 1.5, py: 1,
-                                                        border: '1px solid #1e2d4555',
+                                                        bgcolor: 'var(--lm-sunken)', borderRadius: 1.5, px: 1.5, py: 1,
+                                                        border: '1px solid color-mix(in srgb, var(--lm-line) 33%, transparent)',
                                                         display: 'flex', flexDirection: 'column', gap: 0.5,
                                                     }}
                                                 >
@@ -202,8 +202,8 @@ export default function TripsTab({ base, states, setState }) {
                                                         <Box
                                                             sx={{
                                                                 display: 'flex', alignItems: 'center', gap: 0.5,
-                                                                cursor: 'pointer', color: '#5a7090', mb: 0.5,
-                                                                '&:hover': { color: '#00d4ff' },
+                                                                cursor: 'pointer', color: 'var(--lm-muted)', mb: 0.5,
+                                                                '&:hover': { color: 'var(--lm-accent)' },
                                                             }}
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
@@ -220,8 +220,8 @@ export default function TripsTab({ base, states, setState }) {
                                                         <Box
                                                             sx={{
                                                                 display: 'flex', alignItems: 'center', gap: 0.5,
-                                                                cursor: 'pointer', color: '#5a7090', mb: 0.5,
-                                                                '&:hover': { color: '#00d4ff' },
+                                                                cursor: 'pointer', color: 'var(--lm-muted)', mb: 0.5,
+                                                                '&:hover': { color: 'var(--lm-accent)' },
                                                             }}
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
@@ -236,21 +236,21 @@ export default function TripsTab({ base, states, setState }) {
                                                     )}
                                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                            <DirectionsCarIcon sx={{ fontSize: 16, color: '#00d4ff' }} />
-                                                            <Typography variant="caption" sx={{ color: '#c8ddf0' }}>
+                                                            <DirectionsCarIcon sx={{ fontSize: 16, color: 'var(--lm-accent)' }} />
+                                                            <Typography variant="caption" sx={{ color: 'var(--lm-text)' }}>
                                                                 {startClock} – {endClock}
                                                             </Typography>
                                                         </Box>
                                                         <Box sx={{ display: 'flex', gap: 1.5 }}>
-                                                            <Typography variant="caption" sx={{ color: '#5a7090' }}>
+                                                            <Typography variant="caption" sx={{ color: 'var(--lm-muted)' }}>
                                                                 {trip.durationMin} min
                                                             </Typography>
                                                             {trip.socUsed != null && (
-                                                                <Typography variant="caption" sx={{ color: '#ff9900' }}>
+                                                                <Typography variant="caption" sx={{ color: 'var(--lm-warn)' }}>
                                                                     -{trip.socUsed}% {I18n.t('battery')}
                                                                 </Typography>
                                                             )}
-                                                            <Typography variant="caption" sx={{ color: '#00ff88', fontWeight: 700 }}>
+                                                            <Typography variant="caption" sx={{ color: 'var(--lm-ok)', fontWeight: 700 }}>
                                                                 {trip.km} km
                                                             </Typography>
                                                         </Box>
@@ -258,17 +258,17 @@ export default function TripsTab({ base, states, setState }) {
                                                     {(trip.tempMinC != null || trip.elevGainM != null || trip.regenKwh != null) && (
                                                         <Box sx={{ display: 'flex', gap: 1.5, pl: 3 }}>
                                                             {trip.tempMinC != null && (
-                                                                <Typography variant="caption" sx={{ color: '#5a7090', fontSize: '0.7rem' }}>
+                                                                <Typography variant="caption" sx={{ color: 'var(--lm-muted)', fontSize: '0.7rem' }}>
                                                                     🌡️ {trip.tempMinC === trip.tempMaxC ? `${trip.tempMinC}°C` : `${trip.tempMinC}–${trip.tempMaxC}°C`}
                                                                 </Typography>
                                                             )}
                                                             {trip.elevGainM != null && trip.elevGainM !== 0 && (
-                                                                <Typography variant="caption" sx={{ color: '#5a7090', fontSize: '0.7rem' }}>
+                                                                <Typography variant="caption" sx={{ color: 'var(--lm-muted)', fontSize: '0.7rem' }}>
                                                                     {trip.elevGainM > 0 ? '⬆️' : '⬇️'} {Math.abs(trip.elevGainM)} m
                                                                 </Typography>
                                                             )}
                                                             {trip.regenKwh != null && (
-                                                                <Typography variant="caption" sx={{ color: '#00ff88', fontSize: '0.7rem' }}>
+                                                                <Typography variant="caption" sx={{ color: 'var(--lm-ok)', fontSize: '0.7rem' }}>
                                                                     ♻️ {trip.regenKwh} kWh {I18n.t('regen')}
                                                                 </Typography>
                                                             )}
@@ -276,27 +276,27 @@ export default function TripsTab({ base, states, setState }) {
                                                     )}
                                                     {trip.energyOfficial && (
                                                         <Box sx={{ display: 'flex', gap: 1.5, pl: 3 }}>
-                                                            <Typography variant="caption" sx={{ color: '#3a5070', fontSize: '0.7rem' }}>
+                                                            <Typography variant="caption" sx={{ color: 'var(--lm-muted)', fontSize: '0.7rem' }}>
                                                                 🔋 {I18n.t('Official energy split')}:
                                                             </Typography>
-                                                            <Typography variant="caption" sx={{ color: '#00d4ff', fontSize: '0.7rem' }}>
+                                                            <Typography variant="caption" sx={{ color: 'var(--lm-accent)', fontSize: '0.7rem' }}>
                                                                 {I18n.t('Driving')} {trip.energyDrivingKwh} kWh
                                                             </Typography>
-                                                            <Typography variant="caption" sx={{ color: '#a090ff', fontSize: '0.7rem' }}>
+                                                            <Typography variant="caption" sx={{ color: 'var(--lm-accent)', fontSize: '0.7rem' }}>
                                                                 {I18n.t('Climate')} {trip.energyAcKwh} kWh
                                                             </Typography>
-                                                            <Typography variant="caption" sx={{ color: '#5a7090', fontSize: '0.7rem' }}>
+                                                            <Typography variant="caption" sx={{ color: 'var(--lm-muted)', fontSize: '0.7rem' }}>
                                                                 {I18n.t('Other')} {trip.energyOtherKwh} kWh
                                                             </Typography>
                                                         </Box>
                                                     )}
                                                     {trip.energyPending && (
-                                                        <Typography variant="caption" sx={{ color: '#5a7090', fontSize: '0.7rem', pl: 3, fontStyle: 'italic' }}>
+                                                        <Typography variant="caption" sx={{ color: 'var(--lm-muted)', fontSize: '0.7rem', pl: 3, fontStyle: 'italic' }}>
                                                             ⏳ {I18n.t('Official energy data not yet available from the cloud')}
                                                         </Typography>
                                                     )}
                                                     {trip.energyUnavailable && (
-                                                        <Typography variant="caption" sx={{ color: '#5a7090', fontSize: '0.7rem', pl: 3, fontStyle: 'italic' }}>
+                                                        <Typography variant="caption" sx={{ color: 'var(--lm-muted)', fontSize: '0.7rem', pl: 3, fontStyle: 'italic' }}>
                                                             ⚠️ {I18n.t('Official energy data unavailable for this trip')}
                                                         </Typography>
                                                     )}
@@ -310,17 +310,17 @@ export default function TripsTab({ base, states, setState }) {
                                             <Box
                                                 sx={{
                                                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                                                    bgcolor: '#070d1a', borderRadius: 1.5, px: 1.5, py: 1,
-                                                    border: '1px dashed #5a709055',
+                                                    bgcolor: 'var(--lm-sunken)', borderRadius: 1.5, px: 1.5, py: 1,
+                                                    border: '1px dashed color-mix(in srgb, var(--lm-muted) 33%, transparent)',
                                                 }}
                                             >
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                    <HelpOutlineIcon sx={{ fontSize: 16, color: '#5a7090' }} />
-                                                    <Typography variant="caption" sx={{ color: '#5a7090' }}>
+                                                    <HelpOutlineIcon sx={{ fontSize: 16, color: 'var(--lm-muted)' }} />
+                                                    <Typography variant="caption" sx={{ color: 'var(--lm-muted)' }}>
                                                         {I18n.t('Other (untracked trips)')}
                                                     </Typography>
                                                 </Box>
-                                                <Typography variant="caption" sx={{ color: '#5a7090', fontWeight: 700 }}>
+                                                <Typography variant="caption" sx={{ color: 'var(--lm-muted)', fontWeight: 700 }}>
                                                     {day.otherKm} km
                                                 </Typography>
                                             </Box>
@@ -333,7 +333,7 @@ export default function TripsTab({ base, states, setState }) {
                 })
             )}
 
-            <Typography variant="caption" sx={{ color: '#5a7090', display: 'block', textAlign: 'center', mt: 2 }}>
+            <Typography variant="caption" sx={{ color: 'var(--lm-muted)', display: 'block', textAlign: 'center', mt: 2 }}>
                 {I18n.t('Trips are detected every 5 minutes based on speed. Very short trips between two polls may show up as "Other" instead of being recorded as an individual trip.')}
             </Typography>
         </Box>
