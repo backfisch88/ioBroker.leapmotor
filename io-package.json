@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "leapmotor",
-        "version": "0.8.1",
+        "version": "0.8.2",
         "news": {
+            "0.8.2": {
+                "en": "Admin start shows a spinner while loading and remembers the last vehicle; connection debug lines only shown on error.",
+                "de": "Admin-Start zeigt beim Laden einen Spinner und merkt sich das letzte Fahrzeug; Debug-Zeilen der Verbindung nur noch bei Fehler.",
+                "es": "Admin start shows a spinner while loading and remembers the last vehicle; connection debug lines only shown on error.",
+                "fr": "Admin start shows a spinner while loading and remembers the last vehicle; connection debug lines only shown on error.",
+                "it": "Admin start shows a spinner while loading and remembers the last vehicle; connection debug lines only shown on error.",
+                "nl": "Admin start shows a spinner while loading and remembers the last vehicle; connection debug lines only shown on error.",
+                "pl": "Admin start shows a spinner while loading and remembers the last vehicle; connection debug lines only shown on error.",
+                "pt": "Admin start shows a spinner while loading and remembers the last vehicle; connection debug lines only shown on error.",
+                "ru": "Admin start shows a spinner while loading and remembers the last vehicle; connection debug lines only shown on error.",
+                "uk": "Admin start shows a spinner while loading and remembers the last vehicle; connection debug lines only shown on error.",
+                "zh-cn": "Admin start shows a spinner while loading and remembers the last vehicle; connection debug lines only shown on error."
+            },
             "0.8.1": {
                 "en": "Faster start of the admin page (vehicles are read from the adapter's states instead of loading every object of the system).",
                 "de": "Schnellerer Start der Admin-Seite (Fahrzeuge werden aus den States des Adapters gelesen statt alle Objekte des Systems zu laden).",

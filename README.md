@@ -176,6 +176,8 @@ Which comfort commands actually appear depends on the detected vehicle model —
 ## Changelog
 
 ### **WORK IN PROGRESS**
+
+### 0.8.2 (2026-11-12)
 - (backfisch88) Changed: connection debug lines only shown on error
 - (backfisch88) Changed: admin start shows a spinner instead of "No vehicle found" while loading, remembers the last selected vehicle
 
