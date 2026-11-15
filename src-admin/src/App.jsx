@@ -4,7 +4,7 @@ import {
     Typography, GlobalStyles, CircularProgress, Alert,
     Select, MenuItem,
 } from '@mui/material';
-import { I18n } from '@iobroker/adapter-react-v5';
+import { I18n, Utils } from '@iobroker/adapter-react-v5';
 
 import { useConnection } from './useConnection';
 import DashboardTab from './components/DashboardTab';
@@ -14,36 +14,33 @@ import DiagnosticsTab from './components/DiagnosticsTab';
 import TripsTab from './components/TripsTab';
 import SettingsTab from './components/SettingsTab';
 
-// Theme folgt dem ioBroker-Admin (localStorage "App.themeName" bzw. URL-Parameter
-// "react"), sonst dem System.
-function detectThemeType() {
-    const lum = (c) => {
-        const m = /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/.exec(c || '');
-        if (!m || (m[4] !== undefined && Number(m[4]) === 0)) return null;
-        return (0.2126 * m[1] + 0.7152 * m[2] + 0.0722 * m[3]) / 255;
-    };
-    // 1. Tatsächliche Hintergrundfarbe des ioBroker-Admins (gleiche Origin, daher lesbar)
-    try {
-        const pd = window.parent && window.parent !== window ? window.parent.document : null;
-        if (pd) {
-            for (const el of [pd.body, pd.documentElement, pd.getElementById('root')]) {
-                const l = el ? lum(window.parent.getComputedStyle(el).backgroundColor) : null;
-                if (l !== null) return l < 0.5 ? 'dark' : 'light';
-            }
-        }
-    } catch { /* ignore */ }
-    // 2. Gespeichertes Admin-Theme
-    let name = '';
-    try {
-        const ls = window.localStorage;
-        name = ls.getItem('App.themeType') || ls.getItem('App.themeName') || ls.getItem('App.theme') || '';
-    } catch { /* ignore */ }
-    if (!name) {
-        try { name = new URLSearchParams(window.location.search).get('react') || ''; } catch { /* ignore */ }
-    }
-    if (name === 'dark' || name === 'blue') return 'dark';
-    if (name === 'light' || name === 'colored') return 'light';
+// Theme wie bei allen ioBroker-React-Adaptern: Name aus Utils.getThemeName()
+// (localStorage "App.themeName" des Admins, sonst Systemeinstellung). Der Admin
+// meldet Wechsel per postMessage "updateTheme" an den Tab.
+function readThemeType() {
+    try { return Utils.getThemeType(Utils.getThemeName()); } catch { /* ignore */ }
     return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+function useThemeType() {
+    const [type, setType] = useState(readThemeType);
+    useEffect(() => {
+        const update = () => setType(readThemeType());
+        const onMessage = (e) => {
+            const d = e && e.data;
+            if (d === 'updateTheme' || (d && typeof d === 'object' && d.type === 'updateTheme')) update();
+        };
+        window.addEventListener('message', onMessage);
+        window.addEventListener('storage', update);
+        const mq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+        if (mq && mq.addEventListener) mq.addEventListener('change', update);
+        return () => {
+            window.removeEventListener('message', onMessage);
+            window.removeEventListener('storage', update);
+            if (mq && mq.removeEventListener) mq.removeEventListener('change', update);
+        };
+    }, []);
+    return type;
 }
 
 const TOKENS = {
@@ -115,7 +112,7 @@ export default function App() {
         I18n.setLanguage(systemLanguage);
     }
     const [tab, setTab] = useState(0);
-    const themeType = useMemo(detectThemeType, []);
+    const themeType = useThemeType();
     const theme = useMemo(() => buildTheme(themeType), [themeType]);
     const [vins, setVins] = useState([]);
     const [selectedVin, setSelectedVin] = useState(() => {
