@@ -23,18 +23,20 @@
       "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12
     },
     "appCert": {
-      "type": "textarea",
+      "type": "text",
       "label": "App certificate (PEM)",
       "help": "Content of app.crt - required, see README (App certificate) for where to get it",
-      "rows": 6,
+      "minRows": 6,
+      "maxRows": 10,
       "newLine": true,
       "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12
     },
     "appKey": {
-      "type": "textarea",
+      "type": "text",
       "label": "App private key (PEM)",
       "help": "Content of app.key - required, stored encrypted",
-      "rows": 6,
+      "minRows": 6,
+      "maxRows": 10,
       "newLine": true,
       "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12
     },

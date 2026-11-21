@@ -189,6 +189,9 @@ Which comfort commands actually appear depends on the detected vehicle model —
 
 ### **WORK IN PROGRESS**
 
+### 0.9.2 (2026-11-21)
+- (backfisch88) Fix: certificate and key fields in the adapter settings were not shown
+
 ### 0.9.1 (2026-11-21)
 - (backfisch88) Fix: certificate and key fields in the adapter settings were not editable
 
@@ -213,9 +216,6 @@ Which comfort commands actually appear depends on the detected vehicle model —
 - (backfisch88) New: optional charging progress notification and public-charger time-limit warning
 - (backfisch88) New: fan speed up to the car's maximum (B10/B05: 9)
 - (backfisch88) Fix: README - T03 charge limit has no effect, charging schedule works
-
-### 0.7.5 (2026-10-25)
-- Fix: boolean status datapoints (climate, locked, doors, ignition, Bluetooth, hotspot, window-open) were written from the raw cloud signal without converting to a real boolean
 
 Older changes can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 
