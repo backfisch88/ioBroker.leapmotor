@@ -1,8 +1,5 @@
 # Older Changelog
 
-## 0.7.5 (2026-10-25)
-- Fix: boolean status datapoints (climate, locked, doors, ignition, Bluetooth, hotspot, window-open) were written from the raw cloud signal without converting to a real boolean
-
 ## 0.7.4 (2026-10-25)
 - Fix: login failed with "Could not open account certificate" for accounts with a very large internal ID (number precision lost in JSON parsing)
 
