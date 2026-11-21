@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "leapmotor",
-        "version": "0.8.3",
+        "version": "0.9.0",
         "news": {
+            "0.9.0": {
+                "en": "Breaking: the app certificate is no longer bundled. Paste app.crt and app.key into the adapter settings (see README).",
+                "de": "Breaking: Das App-Zertifikat wird nicht mehr mitgeliefert. app.crt und app.key in den Adapter-Einstellungen eintragen (siehe README).",
+                "es": "Breaking: the app certificate is no longer bundled. Paste app.crt and app.key into the adapter settings (see README).",
+                "fr": "Breaking: the app certificate is no longer bundled. Paste app.crt and app.key into the adapter settings (see README).",
+                "it": "Breaking: the app certificate is no longer bundled. Paste app.crt and app.key into the adapter settings (see README).",
+                "nl": "Breaking: the app certificate is no longer bundled. Paste app.crt and app.key into the adapter settings (see README).",
+                "pl": "Breaking: the app certificate is no longer bundled. Paste app.crt and app.key into the adapter settings (see README).",
+                "pt": "Breaking: the app certificate is no longer bundled. Paste app.crt and app.key into the adapter settings (see README).",
+                "ru": "Breaking: the app certificate is no longer bundled. Paste app.crt and app.key into the adapter settings (see README).",
+                "uk": "Breaking: the app certificate is no longer bundled. Paste app.crt and app.key into the adapter settings (see README).",
+                "zh-cn": "Breaking: the app certificate is no longer bundled. Paste app.crt and app.key into the adapter settings (see README)."
+            },
             "0.8.3": {
                 "en": "Fix: switching the car on while charging no longer ends the charging session early (no false 'charging finished' message).",
                 "de": "Fix: Einschalten des Autos während des Ladens beendet die Ladesitzung nicht mehr vorzeitig (keine falsche Lade-beendet-Meldung).",
@@ -80,19 +93,6 @@
                 "ru": "Новое: опциональные комфорт-функции для подготовки к поездке/работе (обогрев сиденья водителя, обогрев руля, обогрев лобового стекла с собственным порогом температуры), по умолчанию отключены, так как не у каждой модели есть это оборудование. Исправление: защита от холода солнцезащитной шторки теперь использует собственный, более строгий порог температуры (5°C) вместо общего порога обогрева, который закрывал крышу уже при 14°C. Новое: официальное сравнение истории зарядки, измеренной облаком, на вкладке Диагностика, синхронизируется раз в день (пока только для сравнения). Известное ограничение (T03): команды записи лимита зарядки и графика зарядки не имеют подтверждённого эффекта на этом автомобиле - задокументировано и теперь регистрируется как предупреждение, а не выглядит успешным. Исправление: накопленная стоимость/кВт·ч текущей сессии зарядки теперь сохраняется и восстанавливается после перезапуска адаптера, вместо тихого сброса в 0. Новое: опциональное расширенное уведомление о завершении поездки с общим кВт·ч и разбивкой на движение/климат/прочее, по умолчанию отключено.",
                 "uk": "Нове: опціональні комфорт-функції для підготовки до поїздки/роботи (підігрів сидіння водія, підігрів керма, обігрів лобового скла з власним порогом температури), за замовчуванням вимкнені, оскільки не кожна модель має це обладнання. Виправлення: захист від холоду сонцезахисної шторки тепер використовує власний, суворіший порог температури (5°C) замість загального порогу опалення, який закривав дах уже при 14°C. Нове: офіційне порівняння історії заряджання, вимірюваної хмарою, на вкладці Діагностика, синхронізується раз на день (наразі лише для порівняння). Відоме обмеження (T03): команди запису ліміту заряджання та графіка заряджання не мають підтвердженого ефекту на цьому автомобілі - задокументовано й тепер фіксується як попередження, а не виглядає успішним. Виправлення: накопичена вартість/кВт·год поточної сесії заряджання тепер зберігається й відновлюється після перезапуску адаптера, замість тихого скидання до 0. Нове: опціональне розширене сповіщення про завершення поїздки із загальним кВт·год та розподілом рух/клімат/інше, за замовчуванням вимкнене.",
                 "zh-cn": "新增:为驾驶/上班准备提供可选的舒适附加功能(主驾座椅加热、方向盘加热、低于其独立温度阈值的前挡风玻璃除霜),默认关闭,因为并非所有车型都配备此硬件。修复:遮阳帘防寒保护现在使用独立的、更严格的温度阈值(5°C),而不是通用加热阈值(该阈值在14°C时就已关闭车顶)。新增:诊断选项卡中的官方云端计量充电历史对比,每天同步一次(目前仅供对比)。已知限制(T03):充电限额与充电计划的写入命令在该车辆上没有经过验证的效果 - 已记录,现在会记录为警告而不是看起来成功。修复:正在进行的充电会话累计的费用/kWh现在会在适配器重启后保存并恢复,而不是静默重置为0。新增:可选的扩展行程结束通知,包含总kWh以及行驶/空调/其他的细分,默认关闭。"
-            },
-            "0.7.2": {
-                "en": "New: notification for new vehicle inbox messages (service reminders, recalls, etc.), separate from the existing software-update notification. Fix: outdoor temperature (used for trip min/max temp and Prepare-to-Drive/Work) now falls back to Open-Meteo not just when the vehicle doesn't report a value at all, but also when its reported value has stopped updating (confirmed on T03: the cloud keeps serving the same reading once parked long enough) - same 30min staleness threshold as the existing data-age indicator, and cached for 10min so this never polls Open-Meteo more than necessary. Fix: the Cloud API Language field's help text (and its translations, which didn't exist in any language) referenced settings that had already moved to the Settings tab under old wording.",
-                "de": "Neu: Benachrichtigung bei neuen Fahrzeug-Nachrichten (Service-Erinnerungen, Rückrufe, etc.), getrennt von der bestehenden Software-Update-Benachrichtigung. Fix: die Außentemperatur (genutzt für Fahrt-Min/Max-Temperatur und Prepare-to-Drive/Work) fällt jetzt auf Open-Meteo zurück, nicht nur wenn das Fahrzeug gar keinen Wert meldet, sondern auch wenn der gemeldete Wert nicht mehr aktualisiert wird (bestätigt beim T03: die Cloud liefert nach längerem Parken immer denselben alten Wert) - gleicher 30-Minuten-Schwellwert wie der bestehende Datenalter-Indikator, dabei 10 Minuten gecacht, damit Open-Meteo nicht öfter als nötig abgefragt wird. Fix: der Hilfetext beim Cloud-API-Sprache-Feld (und seine Übersetzungen, die in keiner Sprache existierten) verwies mit veralteter Formulierung auf Einstellungen, die längst in den Settings-Tab umgezogen waren.",
-                "es": "Nuevo: notificación de nuevos mensajes del vehículo (recordatorios de servicio, retiradas, etc.), separada de la notificación de actualización de software existente. Corrección: la temperatura exterior (usada para la temp. mín/máx de trayecto y Preparar para conducir/trabajo) ahora recurre a Open-Meteo no solo cuando el vehículo no reporta ningún valor, sino también cuando el valor reportado ha dejado de actualizarse (confirmado en el T03: la nube sigue sirviendo la misma lectura tras aparcar suficiente tiempo) - mismo umbral de 30 min que el indicador de antigüedad de datos existente, con caché de 10 min para no consultar Open-Meteo más de lo necesario. Corrección: el texto de ayuda del campo de idioma de la API en la nube (y sus traducciones, inexistentes en cualquier idioma) hacía referencia con redacción desactualizada a ajustes ya trasladados a la pestaña Ajustes.",
-                "fr": "Nouveau : notification pour les nouveaux messages du véhicule (rappels d'entretien, rappels constructeur, etc.), distincte de la notification de mise à jour logicielle existante. Correction : la température extérieure (utilisée pour la temp. min/max de trajet et Prêt à conduire/travailler) recourt désormais à Open-Meteo non seulement quand le véhicule ne signale aucune valeur, mais aussi quand la valeur signalée cesse d'être mise à jour (confirmé sur T03 : le cloud continue de renvoyer la même lecture après un stationnement assez long) - même seuil de 30 min que l'indicateur d'ancienneté des données existant, mis en cache 10 min pour ne pas interroger Open-Meteo plus que nécessaire. Correction : le texte d'aide du champ de langue de l'API cloud (et ses traductions, inexistantes dans toutes les langues) faisait référence, avec une formulation obsolète, à des paramètres déjà déplacés vers l'onglet Paramètres.",
-                "it": "Novità: notifica per nuovi messaggi dal veicolo (promemoria di manutenzione, richiami, ecc.), separata dalla notifica di aggiornamento software esistente. Correzione: la temperatura esterna (usata per temp. min/max viaggio e Pronto per guidare/lavorare) ora ricorre a Open-Meteo non solo quando il veicolo non riporta alcun valore, ma anche quando il valore riportato ha smesso di aggiornarsi (confermato su T03: il cloud continua a fornire la stessa lettura dopo un parcheggio sufficientemente lungo) - stessa soglia di 30 min dell'indicatore di età dei dati esistente, con cache di 10 min per non interrogare Open-Meteo più del necessario. Correzione: il testo di aiuto del campo lingua API cloud (e le sue traduzioni, inesistenti in qualsiasi lingua) faceva riferimento, con formulazione obsoleta, a impostazioni già spostate nella scheda Impostazioni.",
-                "nl": "Nieuw: melding bij nieuwe voertuigberichten (servicemeldingen, terugroepacties, enz.), los van de bestaande software-update-melding. Fix: de buitentemperatuur (gebruikt voor rit-min/max-temperatuur en Klaar-om-te-rijden/werken) valt nu terug op Open-Meteo, niet alleen wanneer het voertuig helemaal geen waarde meldt, maar ook wanneer de gemelde waarde niet meer wordt bijgewerkt (bevestigd op T03: de cloud blijft dezelfde meting geven na lang genoeg parkeren) - dezelfde 30min-drempel als de bestaande gegevensleeftijd-indicator, met 10 min cache zodat Open-Meteo niet vaker dan nodig wordt bevraagd. Fix: de hulptekst van het Cloud-API-taalveld (en de vertalingen ervan, die in geen enkele taal bestonden) verwees met verouderde bewoording naar instellingen die al naar het Instellingen-tabblad waren verplaatst.",
-                "pl": "Nowość: powiadomienie o nowych wiadomościach pojazdu (przypomnienia serwisowe, akcje serwisowe itp.), oddzielone od istniejącego powiadomienia o aktualizacji oprogramowania. Poprawka: temperatura zewnętrzna (używana do min/maks temp. przejazdu i Gotowości do jazdy/pracy) korzysta teraz z Open-Meteo nie tylko gdy pojazd w ogóle nie zgłasza wartości, ale też gdy zgłaszana wartość przestała się aktualizować (potwierdzone na T03: chmura wciąż podaje ten sam odczyt po dłuższym postoju) - ten sam próg 30 min co istniejący wskaźnik wieku danych, buforowany 10 min, by nie odpytywać Open-Meteo częściej niż trzeba. Poprawka: tekst pomocy pola języka API chmury (i jego tłumaczenia, nieistniejące w żadnym języku) odwoływał się, z nieaktualnym sformułowaniem, do ustawień już przeniesionych do zakładki Ustawienia.",
-                "pt": "Novo: notificação de novas mensagens do veículo (lembretes de manutenção, recalls, etc.), separada da notificação de atualização de software existente. Correção: a temperatura exterior (usada para temp. mín/máx de viagem e Pronto para conduzir/trabalho) recorre agora ao Open-Meteo não só quando o veículo não reporta nenhum valor, mas também quando o valor reportado deixou de ser atualizado (confirmado no T03: a cloud continua a fornecer a mesma leitura após estacionar tempo suficiente) - mesmo limite de 30 min do indicador de idade dos dados existente, em cache 10 min para não consultar o Open-Meteo mais do que necessário. Correção: o texto de ajuda do campo de idioma da API cloud (e as suas traduções, inexistentes em qualquer idioma) referia-se, com redação desatualizada, a definições já movidas para o separador Definições.",
-                "ru": "Новое: уведомление о новых сообщениях автомобиля (напоминания о сервисе, отзывы и т.д.), отдельно от существующего уведомления об обновлении ПО. Исправление: температура снаружи (используется для мин/макс темп. поездки и подготовки к поездке/работе) теперь переключается на Open-Meteo не только когда автомобиль вообще не сообщает значение, но и когда сообщаемое значение перестаёт обновляться (подтверждено на T03: облако продолжает выдавать то же значение после достаточно долгой стоянки) - тот же порог в 30 минут, что и у существующего индикатора возраста данных, с кэшированием на 10 минут, чтобы не запрашивать Open-Meteo чаще необходимого. Исправление: текст подсказки поля языка облачного API (и его переводы, отсутствовавшие на всех языках) устаревшей формулировкой ссылался на настройки, уже перенесённые на вкладку Настройки.",
-                "uk": "Нове: сповіщення про нові повідомлення автомобіля (нагадування про сервіс, відкликання тощо), окремо від наявного сповіщення про оновлення ПЗ. Виправлення: температура зовні (використовується для мін/макс темп. поїздки та підготовки до поїздки/роботи) тепер переходить на Open-Meteo не лише коли автомобіль взагалі не повідомляє значення, а й коли повідомлене значення перестає оновлюватися (підтверджено на T03: хмара продовжує видавати те саме значення після достатньо довгої стоянки) - той самий поріг 30 хв, що й наявний індикатор віку даних, з кешуванням на 10 хв, щоб не опитувати Open-Meteo частіше за потрібне. Виправлення: текст підказки поля мови хмарного API (та його переклади, відсутні жодною мовою) застарілим формулюванням посилався на налаштування, вже перенесені на вкладку Налаштування.",
-                "zh-cn": "新增:车辆新消息通知(保养提醒、召回等),与现有的软件更新通知分开。修复:车外温度(用于行程最低/最高温度及驾驶/上班准备)现在不仅在车辆完全不上报数值时会切换到Open-Meteo,在上报的数值不再更新时(已在T03上确认:长时间停放后云端持续返回同一读数)也会切换 - 与现有数据新鲜度指标相同的30分钟阈值,并缓存10分钟以避免过度请求Open-Meteo。修复:云端API语言字段的帮助文本(及其在所有语言中都不存在的翻译)使用过时的措辞引用了已迁移至设置选项卡的设置项。"
             }
         },
         "titleLang": {
@@ -167,13 +167,57 @@
                 "de": "Leapmotor"
             },
             "link": "/adapter/leapmotor/tab.html"
-        }
+        },
+        "messages": [
+            {
+                "condition": {
+                    "operand": "and",
+                    "rules": [
+                        "oldVersion<0.9.0",
+                        "newVersion>=0.9.0"
+                    ]
+                },
+                "title": {
+                    "en": "Certificates required",
+                    "de": "Zertifikate erforderlich",
+                    "es": "Certificates required",
+                    "fr": "Certificates required",
+                    "it": "Certificates required",
+                    "nl": "Certificates required",
+                    "pl": "Certificates required",
+                    "pt": "Certificates required",
+                    "ru": "Certificates required",
+                    "uk": "Certificates required",
+                    "zh-cn": "Certificates required"
+                },
+                "text": {
+                    "en": "The app certificate is no longer bundled with the adapter. After this update you must paste the content of app.crt and app.key into the adapter settings (see README, section App certificate), otherwise the adapter will not connect. Continue with the update?",
+                    "de": "Das App-Zertifikat wird nicht mehr mit dem Adapter ausgeliefert. Nach diesem Update musst du den Inhalt von app.crt und app.key in den Adapter-Einstellungen eintragen (siehe README, Abschnitt App certificate), sonst verbindet sich der Adapter nicht. Update fortsetzen?",
+                    "es": "The app certificate is no longer bundled with the adapter. After this update you must paste the content of app.crt and app.key into the adapter settings (see README, section App certificate), otherwise the adapter will not connect. Continue with the update?",
+                    "fr": "The app certificate is no longer bundled with the adapter. After this update you must paste the content of app.crt and app.key into the adapter settings (see README, section App certificate), otherwise the adapter will not connect. Continue with the update?",
+                    "it": "The app certificate is no longer bundled with the adapter. After this update you must paste the content of app.crt and app.key into the adapter settings (see README, section App certificate), otherwise the adapter will not connect. Continue with the update?",
+                    "nl": "The app certificate is no longer bundled with the adapter. After this update you must paste the content of app.crt and app.key into the adapter settings (see README, section App certificate), otherwise the adapter will not connect. Continue with the update?",
+                    "pl": "The app certificate is no longer bundled with the adapter. After this update you must paste the content of app.crt and app.key into the adapter settings (see README, section App certificate), otherwise the adapter will not connect. Continue with the update?",
+                    "pt": "The app certificate is no longer bundled with the adapter. After this update you must paste the content of app.crt and app.key into the adapter settings (see README, section App certificate), otherwise the adapter will not connect. Continue with the update?",
+                    "ru": "The app certificate is no longer bundled with the adapter. After this update you must paste the content of app.crt and app.key into the adapter settings (see README, section App certificate), otherwise the adapter will not connect. Continue with the update?",
+                    "uk": "The app certificate is no longer bundled with the adapter. After this update you must paste the content of app.crt and app.key into the adapter settings (see README, section App certificate), otherwise the adapter will not connect. Continue with the update?",
+                    "zh-cn": "The app certificate is no longer bundled with the adapter. After this update you must paste the content of app.crt and app.key into the adapter settings (see README, section App certificate), otherwise the adapter will not connect. Continue with the update?"
+                },
+                "level": "warn",
+                "buttons": [
+                    "agree",
+                    "cancel"
+                ]
+            }
+        ]
     },
     "native": {
         "email": "",
         "password": "",
         "operationPassword": "",
-        "language": "en-GB"
+        "language": "en-GB",
+        "appCert": "",
+        "appKey": ""
     },
     "objects": [],
     "instanceObjects": [
@@ -201,10 +245,12 @@
     ],
     "protectedNative": [
         "password",
-        "operationPassword"
+        "operationPassword",
+        "appKey"
     ],
     "encryptedNative": [
         "password",
-        "operationPassword"
+        "operationPassword",
+        "appKey"
     ]
 }

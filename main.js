@@ -3,9 +3,7 @@ const utils = require('@iobroker/adapter-core');
 const { LeapmotorClient } = require('./lib/leapmotor-client');
 const axios = require('axios');
 const suncalc = require('suncalc');
-const fs = require('node:fs');
-const path = require('node:path');
-const CERT_DIR = path.join(__dirname, 'certs');
+const crypto = require('node:crypto');
 
 const DEFAULT_BATTERY_CAPACITY_KWH = {
     // Usable (net) capacity of the most common EU variant; other variants can be
@@ -151,6 +149,21 @@ function computeEnergyQueryBeginMs(startTimeMs, history) {
     }
     return startTimeMs - THIRTY_MIN_MS;
 }
+// Accepts a PEM pasted into a text field, even if line breaks got lost or were
+// replaced by "\n" / spaces, and returns a clean PEM (or '' if empty).
+function normalizePem(value) {
+    const text = String(value || '')
+        .replace(/\\n/g, '\n')
+        .replace(/\r/g, '')
+        .trim();
+    const m = /-----BEGIN ([A-Z ]+)-----([\s\S]*?)-----END \1-----/.exec(text);
+    if (!m) {
+        return text;
+    }
+    const body = m[2].replace(/\s+/g, '');
+    return `-----BEGIN ${m[1]}-----\n${body.match(/.{1,64}/g).join('\n')}\n-----END ${m[1]}-----\n`;
+}
+
 class LeapmotorAdapter extends utils.Adapter {
     constructor(options = {}) {
         super({ ...options, name: 'leapmotor' });
@@ -747,12 +760,19 @@ class LeapmotorAdapter extends utils.Adapter {
             this.log.error('Email and password must be configured!');
             return;
         }
-        let appCertPem, appKeyPem;
+        const appCertPem = normalizePem(cfg.appCert);
+        const appKeyPem = normalizePem(cfg.appKey);
+        if (!appCertPem || !appKeyPem) {
+            this.log.error(
+                'App certificate and key are not configured. Paste the content of app.crt and app.key into the adapter settings (see README, "App certificate").',
+            );
+            return;
+        }
         try {
-            appCertPem = fs.readFileSync(path.join(CERT_DIR, 'app.crt'), 'utf8');
-            appKeyPem = fs.readFileSync(path.join(CERT_DIR, 'app.key'), 'utf8');
+            new crypto.X509Certificate(appCertPem);
+            crypto.createPrivateKey(appKeyPem);
         } catch (e) {
-            this.log.error(`Certificates not found: ${e}`);
+            this.log.error(`App certificate or key is invalid: ${e.message}. Check the PEM content in the adapter settings.`);
             return;
         }
         this.client = new LeapmotorClient({

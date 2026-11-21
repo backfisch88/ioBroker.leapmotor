@@ -159,5 +159,9 @@
     "Settings": "Einstellungen",
     "Trips": "Fahrten",
     "Affects Leapmotor cloud API text only (e.g. schedule day names). Does not change the Admin Tab UI language, which follows your ioBroker Admin language setting. Everything else (polling, GPS recording, notifications, electricity prices, home location, Prepare-to-Drive/Work, data retention) has moved to the Settings tab inside the Leapmotor admin tab itself.": "Betrifft nur den Text der Leapmotor-Cloud-API (z.B. Wochentag-Namen im Zeitplan). Ändert nicht die Sprache des Admin-Tabs selbst, die folgt deiner ioBroker-Admin-Spracheinstellung. Alles andere (Polling, GPS-Aufzeichnung, Benachrichtigungen, Strompreise, Heim-Standort, Prepare-to-Drive/Work, Datenaufbewahrung) ist in den Settings-Tab innerhalb des Leapmotor-Admin-Tabs umgezogen.",
-    "Notify on new vehicle message (service reminders, recalls, etc.)": "Bei neuer Fahrzeug-Nachricht benachrichtigen (Service-Erinnerungen, Rückrufe, etc.)"
+    "Notify on new vehicle message (service reminders, recalls, etc.)": "Bei neuer Fahrzeug-Nachricht benachrichtigen (Service-Erinnerungen, Rückrufe, etc.)",
+    "App certificate (PEM)": "App-Zertifikat (PEM)",
+    "Content of app.crt - required, see README (App certificate) for where to get it": "Inhalt von app.crt - erforderlich, Bezugsquelle siehe README (App certificate)",
+    "App private key (PEM)": "Privater App-Schlüssel (PEM)",
+    "Content of app.key - required, stored encrypted": "Inhalt von app.key - erforderlich, wird verschlüsselt gespeichert"
 }

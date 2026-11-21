@@ -22,6 +22,24 @@
       "newLine": true,
       "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12
     },
+    "appCert": {
+      "type": "textarea",
+      "label": "App certificate (PEM)",
+      "help": "Content of app.crt - required, see README (App certificate) for where to get it",
+      "minRows": 4,
+      "maxRows": 8,
+      "newLine": true,
+      "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12
+    },
+    "appKey": {
+      "type": "textarea",
+      "label": "App private key (PEM)",
+      "help": "Content of app.key - required, stored encrypted",
+      "minRows": 4,
+      "maxRows": 8,
+      "newLine": true,
+      "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12
+    },
     "language": {
       "type": "select",
       "label": "Cloud API Language",

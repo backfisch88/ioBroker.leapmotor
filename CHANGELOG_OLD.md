@@ -1,5 +1,12 @@
 # Older Changelog
 
+## 0.7.3 (2026-10-15)
+- New: optional comfort extras for Prepare-to-Drive/Work (seat heat, steering wheel heat, defrost)
+- New: charging session history cross-check (Diagnostics tab)
+- New: optional extended trip-done notification
+- Fix: separate sunshade cold-protection threshold
+- Fix: running charging session restored after restart
+
 ## 0.7.2 (2026-09-24)
 - New: notification for new vehicle inbox messages
 - Fix: outdoor temperature falls back to Open-Meteo when the vehicle value is stale
