@@ -1,5 +1,8 @@
 # Older Changelog
 
+## 0.7.4 (2026-10-25)
+- Fix: login failed with "Could not open account certificate" for accounts with a very large internal ID (number precision lost in JSON parsing)
+
 ## 0.7.3 (2026-10-15)
 - New: optional comfort extras for Prepare-to-Drive/Work (seat heat, steering wheel heat, defrost)
 - New: charging session history cross-check (Diagnostics tab)

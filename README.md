@@ -189,6 +189,9 @@ Which comfort commands actually appear depends on the detected vehicle model —
 
 ### **WORK IN PROGRESS**
 
+### 0.9.1 (2026-11-21)
+- (backfisch88) Fix: certificate and key fields in the adapter settings were not editable
+
 ### 0.9.0 (2026-11-21)
 - (backfisch88) Breaking: the app certificate is no longer bundled. Paste `app.crt` and `app.key` into the adapter settings (see "App certificate")
 
@@ -213,9 +216,6 @@ Which comfort commands actually appear depends on the detected vehicle model —
 
 ### 0.7.5 (2026-10-25)
 - Fix: boolean status datapoints (climate, locked, doors, ignition, Bluetooth, hotspot, window-open) were written from the raw cloud signal without converting to a real boolean
-
-### 0.7.4 (2026-10-25)
-- Fix: login failed with "Could not open account certificate" for accounts with a very large internal ID (number precision lost in JSON parsing)
 
 Older changes can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 
